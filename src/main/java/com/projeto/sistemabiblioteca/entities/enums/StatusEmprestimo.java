@@ -5,5 +5,6 @@ public enum StatusEmprestimo {
 	EM_ANDAMENTO,
 	ATRASADO,
 	DEVOLVIDO,
-	CANCELADO;
+	CANCELADO,
+	EXEMPLAR_PERDIDO;
 }

@@ -6,6 +6,8 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,24 +25,35 @@ public class HistoricoEmprestimo {
 	private String nomePessoa;
 	private long idExemplar;
 	private String tituloExemplar;
-	private LocalDate dtEmprestimo;
-	private LocalDate dtDevolucao;
+	private LocalDate dtInicioEmprestimo;
+	private LocalDate dtRetiradaExemplar;
+	private LocalDate dtDevolucaoPrevista;
+	private LocalDate dtDevolvidoExemplar;
+	
+	@Enumerated(EnumType.STRING)
 	private StatusEmprestimo status;
+	
+	private double multa;
+	
+	@Enumerated(EnumType.STRING)
 	private StatusPagamento statusPagamento;
 	
 	public HistoricoEmprestimo() {
 		
 	}
 
-	public HistoricoEmprestimo(long idPessoa, String nomePessoa, long idExemplar, String tituloExemplar,
-			LocalDate dtEmprestimo, LocalDate dtDevolucao, StatusEmprestimo status, StatusPagamento statusPagamento) {
+	public HistoricoEmprestimo(long idPessoa, String nomePessoa, long idExemplar, String tituloExemplar, LocalDate dtInicioEmprestimo, LocalDate dtRetiradaExemplar, 
+			LocalDate dtDevolucaoPrevista, LocalDate dtDevolvidoExemplar, StatusEmprestimo status, double multa, StatusPagamento statusPagamento) {
 		this.idPessoa = idPessoa;
 		this.nomePessoa = nomePessoa;
 		this.idExemplar = idExemplar;
 		this.tituloExemplar = tituloExemplar;
-		this.dtEmprestimo = dtEmprestimo;
-		this.dtDevolucao = dtDevolucao;
+		this.dtInicioEmprestimo = dtInicioEmprestimo;
+		this.dtRetiradaExemplar = dtRetiradaExemplar;
+		this.dtDevolucaoPrevista = dtDevolucaoPrevista;
+		this.dtDevolvidoExemplar = dtDevolvidoExemplar;
 		this.status = status;
+		this.multa = multa;
 		this.statusPagamento = statusPagamento;
 	}
 
@@ -64,16 +77,28 @@ public class HistoricoEmprestimo {
 		return tituloExemplar;
 	}
 
-	public LocalDate getDtEmprestimo() {
-		return dtEmprestimo;
+	public LocalDate getDtInicioEmprestimo() {
+		return dtInicioEmprestimo;
+	}
+	
+	public LocalDate getDtRetiradaExemplar() {
+		return dtRetiradaExemplar;
 	}
 
-	public LocalDate getDtDevolucao() {
-		return dtDevolucao;
+	public LocalDate getDtDevolucaoPrevista() {
+		return dtDevolucaoPrevista;
+	}
+	
+	public LocalDate getDtDevolvidoExemplar() {
+		return dtDevolvidoExemplar;
 	}
 
 	public StatusEmprestimo getStatus() {
 		return status;
+	}
+	
+	public double getMulta() {
+		return multa;
 	}
 
 	public StatusPagamento getStatusPagamento() {

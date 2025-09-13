@@ -1,6 +1,6 @@
 package com.projeto.sistemabiblioteca.entities.enums;
 
-public enum EstadoExemplar {
+public enum EstadoFisico {
 	MUITO_RUIM,
 	RUIM,
 	BOM,

@@ -1,6 +1,8 @@
 package com.projeto.sistemabiblioteca.entities;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
@@ -23,14 +25,22 @@ public class Emprestimo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private LocalDate dtEmprestimo;
-	private LocalDate dtDevolucao;
+	private LocalDate dtInicioEmprestimo;
+	private LocalDate dtRetiradaExemplar;
+	private LocalDate dtDevolucaoPrevista;
+	private LocalDate dtDevolvidoExemplar;
 	
 	@Enumerated(EnumType.STRING)
 	private StatusEmprestimo status;
 	
+	private double multa;
+	
 	@Enumerated(EnumType.STRING)
 	private StatusPagamento statusPagamento;
+	
+	@ManyToOne
+	@JoinColumn(name = "id_pessoa")
+	private Pessoa pessoa;
 	
 	@ManyToOne
 	@JoinColumn(name = "id_exemplar")
@@ -39,13 +49,39 @@ public class Emprestimo {
 	public Emprestimo() {
 		
 	}
-
-	public Emprestimo(LocalDate dtEmprestimo, LocalDate dtDevolucao, StatusEmprestimo status,
-			StatusPagamento statusPagamento, Exemplar exemplar) {
-		this.dtEmprestimo = dtEmprestimo;
-		setDtDevolucao(dtDevolucao);
-		this.status = status;
-		this.statusPagamento = statusPagamento;
+	
+	/**
+	 * Cria uma instância de empréstimo com o a data de devolução prevista definida automaticamente
+	 * A data de início do empréstimo é definida com a data em que foi instanciado, o status inicia definido 
+	 * como RESERVADO e o statusPagamento como NAO_APLICAVEL.
+	 * 
+	 * @param pessoa
+	 * @param exemplar
+	 */
+	public Emprestimo(Pessoa pessoa, Exemplar exemplar) {
+		dtInicioEmprestimo = LocalDate.now();
+		dtDevolucaoPrevista = calcularDataDeDevolucao();
+		status = StatusEmprestimo.RESERVADO;
+		statusPagamento = StatusPagamento.NAO_APLICAVEL;
+		this.pessoa = pessoa;
+		this.exemplar = exemplar;
+	}
+	
+	/**
+	 * Cria uma instância do empréstimo com data de devolução prevista definida manualmente.
+	 * A data de início do empréstimo é definida com a data em que foi instanciado, o status inicia definido 
+	 * como RESERVADO e o statusPagamento como NAO_APLICAVEL.
+	 * 
+	 * @param dtDevolucaoPrevista
+	 * @param pessoa
+	 * @param exemplar
+	 */
+	public Emprestimo(LocalDate dtDevolucaoPrevista, Pessoa pessoa, Exemplar exemplar) {
+		dtInicioEmprestimo = LocalDate.now();
+		setDtDevolucaoPrevista(dtDevolucaoPrevista);
+		status = StatusEmprestimo.RESERVADO;
+		statusPagamento = StatusPagamento.NAO_APLICAVEL;
+		this.pessoa = pessoa;
 		this.exemplar = exemplar;
 	}
 
@@ -53,39 +89,45 @@ public class Emprestimo {
 		return id;
 	}
 
-	public LocalDate getDtEmprestimo() {
-		return dtEmprestimo;
+	public LocalDate getDtInicioEmprestimo() {
+		return dtInicioEmprestimo;
+	}
+	
+	public LocalDate getDtRetiradaExemplar() {
+		return dtRetiradaExemplar;
 	}
 
-	public void setDtEmprestimo(LocalDate dtEmprestimo) {
-		this.dtEmprestimo = dtEmprestimo;
+	public LocalDate getDtDevolucaoPrevista() {
+		return dtDevolucaoPrevista;
 	}
 
-	public LocalDate getDtDevolucao() {
-		return dtDevolucao;
-	}
-
-	public void setDtDevolucao(LocalDate dtDevolucao) {
-		if (dtDevolucao.isBefore(dtEmprestimo)) {
-			throw new IllegalArgumentException("Erro: A data de devolução é anterior a data de empréstimo.");
+	public void setDtDevolucaoPrevista(LocalDate dtDevolucaoPrevista) {
+		if (dtDevolucaoPrevista.isBefore(dtInicioEmprestimo)) {
+			throw new IllegalArgumentException("Erro: A data de devolução prevista é anterior à data de início do empréstimo.");
 		}
-		this.dtDevolucao = dtDevolucao;
+		else if (dtDevolucaoPrevista.isBefore(LocalDate.now())) {
+			throw new IllegalArgumentException("Erro: A data de devolução prevista não pode ser no passado.");
+		}
+		else if (ChronoUnit.DAYS.between(dtInicioEmprestimo, dtDevolucaoPrevista) >  90) {
+			throw new IllegalArgumentException("Erro: A data de devolução inserida ultrapassou o prazo máximo de 90 dias.");
+		}
+		this.dtDevolucaoPrevista = dtDevolucaoPrevista;
+	}
+	
+	public LocalDate getDtDevolvidoExemplar() {
+		return dtDevolvidoExemplar;
 	}
 
 	public StatusEmprestimo getStatus() {
 		return status;
 	}
 
-	public void setStatus(StatusEmprestimo status) {
-		this.status = status;
-	}
-
 	public StatusPagamento getStatusPagamento() {
 		return statusPagamento;
 	}
-
-	public void setStatusPagamento(StatusPagamento statusPagamento) {
-		this.statusPagamento = statusPagamento;
+	
+	public double getMulta() {
+		return multa;
 	}
 
 	public Exemplar getExemplar() {
@@ -94,5 +136,195 @@ public class Emprestimo {
 
 	public void setExemplar(Exemplar exemplar) {
 		this.exemplar = exemplar;
+	}
+	
+	/**
+	 * Registra a retirada do Exemplar.
+	 * 
+	 * Muda o status para EM_ANDAMENTO e atribui a data atual à variável dtRetiradaExemplar.
+	 */
+	public void retirarExemplar() {
+		if (status == StatusEmprestimo.CANCELADO) {
+			throw new IllegalStateException("Erro: O empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
+		}
+		else if (status != StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: O exemplar já foi retirado.");
+		}
+		
+		status = StatusEmprestimo.EM_ANDAMENTO;
+		dtRetiradaExemplar = LocalDate.now();
+	}
+	
+	/**
+	 * Registra a devolução do exemplar.
+	 * 
+	 * Muda o status para DEVOLVIDO, atribui a data atual à variável dtDevolvidoExemplar
+	 * e muda o status do exemplar para DISPONIVEL.
+	 */
+	public void devolverExemplar() {
+		if (status == StatusEmprestimo.CANCELADO) {
+			throw new IllegalStateException("Erro: O empréstimo foi cancelado anteriormente. Não é possível devolver exemplar.");
+		}
+		else if (status == StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: O exemplar ainda não foi retirado.");
+		}
+		else if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		}
+		
+		status = StatusEmprestimo.DEVOLVIDO;
+		dtDevolvidoExemplar = LocalDate.now();
+		exemplar.devolver();
+	}
+	
+	/**
+	 * Registra a perda do exemplar.
+	 * 
+	 * Muda o status para EXEMPLAR_PERDIDO, chama o método aplicarMultaPorPerda e 
+	 * muda o status do exemplar para PERDIDO.
+	 */
+	public void registrarPerdaDoExemplar() {
+		if (status == StatusEmprestimo.CANCELADO) {
+			throw new IllegalStateException("Erro: O empréstimo foi cancelado anteriormente. Não é possível registrar a perda do exemplar.");
+		}
+		else if (status == StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: O exemplar ainda não foi retirado.");
+		}
+		else if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		}
+		else if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
+			throw new IllegalStateException("Erro: Já foi registrado a perda do exemplar.");
+		}
+		
+		status = StatusEmprestimo.EXEMPLAR_PERDIDO;
+		aplicarMultaPorPerda();
+		exemplar.registrarPerda();
+	}
+	
+	/**
+	 * Registra o atraso do empréstimo.
+	 * 
+	 * Muda o status para ATRASADO, chama o método aplicarMulta e chama o método calcularMultaDiaria.
+	 */
+	public void registrarAtraso() {
+		if (status == StatusEmprestimo.CANCELADO) {
+			throw new IllegalStateException("Erro: O empréstimo já foi cancelado.");
+		}
+		else if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		}
+		else if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
+			throw new IllegalStateException("Erro: O exemplar foi perdido. Não é possível registrar o atraso.");
+		}
+		else if (calcularDiasDeAtraso() <= 0) {
+			throw new IllegalStateException("Erro: O empréstimo ainda não está atrasado.");
+		}
+		else if (status == StatusEmprestimo.ATRASADO) {
+			throw new IllegalStateException("Erro: Já foi registrado o atraso.");
+		}
+		
+		status = StatusEmprestimo.ATRASADO;
+		aplicarMulta();
+		calcularMultaDiaria();
+	}
+	
+	public void cancelarReserva() {
+		if (status == StatusEmprestimo.CANCELADO) {
+			throw new IllegalStateException("Erro: O empréstimo já foi cancelado.");
+		}
+		else if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		}
+		else if (status != StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: O exemplar já foi retirado.");
+		}
+		
+		status = StatusEmprestimo.CANCELADO;
+	}
+	
+	/**
+	 * Aplica multa por perda do exemplar
+	 * 
+	 * Chama o método calcularMultaPorPerda, atribui o resultado na variável multa e
+	 * muda o statusPagamento para PENDENTE.
+	 */
+	public void aplicarMultaPorPerda() {
+		multa = calcularMultaPorPerda();
+		statusPagamento = StatusPagamento.PENDENTE;
+	}
+	
+	public double calcularMultaPorPerda() {
+		return 50.0;
+	}
+	
+	/**
+	 * Aplica multa por atraso.
+	 * 
+	 * Chama o método calcularMultaDiaria, atribui o resultado na variável multa e 
+	 * muda o statusPagamento para PENDENTE.
+	 */
+	public void aplicarMulta() {
+		multa = calcularMultaDiaria();
+		statusPagamento = StatusPagamento.PENDENTE;
+	}
+	
+	public double calcularMultaDiaria() {
+		return 1.0 * calcularDiasDeAtraso();
+	}
+	
+	public void pagarMulta() {
+		if (statusPagamento != StatusPagamento.PENDENTE) {
+			throw new IllegalStateException("Erro: não há multa pendente.");
+		}
+		
+		statusPagamento = StatusPagamento.PAGO;
+	}
+	
+	public void perdoarMulta() {
+		if (statusPagamento == StatusPagamento.NAO_APLICAVEL) {
+			throw new IllegalStateException("Erro: não há multa pendente.");
+		}
+		
+		statusPagamento = StatusPagamento.PERDOADO;
+	}
+	
+	public int calcularDiasDeAtraso() {
+		if (status != StatusEmprestimo.ATRASADO) {
+			throw new IllegalStateException("Erro: não há atraso.");
+		}
+		
+		return (int) ChronoUnit.DAYS.between(dtDevolucaoPrevista, LocalDate.now());
+	}
+	
+	public int calcularDiasDeEmprestimo() {
+		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.EM_ANDAMENTO, StatusEmprestimo.ATRASADO).contains(status)) {
+			throw new IllegalStateException("Erro: o empréstimo não está ativo.");
+		}
+		
+		return (int) ChronoUnit.DAYS.between(dtInicioEmprestimo, LocalDate.now());
+	}
+	
+	public LocalDate calcularDataDeDevolucao() {
+		if (dtDevolucaoPrevista != null) {
+			throw new IllegalStateException("Erro: já tem data de devolução prevista.");
+		}
+		
+		int qtdPaginas = exemplar.getEdicao().getQtdPaginas();
+		if (qtdPaginas <= 100) {
+			return dtInicioEmprestimo.plusDays(9);
+		}
+		else if (qtdPaginas <= 500) {
+			return dtInicioEmprestimo.plusDays(16);
+		}
+		else if (qtdPaginas <= 1000) {
+			return dtInicioEmprestimo.plusDays(23);
+		}
+		else if (qtdPaginas <= 3000){
+			return dtInicioEmprestimo.plusDays(30);
+		}
+		else {
+			return dtInicioEmprestimo.plusDays(37);
+		}
 	}
 }

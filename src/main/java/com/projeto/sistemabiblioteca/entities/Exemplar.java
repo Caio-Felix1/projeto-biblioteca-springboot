@@ -1,6 +1,7 @@
 package com.projeto.sistemabiblioteca.entities;
 
-import com.projeto.sistemabiblioteca.entities.enums.EstadoExemplar;
+import com.projeto.sistemabiblioteca.entities.enums.EstadoFisico;
+import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,10 +21,11 @@ public class Exemplar {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	private boolean alugado;
+	@Enumerated(EnumType.STRING)
+	private StatusExemplar status;
 	
 	@Enumerated(EnumType.STRING)
-	private EstadoExemplar estado;
+	private EstadoFisico estadoFisico;
 	
 	@ManyToOne
 	@JoinColumn(name = "id_edicao")
@@ -33,9 +35,9 @@ public class Exemplar {
 		
 	}
 	
-	public Exemplar(boolean alugado, EstadoExemplar estado, Edicao edicao) {
-		this.alugado = alugado;
-		this.estado = estado;
+	public Exemplar(EstadoFisico estadoFisico, Edicao edicao) {
+		status = StatusExemplar.DISPONIVEL;
+		this.estadoFisico = estadoFisico;
 		this.edicao = edicao;
 	}
 	
@@ -43,20 +45,20 @@ public class Exemplar {
 		return id;
 	}
 
-	public boolean getAlugado() {
-		return alugado;
+	public StatusExemplar getStatus() {
+		return status;
 	}
 
-	public void setAlugado(boolean alugado) {
-		this.alugado = alugado;
+	public void setStatus(StatusExemplar status) {
+		this.status = status;
 	}
 
-	public EstadoExemplar getEstado() {
-		return estado;
+	public EstadoFisico getEstadoFisico() {
+		return estadoFisico;
 	}
-
-	public void setEstado(EstadoExemplar estado) {
-		this.estado = estado;
+	
+	public void setEstadoFisico(EstadoFisico estadoFisico) {
+		this.estadoFisico = estadoFisico;
 	}
 	
 	public Edicao getEdicao() {
@@ -65,5 +67,53 @@ public class Exemplar {
 
 	public void setEdicao(Edicao edicao) {
 		this.edicao = edicao;
+	}
+	
+	public void alugar() {
+		if (status != StatusExemplar.DISPONIVEL) {
+			throw new IllegalStateException("Erro: o exemplar está indisponível.");
+		}
+		
+		status = StatusExemplar.ALUGADO;
+	}
+	
+	public void devolver() {
+		if (status != StatusExemplar.ALUGADO && status != StatusExemplar.PERDIDO) {
+			throw new IllegalStateException("Erro: o exemplar não está alugado ou perdido. Não é possível devolver.");
+		}
+		
+		status = StatusExemplar.DISPONIVEL;
+	}
+	
+	public void registrarPerda() {
+		if (status == StatusExemplar.REMOVIDO) {
+			throw new IllegalStateException("Erro: o exemplar já foi removido. Não é possível registrar a perda.");
+		}
+		
+		status = StatusExemplar.PERDIDO;
+	}
+	
+	public void solicitarExclusao() {
+		if (status != StatusExemplar.DISPONIVEL && status != StatusExemplar.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: o exemplar não está disponível. Não é possível solicitar a exclusão.");
+		}
+		
+		status = StatusExemplar.EM_ANALISE_EXCLUSAO;
+	}
+	
+	public void rejeitarExclusao() {
+		if (status != StatusExemplar.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: o exemplar não está em análise para exclusão.");
+		}
+		
+		status = StatusExemplar.DISPONIVEL;
+	}
+	
+	public void remover() {
+		if (status != StatusExemplar.DISPONIVEL && status != StatusExemplar.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: o exemplar não está disponível. Não é possível remover.");
+		}
+		
+		status = StatusExemplar.REMOVIDO;
 	}
 }

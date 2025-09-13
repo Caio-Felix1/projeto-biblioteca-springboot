@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
+import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,6 +38,9 @@ public class Pessoa {
 	private String email;
 	private String senhaHash;
 	
+	@Enumerated(EnumType.STRING)
+	private StatusConta statusConta;
+	
 	@ManyToOne
 	@JoinColumn(name = "id_endereco")
 	private Endereco endereco;
@@ -46,15 +50,20 @@ public class Pessoa {
 	}
 
 	public Pessoa(String nome, String cpf, Sexo sexo, FuncaoUsuario funcao, LocalDate dtNascimento, 
-			String telefone, String email, String senhaHash, Endereco endereco) {
+			String telefone, String email, String senhaHash, StatusConta statusConta, Endereco endereco) {
+		if (statusConta != StatusConta.EM_ANALISE_APROVACAO && statusConta != StatusConta.ATIVA) {
+			throw new IllegalArgumentException("Erro: cadastro com status da conta inválido.");
+		}
+		
 		this.nome = nome;
 		this.cpf = cpf;
 		this.sexo = sexo;
 		this.funcao = funcao;
 		this.dtNascimento = dtNascimento;
 		this.telefone = telefone;
-		this.email = email;
+		setEmail(email);
 		this.senhaHash = senhaHash;
+		this.statusConta = statusConta;
 		this.endereco = endereco;
 	}
 
@@ -115,6 +124,9 @@ public class Pessoa {
 	}
 
 	public void setEmail(String email) {
+		if (email.matches("[a-z0-9]+@[a-z]+\\.com(\\.br)?")) {
+			throw new IllegalArgumentException("Erro: email no formato inválido.");
+		}
 		this.email = email;
 	}
 
@@ -125,6 +137,10 @@ public class Pessoa {
 	public void setSenhaHash(String senhaHash) {
 		this.senhaHash = senhaHash;
 	}
+	
+	public StatusConta getStatusConta() {
+		return statusConta;
+	}
 
 	public Endereco getEndereco() {
 		return endereco;
@@ -132,5 +148,45 @@ public class Pessoa {
 
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
+	}
+	
+	public void inativarConta() {
+		if (statusConta != StatusConta.ATIVA && statusConta != StatusConta.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: a conta não está ativa ou em análise para exclusão.");
+		}
+		
+		statusConta = StatusConta.INATIVA;
+	}
+	
+	public void aprovarConta() {
+		if (statusConta != StatusConta.EM_ANALISE_APROVACAO) {
+			throw new IllegalStateException("Erro: a conta não está em análise para aprovação do cadastro.");
+		}
+		
+		statusConta = StatusConta.ATIVA;
+	}
+	
+	public void rejeitarConta() {
+		if (statusConta != StatusConta.EM_ANALISE_APROVACAO) {
+			throw new IllegalStateException("Erro: a conta não está em análise para aprovação do cadastro.");
+		}
+		
+		statusConta = StatusConta.REJEITADA;
+	}
+	
+	public void solicitarExclusaoConta() {
+		if (statusConta != StatusConta.ATIVA && statusConta != StatusConta.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: a conta não está ativa.");
+		}
+		
+		statusConta = StatusConta.EM_ANALISE_EXCLUSAO;
+	}
+	
+	public void rejeitarSolicitacaoExclusao() {
+		if (statusConta != StatusConta.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: a conta não está em análise para exclusão.");
+		}
+		
+		statusConta = StatusConta.ATIVA;
 	}
 }
