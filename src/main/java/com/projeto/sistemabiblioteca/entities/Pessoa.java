@@ -1,8 +1,10 @@
 package com.projeto.sistemabiblioteca.entities;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 
-import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
+import com.projeto.sistemabiblioteca.enums.FuncaoPessoa;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 
@@ -15,10 +17,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "tb_pessoa")
-public class Pessoa {
+public class Pessoa implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +36,7 @@ public class Pessoa {
 	private Sexo sexo;
 	
 	@Enumerated(EnumType.STRING)
-	private FuncaoUsuario funcao;
+	private FuncaoPessoa funcao;
 	
 	private LocalDate dtNascimento;
 	private String telefone;
@@ -49,22 +54,29 @@ public class Pessoa {
 		
 	}
 
-	public Pessoa(String nome, String cpf, Sexo sexo, FuncaoUsuario funcao, LocalDate dtNascimento, 
-			String telefone, String email, String senhaHash, StatusConta statusConta, Endereco endereco) {
-		if (statusConta != StatusConta.EM_ANALISE_APROVACAO && statusConta != StatusConta.ATIVA) {
-			throw new IllegalArgumentException("Erro: cadastro com status da conta inválido.");
-		}
-		
-		this.nome = nome;
-		this.cpf = cpf;
-		this.sexo = sexo;
+//	public Pessoa(String nome, String cpf, Sexo sexo, FuncaoPessoa funcao, LocalDate dtNascimento,
+//			String telefone, String email, String senhaHash, StatusConta statusConta, Endereco endereco) {
+//		if (statusConta != StatusConta.EM_ANALISE_APROVACAO && statusConta != StatusConta.ATIVA) {
+//			throw new IllegalArgumentException("Erro: cadastro com status da conta inválido.");
+//		}
+//
+//		this.nome = nome;
+//		this.cpf = cpf;
+//		this.sexo = sexo;
+//		this.funcao = funcao;
+//		this.dtNascimento = dtNascimento;
+//		this.telefone = telefone;
+//		setEmail(email);
+//		this.senhaHash = senhaHash;
+//		this.statusConta = statusConta;
+//		this.endereco = endereco;
+//	}
+
+	public Pessoa(String email, String encryptedPassword, FuncaoPessoa funcao) {
+		this.email = email;
+		this.senhaHash = encryptedPassword; // campo que você usa para guardar a senha
 		this.funcao = funcao;
-		this.dtNascimento = dtNascimento;
-		this.telefone = telefone;
-		setEmail(email);
-		this.senhaHash = senhaHash;
-		this.statusConta = statusConta;
-		this.endereco = endereco;
+		this.statusConta = StatusConta.EM_ANALISE_APROVACAO; // opcional, pode definir um padrão
 	}
 
 	public Long getId() {
@@ -95,11 +107,11 @@ public class Pessoa {
 		this.sexo = sexo;
 	}
 
-	public FuncaoUsuario getFuncao() {
+	public FuncaoPessoa getFuncao() {
 		return funcao;
 	}
 
-	public void setFuncao(FuncaoUsuario funcao) {
+	public void setFuncao(FuncaoPessoa funcao) {
 		this.funcao = funcao;
 	}
 
@@ -188,5 +200,23 @@ public class Pessoa {
 		}
 		
 		statusConta = StatusConta.ATIVA;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		if (this.funcao == FuncaoPessoa.ADMINISTRADOR) {
+			return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),new SimpleGrantedAuthority("ROLE_USER"));
+		}
+		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+	}
+
+	@Override
+	public String getPassword() {
+		return this.senhaHash;
+	}
+
+	@Override
+	public String getUsername() {
+		return email;
 	}
 }
