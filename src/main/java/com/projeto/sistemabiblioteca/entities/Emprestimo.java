@@ -62,6 +62,7 @@ public class Emprestimo {
 		dtInicioEmprestimo = LocalDate.now();
 		dtDevolucaoPrevista = calcularDataDeDevolucao();
 		status = StatusEmprestimo.RESERVADO;
+		multa = 0.0;
 		statusPagamento = StatusPagamento.NAO_APLICAVEL;
 		this.pessoa = pessoa;
 		this.exemplar = exemplar;
@@ -80,6 +81,7 @@ public class Emprestimo {
 		dtInicioEmprestimo = LocalDate.now();
 		setDtDevolucaoPrevista(dtDevolucaoPrevista);
 		status = StatusEmprestimo.RESERVADO;
+		multa = 0.0;
 		statusPagamento = StatusPagamento.NAO_APLICAVEL;
 		this.pessoa = pessoa;
 		this.exemplar = exemplar;

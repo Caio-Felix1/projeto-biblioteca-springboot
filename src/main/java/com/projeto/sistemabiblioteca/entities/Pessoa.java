@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.validation.ValidacaoUtils;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -62,7 +63,7 @@ public class Pessoa implements UserDetails {
 //		}
 //
 //		this.nome = nome;
-//		this.cpf = cpf;
+//		setCpf(cpf);
 //		this.sexo = sexo;
 //		this.funcao = funcao;
 //		this.dtNascimento = dtNascimento;
@@ -97,6 +98,9 @@ public class Pessoa implements UserDetails {
 	}
 
 	public void setCpf(String cpf) {
+		if (!ValidacaoUtils.isFormatoCpfValido(cpf)) {
+			throw new IllegalArgumentException("Erro: cpf inválido.");
+		}
 		this.cpf = cpf;
 	}
 
@@ -137,8 +141,8 @@ public class Pessoa implements UserDetails {
 	}
 
 	public void setEmail(String email) {
-		if (email.matches("[a-z0-9]+@[a-z]+\\.com(\\.br)?")) {
-			throw new IllegalArgumentException("Erro: email no formato inválido.");
+		if (!ValidacaoUtils.isFormatoEmailValido(email)) {
+			throw new IllegalArgumentException("Erro: email inválido.");
 		}
 		this.email = email;
 	}

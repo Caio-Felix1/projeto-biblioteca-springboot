@@ -4,7 +4,7 @@ import com.projeto.sistemabiblioteca.DTOs.AutenticationDTO;
 import com.projeto.sistemabiblioteca.DTOs.LoginResponseDTO;
 import com.projeto.sistemabiblioteca.DTOs.RegisterDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
-import com.projeto.sistemabiblioteca.repositories.PessoaRepositorio;
+import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class AutenticationController {
 	private AuthenticationManager authenticationManager;
 	
 	@Autowired
-	private PessoaRepositorio repositorio;
+	private PessoaRepository repositorio;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.projeto.sistemabiblioteca.entities.Editora;
 
-public interface EditoraRepositorio extends JpaRepository<Editora, Long> {
+public interface EditoraRepository extends JpaRepository<Editora, Long> {
 
 }

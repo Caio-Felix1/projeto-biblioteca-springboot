@@ -1,6 +1,6 @@
 package com.projeto.sistemabiblioteca.infra.security;
 
-import com.projeto.sistemabiblioteca.repositories.PessoaRepositorio;
+import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     TokenService tokenSevice;
 
     @Autowired
-    PessoaRepositorio  pessoaRepositorio;
+    PessoaRepository  pessoaRepositorio;
 
     public SecurityFilter(TokenService tokenSevice) {
         this.tokenSevice = tokenSevice;
