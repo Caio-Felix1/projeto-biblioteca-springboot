@@ -18,12 +18,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_emprestimo")
+@Table(name = "emprestimo")
 public class Emprestimo {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idEmprestimo;
 	
 	private LocalDate dtInicioEmprestimo;
 	private LocalDate dtRetiradaExemplar;
@@ -85,8 +85,8 @@ public class Emprestimo {
 		this.exemplar = exemplar;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getIdEmprestimo() {
+		return idEmprestimo;
 	}
 
 	public LocalDate getDtInicioEmprestimo() {
@@ -326,5 +326,13 @@ public class Emprestimo {
 		else {
 			return dtInicioEmprestimo.plusDays(37);
 		}
+	}
+	
+	public int calcularDiasRestantes() {
+		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.EM_ANDAMENTO).contains(status)) {
+			throw new IllegalStateException("Erro: O empréstimo não está ativo. Não é possível calcular dias restantes.");
+		}
+		
+		return (int) ChronoUnit.DAYS.between(dtDevolucaoPrevista, LocalDate.now());
 	}
 }

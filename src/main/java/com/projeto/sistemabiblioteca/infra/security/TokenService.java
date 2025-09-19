@@ -20,7 +20,7 @@ public class TokenService {
             String token = JWT.create().withIssuer("auth-api").withSubject(pessoa.getEmail()).withExpiresAt(genExpirationDate()).sign(algorithm);
             return token;
         }catch (JWTCreationException exception){
-            throw new RuntimeException("erro gerar token",exception);
+            throw new RuntimeException("erro gerar token", exception);
         }
     }
 

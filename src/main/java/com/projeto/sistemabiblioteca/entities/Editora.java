@@ -7,12 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_editora")
+@Table(name = "editora")
 public class Editora {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idEditora;
 	
 	private String nome;
 	
@@ -24,8 +24,8 @@ public class Editora {
 		this.nome = nome;
 	}
 	
-	public Long getId() {
-		return id;
+	public Long getIdEditora() {
+		return idEditora;
 	}
 	
 	public String getNome() {

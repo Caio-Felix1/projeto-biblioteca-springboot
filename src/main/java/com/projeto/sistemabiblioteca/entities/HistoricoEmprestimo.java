@@ -14,12 +14,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_historico_emprestimo")
+@Table(name = "historico_emprestimo")
 public class HistoricoEmprestimo {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idHistoricoEmprestimo;
 	
 	private long idPessoa;
 	private String nomePessoa;
@@ -57,8 +57,8 @@ public class HistoricoEmprestimo {
 		this.statusPagamento = statusPagamento;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getIdHistoricoEmprestimo() {
+		return idHistoricoEmprestimo;
 	}
 
 	public long getIdPessoa() {

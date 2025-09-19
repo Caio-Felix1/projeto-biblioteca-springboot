@@ -1,6 +1,6 @@
 package com.projeto.sistemabiblioteca.DTOs;
 
-import com.projeto.sistemabiblioteca.enums.FuncaoPessoa;
+import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 
-public record RegisterDTO(String email, String senha , FuncaoPessoa funcao) {
+public record RegisterDTO(String email, String senha , FuncaoUsuario funcao) {
 }

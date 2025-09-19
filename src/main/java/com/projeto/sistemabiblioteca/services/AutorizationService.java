@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AutorizationService implements UserDetailsService {
 
-
     @Autowired
     PessoaRepositorio pessoaRepositorio;
+    
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return pessoaRepositorio.findByEmail(username);

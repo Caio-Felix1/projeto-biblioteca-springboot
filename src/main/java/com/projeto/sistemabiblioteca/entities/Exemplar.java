@@ -14,12 +14,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_exemplar")
+@Table(name = "exemplar")
 public class Exemplar {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idExemplar;
 	
 	@Enumerated(EnumType.STRING)
 	private StatusExemplar status;
@@ -41,8 +41,8 @@ public class Exemplar {
 		this.edicao = edicao;
 	}
 	
-	public Long getId() {
-		return id;
+	public Long getIdExemplar() {
+		return idExemplar;
 	}
 
 	public StatusExemplar getStatus() {

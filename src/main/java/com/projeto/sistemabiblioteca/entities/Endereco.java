@@ -7,12 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_endereco")
+@Table(name = "endereco")
 public class Endereco {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idEndereco;
 	
 	private String nomeLogradouro;
 	private int numero;
@@ -37,8 +37,8 @@ public class Endereco {
 		this.pais = pais;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getIdEndereco() {
+		return idEndereco;
 	}
 
 	public String getNomeLogradouro() {

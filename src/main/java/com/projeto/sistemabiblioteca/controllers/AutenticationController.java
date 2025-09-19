@@ -19,11 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("auth")
 public class AutenticationController {
-@Autowired
-private AuthenticationManager authenticationManager;
-
-@Autowired
-private PessoaRepositorio repositorio;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private PessoaRepositorio repositorio;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -43,17 +44,17 @@ private PessoaRepositorio repositorio;
     }
 
 
-    @PostMapping("register")
-    public  ResponseEntity register(@Valid @RequestBody RegisterDTO request){
+    @PostMapping("/register")
+    public  ResponseEntity<String> register(@Valid @RequestBody RegisterDTO request){
         if (repositorio.findByEmail(request.email()) != null) {
             return ResponseEntity.badRequest().body("Email já cadastrado");
         }
 
         String encryptedPassword = passwordEncoder.encode(request.senha());
 
-    Pessoa pessoa = new Pessoa(request.email(),encryptedPassword,request.funcao());
+        Pessoa pessoa = new Pessoa(request.email(),encryptedPassword,request.funcao());
 
-    this.repositorio.save(pessoa);
-    return  ResponseEntity.ok("Registro efetuado com sucesso");
+        this.repositorio.save(pessoa);
+        return  ResponseEntity.ok("Registro efetuado com sucesso");
     }
 }

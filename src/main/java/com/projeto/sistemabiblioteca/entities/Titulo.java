@@ -13,24 +13,24 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_titulo")
+@Table(name = "titulo")
 public class Titulo {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idTitulo;
 	
 	private String nome;
 	private String descricao;
 	
 	@ManyToMany
-	@JoinTable(name = "tb_titulo_categoria",        
+	@JoinTable(name = "titulo_categoria",        
 	joinColumns = @JoinColumn(name = "id_titulo"),         
 	inverseJoinColumns = @JoinColumn(name = "id_categoria"))
 	private Set<Categoria> categorias = new HashSet<>();
 	
 	@ManyToMany
-	@JoinTable(name = "tb_titulo_autor",        
+	@JoinTable(name = "titulo_autor",        
 	joinColumns = @JoinColumn(name = "id_titulo"),         
 	inverseJoinColumns = @JoinColumn(name = "id_autor"))
 	private Set<Autor> autores = new HashSet<>();
@@ -44,8 +44,8 @@ public class Titulo {
 		this.descricao = descricao;
 	}
 	
-	public Long getId() {
-		return id;
+	public Long getIdTitulo() {
+		return idTitulo;
 	}
 	
 	public String getNome() {

@@ -7,12 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tb_autor")
+@Table(name = "autor")
 public class Autor {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idAutor;
 	
 	private String nome;
 	
@@ -24,8 +24,8 @@ public class Autor {
 		this.nome = nome;
 	}
 
-	public Long getId() {
-		return id;
+	public Long getIdAutor() {
+		return idAutor;
 	}
 
 	public String getNome() {

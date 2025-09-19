@@ -4,7 +4,11 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-import com.projeto.sistemabiblioteca.enums.FuncaoPessoa;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 
@@ -17,17 +21,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Table(name = "tb_pessoa")
+@Table(name = "pessoa")
 public class Pessoa implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idPessoa;
 	
 	private String nome;
 	private String cpf;
@@ -36,7 +37,7 @@ public class Pessoa implements UserDetails {
 	private Sexo sexo;
 	
 	@Enumerated(EnumType.STRING)
-	private FuncaoPessoa funcao;
+	private FuncaoUsuario funcao;
 	
 	private LocalDate dtNascimento;
 	private String telefone;
@@ -72,15 +73,15 @@ public class Pessoa implements UserDetails {
 //		this.endereco = endereco;
 //	}
 
-	public Pessoa(String email, String encryptedPassword, FuncaoPessoa funcao) {
+	public Pessoa(String email, String encryptedPassword, FuncaoUsuario funcao) {
 		this.email = email;
 		this.senhaHash = encryptedPassword; // campo que você usa para guardar a senha
 		this.funcao = funcao;
 		this.statusConta = StatusConta.EM_ANALISE_APROVACAO; // opcional, pode definir um padrão
 	}
 
-	public Long getId() {
-		return id;
+	public Long getIdPessoa() {
+		return idPessoa;
 	}
 
 	public String getNome() {
@@ -107,11 +108,11 @@ public class Pessoa implements UserDetails {
 		this.sexo = sexo;
 	}
 
-	public FuncaoPessoa getFuncao() {
+	public FuncaoUsuario getFuncao() {
 		return funcao;
 	}
 
-	public void setFuncao(FuncaoPessoa funcao) {
+	public void setFuncao(FuncaoUsuario funcao) {
 		this.funcao = funcao;
 	}
 
@@ -204,7 +205,7 @@ public class Pessoa implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		if (this.funcao == FuncaoPessoa.ADMINISTRADOR) {
+		if (this.funcao == FuncaoUsuario.ADMINISTRADOR) {
 			return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),new SimpleGrantedAuthority("ROLE_USER"));
 		}
 		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
