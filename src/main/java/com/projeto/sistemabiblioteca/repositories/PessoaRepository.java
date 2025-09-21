@@ -10,11 +10,11 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 
 public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
-	 boolean existsByEmail(String email);
+	 boolean existsByEmailEndereco(String email);
 	
-     Pessoa findByEmail(String email);
+     Pessoa findByEmailEndereco(String email);
 
-     Pessoa findByCpf(String cpf);
+     Pessoa findByCpfValor(String cpf);
      
      List<Pessoa> findByFuncaoEquals(FuncaoUsuario funcao);
      

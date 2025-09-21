@@ -11,8 +11,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.validation.Cpf;
+import com.projeto.sistemabiblioteca.validation.Email;
 import com.projeto.sistemabiblioteca.validation.ValidacaoUtils;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -32,7 +35,9 @@ public class Pessoa implements UserDetails {
 	private Long idPessoa;
 	
 	private String nome;
-	private String cpf;
+	
+	@Embedded
+	private Cpf cpf;
 	
 	@Enumerated(EnumType.STRING)
 	private Sexo sexo;
@@ -42,7 +47,10 @@ public class Pessoa implements UserDetails {
 	
 	private LocalDate dtNascimento;
 	private String telefone;
-	private String email;
+	
+	@Embedded
+	private Email email;
+	
 	private String senhaHash;
 	
 	@Enumerated(EnumType.STRING)
@@ -56,25 +64,25 @@ public class Pessoa implements UserDetails {
 		
 	}
 
-//	public Pessoa(String nome, String cpf, Sexo sexo, FuncaoPessoa funcao, LocalDate dtNascimento,
-//			String telefone, String email, String senhaHash, StatusConta statusConta, Endereco endereco) {
+//	public Pessoa(String nome, Cpf cpf, Sexo sexo, FuncaoPessoa funcao, LocalDate dtNascimento,
+//			String telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
 //		if (statusConta != StatusConta.EM_ANALISE_APROVACAO && statusConta != StatusConta.ATIVA) {
 //			throw new IllegalArgumentException("Erro: cadastro com status da conta inválido.");
 //		}
 //
 //		this.nome = nome;
-//		setCpf(cpf);
+//		this.cpf = cpf;
 //		this.sexo = sexo;
 //		this.funcao = funcao;
 //		this.dtNascimento = dtNascimento;
 //		this.telefone = telefone;
-//		setEmail(email);
+//		this.email = email;
 //		this.senhaHash = senhaHash;
 //		this.statusConta = statusConta;
 //		this.endereco = endereco;
 //	}
 
-	public Pessoa(String email, String encryptedPassword, FuncaoUsuario funcao) {
+	public Pessoa(Email email, String encryptedPassword, FuncaoUsuario funcao) {
 		this.email = email;
 		this.senhaHash = encryptedPassword; // campo que você usa para guardar a senha
 		this.funcao = funcao;
@@ -93,14 +101,11 @@ public class Pessoa implements UserDetails {
 		this.nome = nome;
 	}
 
-	public String getCpf() {
+	public Cpf getCpf() {
 		return cpf;
 	}
 
-	public void setCpf(String cpf) {
-		if (!ValidacaoUtils.isFormatoCpfValido(cpf)) {
-			throw new IllegalArgumentException("Erro: cpf inválido.");
-		}
+	public void setCpf(Cpf cpf) {
 		this.cpf = cpf;
 	}
 
@@ -136,14 +141,11 @@ public class Pessoa implements UserDetails {
 		this.telefone = telefone;
 	}
 
-	public String getEmail() {
+	public Email getEmail() {
 		return email;
 	}
 
-	public void setEmail(String email) {
-		if (!ValidacaoUtils.isFormatoEmailValido(email)) {
-			throw new IllegalArgumentException("Erro: email inválido.");
-		}
+	public void setEmail(Email email) {
 		this.email = email;
 	}
 
@@ -210,7 +212,7 @@ public class Pessoa implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		if (this.funcao == FuncaoUsuario.ADMINISTRADOR) {
-			return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),new SimpleGrantedAuthority("ROLE_USER"));
+			return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
 		}
 		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
 	}
@@ -222,6 +224,6 @@ public class Pessoa implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return email;
+		return email.getEndereco();
 	}
 }

@@ -17,6 +17,7 @@ import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.infra.security.TokenService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
 import com.projeto.sistemabiblioteca.services.exceptions.EmailJaCadastradoException;
+import com.projeto.sistemabiblioteca.validation.Email;
 
 import jakarta.validation.Valid;
 
@@ -55,16 +56,18 @@ public class AutenticacaoController {
 
     @PostMapping("/registro")
     public  ResponseEntity<String> registrar(@Valid @RequestBody RegistroDTO request){
-        try {
+        Email email;
+    	try {
             pessoaService.verificarEmailDisponivel(request.email());
+            email = new Email("[a-z0-9]+@[a-z]+\\.com(\\.br)?", request.email());
         } 
-        catch (EmailJaCadastradoException e) {
+        catch (RuntimeException e) {
         	return ResponseEntity.badRequest().body(e.getMessage());
         }
 
         String encryptedPassword = passwordEncoder.encode(request.senha());
-
-        Pessoa pessoa = new Pessoa(request.email(),encryptedPassword,request.funcao());
+        
+        Pessoa pessoa = new Pessoa(email,encryptedPassword,request.funcao());
 
         pessoaService.inserir(pessoa);
         return  ResponseEntity.ok("Registro efetuado com sucesso.");

@@ -43,13 +43,13 @@ public class PessoaService {
 	}
 	
 	public void verificarEmailDisponivel(String email) {
-		if (pessoaRepository.existsByEmail(email)) {
+		if (pessoaRepository.existsByEmailEndereco(email)) {
 			throw new EmailJaCadastradoException("Erro: email já foi cadastrado.");
 		}
 	}
 	
 	public Pessoa buscarPorEmail(String email) {
-		Pessoa p = pessoaRepository.findByEmail(email);
+		Pessoa p = pessoaRepository.findByEmailEndereco(email);
 		if (p == null) {
 			throw new EntityNotFoundException("Erro: usuário com email correspondente não foi encontrado.");
 		}
@@ -57,7 +57,7 @@ public class PessoaService {
 	}
 	
 	public Pessoa buscarPorCpf(String cpf) {
-		Pessoa p = pessoaRepository.findByCpf(cpf);
+		Pessoa p = pessoaRepository.findByCpfValor(cpf);
 		if (p == null) {
 			throw new EntityNotFoundException("Erro: usuário com cpf correspondente não foi encontrado.");
 		}
