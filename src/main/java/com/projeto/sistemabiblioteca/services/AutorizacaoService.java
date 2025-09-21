@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class AutorizacaoService implements UserDetailsService {
 
@@ -18,11 +20,12 @@ public class AutorizacaoService implements UserDetailsService {
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Pessoa p = pessoaService.findByEmail(username);
-        
-        if (p == null) {
+    	try {
+        	Pessoa p = pessoaService.buscarPorEmail(username);
+        	return p;
+        }
+        catch (EntityNotFoundException e) {
         	throw new UsernameNotFoundException("Erro: usuário não foi encontrado.");
         }
-        return p;
     }
 }
