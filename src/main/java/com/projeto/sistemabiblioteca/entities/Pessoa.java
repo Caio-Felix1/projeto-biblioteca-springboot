@@ -13,7 +13,6 @@ import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
-import com.projeto.sistemabiblioteca.validation.ValidacaoUtils;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

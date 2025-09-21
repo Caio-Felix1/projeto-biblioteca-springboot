@@ -26,20 +26,20 @@ public class PessoaService {
 		return pessoaRepository.findAll();
 	}
 	
-	public List<Pessoa> buscarPorFuncaoIgualA(FuncaoUsuario funcao) {
-		return pessoaRepository.findByFuncaoEquals(funcao);
+	public List<Pessoa> buscarTodosComFuncaoIgualA(FuncaoUsuario funcao) {
+		return pessoaRepository.findAllByFuncaoEquals(funcao);
 	}
 	
-	public List<Pessoa> buscarPorStatusContaIgualA(StatusConta statusConta) {
-		return pessoaRepository.findByStatusContaEquals(statusConta);
+	public List<Pessoa> buscarTodosComStatusContaIgualA(StatusConta statusConta) {
+		return pessoaRepository.findAllByStatusContaEquals(statusConta);
 	}
 	
 	public Pessoa buscarPorId(Long id) {
-		Optional<Pessoa> p = pessoaRepository.findById(id);
-		if (p.isEmpty()) {
-			throw new EntityNotFoundException("Erro: usuário com email correspondente não foi encontrado.");
+		Optional<Pessoa> pessoa = pessoaRepository.findById(id);
+		if (pessoa.isEmpty()) {
+			throw new EntityNotFoundException("Erro: usuário com id correspondente não foi encontrado.");
 		}
-		return p.get();
+		return pessoa.get();
 	}
 	
 	public void verificarEmailDisponivel(String email) {
@@ -49,19 +49,19 @@ public class PessoaService {
 	}
 	
 	public Pessoa buscarPorEmail(String email) {
-		Pessoa p = pessoaRepository.findByEmailEndereco(email);
-		if (p == null) {
+		Pessoa pessoa = pessoaRepository.findByEmailEndereco(email);
+		if (pessoa == null) {
 			throw new EntityNotFoundException("Erro: usuário com email correspondente não foi encontrado.");
 		}
-		return p;
+		return pessoa;
 	}
 	
 	public Pessoa buscarPorCpf(String cpf) {
-		Pessoa p = pessoaRepository.findByCpfValor(cpf);
-		if (p == null) {
+		Pessoa pessoa = pessoaRepository.findByCpfValor(cpf);
+		if (pessoa == null) {
 			throw new EntityNotFoundException("Erro: usuário com cpf correspondente não foi encontrado.");
 		}
-		return p;
+		return pessoa;
 	}
 	
 	public Pessoa inserir(Pessoa pessoa) {
@@ -69,15 +69,15 @@ public class PessoaService {
 	}
 	
 	public void inativar(Long id) {
-		Pessoa p = buscarPorId(id);
-		p.inativarConta();
-		pessoaRepository.save(p);
+		Pessoa pessoa = buscarPorId(id);
+		pessoa.inativarConta();
+		pessoaRepository.save(pessoa);
 	}
 	
-	public Pessoa atualizar(Long id, Pessoa pessoa) {
-		Pessoa p = buscarPorId(id);
-		atualizarDados(p, pessoa);
-		return pessoaRepository.save(p);
+	public Pessoa atualizar(Long id, Pessoa pessoa2) {
+		Pessoa pessoa1 = buscarPorId(id);
+		atualizarDados(pessoa1, pessoa2);
+		return pessoaRepository.save(pessoa1);
 	}
 	
 	private void atualizarDados(Pessoa p1, Pessoa p2) {

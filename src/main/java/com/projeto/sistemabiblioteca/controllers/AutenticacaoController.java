@@ -67,7 +67,7 @@ public class AutenticacaoController {
 
         String encryptedPassword = passwordEncoder.encode(request.senha());
         
-        Pessoa pessoa = new Pessoa(email,encryptedPassword,request.funcao());
+        Pessoa pessoa = new Pessoa(email, encryptedPassword, request.funcao());
 
         pessoaService.inserir(pessoa);
         return  ResponseEntity.ok("Registro efetuado com sucesso.");

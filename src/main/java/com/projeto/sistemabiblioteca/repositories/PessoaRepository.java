@@ -16,7 +16,7 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
      Pessoa findByCpfValor(String cpf);
      
-     List<Pessoa> findByFuncaoEquals(FuncaoUsuario funcao);
+     List<Pessoa> findAllByFuncaoEquals(FuncaoUsuario funcao);
      
-     List<Pessoa> findByStatusContaEquals(StatusConta statusConta);
+     List<Pessoa> findAllByStatusContaEquals(StatusConta statusConta);
 }
