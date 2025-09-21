@@ -49,10 +49,6 @@ public class Exemplar {
 		return status;
 	}
 
-	public void setStatus(StatusExemplar status) {
-		this.status = status;
-	}
-
 	public EstadoFisico getEstadoFisico() {
 		return estadoFisico;
 	}

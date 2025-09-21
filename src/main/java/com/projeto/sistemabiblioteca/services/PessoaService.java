@@ -89,5 +89,6 @@ public class PessoaService {
 		p1.setTelefone(p2.getTelefone());
 		p1.setEmail(p2.getEmail());
 		p1.setSenhaHash(p2.getSenhaHash());
+		p1.setEndereco(p2.getEndereco());
 	}
 }

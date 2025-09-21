@@ -27,7 +27,7 @@ public class AutorService {
 	public Autor buscarPorId(Long id) {
 		Optional<Autor> autor = autorRepository.findById(id);
 		if (autor.isEmpty()) {
-			throw new EntityNotFoundException("Erro: usuário com id correspondente não foi encontrado.");
+			throw new EntityNotFoundException("Erro: autor com id correspondente não foi encontrado.");
 		}
 		return autor.get();
 	}
