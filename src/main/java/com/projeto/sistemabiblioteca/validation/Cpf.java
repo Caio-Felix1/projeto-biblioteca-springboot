@@ -13,7 +13,7 @@ public class Cpf extends FormatoValidation {
 		super();
 	}
 	
-	public Cpf(String regex) {
+	public Cpf(String regex, String valor) {
 		super(regex);
 		setValor(valor);
 	}
@@ -24,7 +24,7 @@ public class Cpf extends FormatoValidation {
 
 	public void setValor(String valor) {
 		if (valor == null || validarFormato(valor) == false) {
-			throw new IllegalArgumentException("Erro: cpf inválido.");
+			throw new IllegalArgumentException("Erro: cpf com formato inválido.");
 		}
 		this.valor = valor;
 	}

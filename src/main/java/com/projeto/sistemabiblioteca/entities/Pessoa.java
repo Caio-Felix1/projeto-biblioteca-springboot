@@ -193,7 +193,10 @@ public class Pessoa implements UserDetails {
 	}
 	
 	public void solicitarExclusaoConta() {
-		if (statusConta != StatusConta.ATIVA && statusConta != StatusConta.EM_ANALISE_EXCLUSAO) {
+		if (statusConta == StatusConta.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: já foi solicitado a exclusão da conta.");
+		}
+		if (statusConta != StatusConta.ATIVA) {
 			throw new IllegalStateException("Erro: a conta não está ativa.");
 		}
 		

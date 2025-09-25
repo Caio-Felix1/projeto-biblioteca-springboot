@@ -105,13 +105,13 @@ public class Emprestimo {
 
 	public void setDtDevolucaoPrevista(LocalDate dtDevolucaoPrevista) {
 		if (dtDevolucaoPrevista.isBefore(dtInicioEmprestimo)) {
-			throw new IllegalArgumentException("Erro: A data de devolução prevista é anterior à data de início do empréstimo.");
+			throw new IllegalArgumentException("Erro: a data de devolução prevista é anterior à data de início do empréstimo.");
 		}
-		else if (dtDevolucaoPrevista.isBefore(LocalDate.now())) {
-			throw new IllegalArgumentException("Erro: A data de devolução prevista não pode ser no passado.");
+		if (dtDevolucaoPrevista.isBefore(LocalDate.now())) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser no passado.");
 		}
-		else if (ChronoUnit.DAYS.between(dtInicioEmprestimo, dtDevolucaoPrevista) >  90) {
-			throw new IllegalArgumentException("Erro: A data de devolução inserida ultrapassou o prazo máximo de 90 dias.");
+		if (ChronoUnit.DAYS.between(dtInicioEmprestimo, dtDevolucaoPrevista) >  90) {
+			throw new IllegalArgumentException("Erro: a data de devolução inserida ultrapassou o prazo máximo de 90 dias.");
 		}
 		this.dtDevolucaoPrevista = dtDevolucaoPrevista;
 	}
@@ -147,10 +147,10 @@ public class Emprestimo {
 	 */
 	public void retirarExemplar() {
 		if (status == StatusEmprestimo.CANCELADO) {
-			throw new IllegalStateException("Erro: O empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
+			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
 		}
-		else if (status != StatusEmprestimo.RESERVADO) {
-			throw new IllegalStateException("Erro: O exemplar já foi retirado.");
+		if (status != StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: o exemplar já foi retirado.");
 		}
 		
 		status = StatusEmprestimo.EM_ANDAMENTO;
@@ -165,13 +165,16 @@ public class Emprestimo {
 	 */
 	public void devolverExemplar() {
 		if (status == StatusEmprestimo.CANCELADO) {
-			throw new IllegalStateException("Erro: O empréstimo foi cancelado anteriormente. Não é possível devolver exemplar.");
+			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível devolver exemplar.");
 		}
-		else if (status == StatusEmprestimo.RESERVADO) {
-			throw new IllegalStateException("Erro: O exemplar ainda não foi retirado.");
+		if (status == StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: o exemplar ainda não foi retirado.");
 		}
-		else if (status == StatusEmprestimo.DEVOLVIDO) {
-			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
+			throw new IllegalStateException("Erro: o exemplar foi perdido. Não é mais possível devolver.");
+		}
+		if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: o exemplar já foi devolvido.");
 		}
 		
 		status = StatusEmprestimo.DEVOLVIDO;
@@ -187,16 +190,16 @@ public class Emprestimo {
 	 */
 	public void registrarPerdaDoExemplar() {
 		if (status == StatusEmprestimo.CANCELADO) {
-			throw new IllegalStateException("Erro: O empréstimo foi cancelado anteriormente. Não é possível registrar a perda do exemplar.");
+			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível registrar a perda do exemplar.");
 		}
-		else if (status == StatusEmprestimo.RESERVADO) {
-			throw new IllegalStateException("Erro: O exemplar ainda não foi retirado.");
+		if (status == StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: o exemplar ainda não foi retirado.");
 		}
-		else if (status == StatusEmprestimo.DEVOLVIDO) {
-			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: o exemplar já foi devolvido.");
 		}
-		else if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
-			throw new IllegalStateException("Erro: Já foi registrado a perda do exemplar.");
+		if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
+			throw new IllegalStateException("Erro: já foi registrado a perda do exemplar.");
 		}
 		
 		status = StatusEmprestimo.EXEMPLAR_PERDIDO;
@@ -211,19 +214,19 @@ public class Emprestimo {
 	 */
 	public void registrarAtraso() {
 		if (status == StatusEmprestimo.CANCELADO) {
-			throw new IllegalStateException("Erro: O empréstimo já foi cancelado.");
+			throw new IllegalStateException("Erro: o empréstimo já foi cancelado.");
 		}
-		else if (status == StatusEmprestimo.DEVOLVIDO) {
-			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: o exemplar já foi devolvido.");
 		}
-		else if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
-			throw new IllegalStateException("Erro: O exemplar foi perdido. Não é possível registrar o atraso.");
+		if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
+			throw new IllegalStateException("Erro: o exemplar foi perdido. Não é possível registrar o atraso.");
 		}
-		else if (calcularDiasDeAtraso() <= 0) {
-			throw new IllegalStateException("Erro: O empréstimo ainda não está atrasado.");
+		if (calcularDiasDeAtraso() <= 0) {
+			throw new IllegalStateException("Erro: o empréstimo ainda não está atrasado.");
 		}
-		else if (status == StatusEmprestimo.ATRASADO) {
-			throw new IllegalStateException("Erro: Já foi registrado o atraso.");
+		if (status == StatusEmprestimo.ATRASADO) {
+			throw new IllegalStateException("Erro: já foi registrado o atraso.");
 		}
 		
 		status = StatusEmprestimo.ATRASADO;
@@ -233,13 +236,13 @@ public class Emprestimo {
 	
 	public void cancelarReserva() {
 		if (status == StatusEmprestimo.CANCELADO) {
-			throw new IllegalStateException("Erro: O empréstimo já foi cancelado.");
+			throw new IllegalStateException("Erro: o empréstimo já foi cancelado.");
 		}
-		else if (status == StatusEmprestimo.DEVOLVIDO) {
-			throw new IllegalStateException("Erro: O exemplar já foi devolvido.");
+		if (status == StatusEmprestimo.DEVOLVIDO) {
+			throw new IllegalStateException("Erro: o exemplar já foi devolvido.");
 		}
-		else if (status != StatusEmprestimo.RESERVADO) {
-			throw new IllegalStateException("Erro: O exemplar já foi retirado.");
+		if (status != StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: o exemplar já foi retirado.");
 		}
 		
 		status = StatusEmprestimo.CANCELADO;
@@ -284,7 +287,7 @@ public class Emprestimo {
 	}
 	
 	public void perdoarMulta() {
-		if (statusPagamento == StatusPagamento.NAO_APLICAVEL) {
+		if (statusPagamento != StatusPagamento.PENDENTE) {
 			throw new IllegalStateException("Erro: não há multa pendente.");
 		}
 		
@@ -332,9 +335,9 @@ public class Emprestimo {
 	
 	public int calcularDiasRestantes() {
 		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.EM_ANDAMENTO).contains(status)) {
-			throw new IllegalStateException("Erro: O empréstimo não está ativo. Não é possível calcular dias restantes.");
+			throw new IllegalStateException("Erro: O empréstimo não está ativo ou já está atrasado. Não é possível calcular dias restantes.");
 		}
 		
-		return (int) ChronoUnit.DAYS.between(dtDevolucaoPrevista, LocalDate.now());
+		return (int) ChronoUnit.DAYS.between(LocalDate.now(), dtDevolucaoPrevista);
 	}
 }

@@ -24,7 +24,7 @@ public class Email extends FormatoValidation {
 
 	public void setEndereco(String endereco) {
 		if (endereco == null || validarFormato(endereco) == false) {
-			throw new IllegalArgumentException("Erro: email inválido.");
+			throw new IllegalArgumentException("Erro: email com formato inválido.");
 		}
 		this.endereco = endereco;
 	}

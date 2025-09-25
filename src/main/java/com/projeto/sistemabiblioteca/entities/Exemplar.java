@@ -1,6 +1,7 @@
 package com.projeto.sistemabiblioteca.entities;
 
 import com.projeto.sistemabiblioteca.entities.enums.EstadoFisico;
+import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 
 import jakarta.persistence.Entity;
@@ -90,7 +91,10 @@ public class Exemplar {
 	}
 	
 	public void solicitarExclusao() {
-		if (status != StatusExemplar.DISPONIVEL && status != StatusExemplar.EM_ANALISE_EXCLUSAO) {
+		if (status == StatusExemplar.EM_ANALISE_EXCLUSAO) {
+			throw new IllegalStateException("Erro: já foi solicitado a exclusão do exemplar.");
+		}
+		if (status != StatusExemplar.DISPONIVEL) {
 			throw new IllegalStateException("Erro: o exemplar não está disponível. Não é possível solicitar a exclusão.");
 		}
 		

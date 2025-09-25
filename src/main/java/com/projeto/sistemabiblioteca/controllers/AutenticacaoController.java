@@ -1,9 +1,10 @@
 package com.projeto.sistemabiblioteca.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,6 @@ import com.projeto.sistemabiblioteca.DTOs.RegistroDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.infra.security.TokenService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
-import com.projeto.sistemabiblioteca.services.exceptions.EmailJaCadastradoException;
 import com.projeto.sistemabiblioteca.validation.Email;
 
 import jakarta.validation.Valid;
@@ -44,12 +44,12 @@ public class AutenticacaoController {
 
 	@PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody AutenticacaoDTO request) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(
+		UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
                 request.email(),
                 request.senha()
         );
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-        var token = tokenService.generateToken((Pessoa) auth.getPrincipal());
+		Authentication auth = this.authenticationManager.authenticate(usernamePassword);
+		String token = tokenService.generateToken((Pessoa) auth.getPrincipal());
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
@@ -70,6 +70,7 @@ public class AutenticacaoController {
         Pessoa pessoa = new Pessoa(email, encryptedPassword, request.funcao());
 
         pessoaService.inserir(pessoa);
+        
         return  ResponseEntity.ok("Registro efetuado com sucesso.");
     }
 }
