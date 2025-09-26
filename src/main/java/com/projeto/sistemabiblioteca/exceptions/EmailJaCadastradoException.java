@@ -1,4 +1,4 @@
-package com.projeto.sistemabiblioteca.services.exceptions;
+package com.projeto.sistemabiblioteca.exceptions;
 
 public class EmailJaCadastradoException extends RuntimeException {
 	

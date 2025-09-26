@@ -1,39 +1,50 @@
 package com.projeto.sistemabiblioteca.validation;
 
+import com.projeto.sistemabiblioteca.exceptions.EmailInvalidoException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-
+import java.util.regex.Pattern;
 @Embeddable
-public class Email extends FormatoValidation {
-	
-	@Column(name = "email")
+public final class Email{
+
+	private static final Pattern EMAIL_REGEX =
+			Pattern.compile("[a-z0-9]+@[a-z]+\\.com(\\.br)?");
+
+	@Column(name = "email", nullable = false, unique = true)
 	private String endereco;
 	
-	public Email() {
-		super();
+	protected Email() {
+
 	}
-	
-	public Email(String regex, String endereco) {
-		super(regex);
-		setEndereco(endereco);
+
+	public Email(String endereco) {
+		if (endereco == null || !EMAIL_REGEX.matcher(endereco).matches()) {
+			throw new EmailInvalidoException("Erro: email com formato inválido.");
+		}
+		this.endereco = endereco;
 	}
 
 	public String getEndereco() {
 		return endereco;
 	}
 
-	public void setEndereco(String endereco) {
-		if (endereco == null || validarFormato(endereco) == false) {
-			throw new IllegalArgumentException("Erro: email com formato inválido.");
-		}
-		this.endereco = endereco;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Email email)) return false;
+		return endereco.equals(email.endereco);
 	}
 
 	@Override
-	public boolean validarFormato(String entrada) {
-		if (entrada == null || !entrada.matches(getRegex())) {
-			return false;
-		}
-		return true;
+	public int hashCode() {
+		return endereco.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return endereco;
+	}
+
+
+
 }

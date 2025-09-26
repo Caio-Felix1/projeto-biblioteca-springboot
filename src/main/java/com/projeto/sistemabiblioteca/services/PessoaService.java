@@ -9,7 +9,7 @@ import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
-import com.projeto.sistemabiblioteca.services.exceptions.EmailJaCadastradoException;
+import com.projeto.sistemabiblioteca.exceptions.EmailJaCadastradoException;
 
 import jakarta.persistence.EntityNotFoundException;
 
