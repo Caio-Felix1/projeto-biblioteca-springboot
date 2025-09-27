@@ -52,8 +52,21 @@ public class SecurityConfigurations {
                 		.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/product").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+
+						.requestMatchers(HttpMethod.GET, "/autores/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/autores").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/autores/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/autores/**").hasRole("ADMIN")
+
+						.requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/categorias").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/categorias/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMIN")
+
+						.requestMatchers(HttpMethod.GET, "/editoras/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/editoras").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/editoras/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/editoras/**").hasRole("ADMIN")
                 )
                 .addFilterAfter(securityFilter, CorsFilter.class)
                 .build();

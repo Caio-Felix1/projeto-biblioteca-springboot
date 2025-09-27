@@ -7,7 +7,9 @@ import com.projeto.sistemabiblioteca.entities.Editora;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EditoraService {
 	
 	private EditoraRepository editoraRepository;

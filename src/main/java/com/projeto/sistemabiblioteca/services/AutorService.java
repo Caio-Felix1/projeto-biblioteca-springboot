@@ -7,7 +7,9 @@ import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.repositories.AutorRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AutorService {
 	
 	private AutorRepository autorRepository;

@@ -7,7 +7,9 @@ import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CategoriaService {
 	
 	private CategoriaRepository categoriaRepository;
