@@ -59,7 +59,7 @@ public class Pessoa implements UserDetails {
 	@JoinColumn(name = "id_endereco")
 	private Endereco endereco;
 	
-	public Pessoa() {
+	protected Pessoa() {
 		
 	}
 

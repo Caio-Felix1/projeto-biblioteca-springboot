@@ -48,7 +48,7 @@ public class AutorService {
 		return autorRepository.save(autor1);
 	}
 	
-	private void atualizarDados(Autor a1, Autor a2) {
-		a1.setNome(a2.getNome());
+	private void atualizarDados(Autor autor1, Autor autor2) {
+		autor1.setNome(autor2.getNome());
 	}
 }

@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -15,26 +17,26 @@ public class Endereco {
 	private Long idEndereco;
 	
 	private String nomeLogradouro;
-	private int numero;
+	private String numero;
 	private String complemento;
 	private String bairro;
 	private String cep;
-	private String estado;
-	private String pais;
 	
-	public Endereco() {
+	@ManyToOne
+	@JoinColumn(name = "id_estado")
+	private Estado estado;
+	
+	protected Endereco() {
 		
 	}
 
-	public Endereco(String nomeLogradouro, int numero, String complemento, String bairro, String cep, String estado,
-			String pais) {
+	public Endereco(String nomeLogradouro, String numero, String complemento, String bairro, String cep, Estado estado) {
 		this.nomeLogradouro = nomeLogradouro;
 		this.numero = numero;
 		this.complemento = complemento;
 		this.bairro = bairro;
 		this.cep = cep;
 		this.estado = estado;
-		this.pais = pais;
 	}
 
 	public Long getIdEndereco() {
@@ -49,11 +51,11 @@ public class Endereco {
 		this.nomeLogradouro = nomeLogradouro;
 	}
 
-	public int getNumero() {
+	public String getNumero() {
 		return numero;
 	}
 
-	public void setNumero(int numero) {
+	public void setNumero(String numero) {
 		this.numero = numero;
 	}
 
@@ -81,19 +83,11 @@ public class Endereco {
 		this.cep = cep;
 	}
 
-	public String getEstado() {
+	public Estado getEstado() {
 		return estado;
 	}
 
-	public void setEstado(String estado) {
+	public void setEstado(Estado estado) {
 		this.estado = estado;
-	}
-
-	public String getPais() {
-		return pais;
-	}
-
-	public void setPais(String pais) {
-		this.pais = pais;
-	}
+	} 	
 }

@@ -5,7 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
-import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,11 +33,6 @@ public class Emprestimo {
 	@Enumerated(EnumType.STRING)
 	private StatusEmprestimo status;
 	
-	private double multa;
-	
-	@Enumerated(EnumType.STRING)
-	private StatusPagamento statusPagamento;
-	
 	@ManyToOne
 	@JoinColumn(name = "id_pessoa")
 	private Pessoa pessoa;
@@ -46,45 +41,49 @@ public class Emprestimo {
 	@JoinColumn(name = "id_exemplar")
 	private Exemplar exemplar;
 	
-	public Emprestimo() {
+	@OneToOne
+	@JoinColumn(name = "id_multa")
+	private Multa multa;
+	
+	protected Emprestimo() {
 		
 	}
 	
 	/**
-	 * Cria uma instância de empréstimo com o a data de devolução prevista definida automaticamente
-	 * A data de início do empréstimo é definida com a data em que foi instanciado, o status inicia definido 
-	 * como RESERVADO e o statusPagamento como NAO_APLICAVEL.
+	 * Cria uma instância de empréstimo com a data de devolução prevista definida automaticamente.
+	 * O status inicia definido como RESERVADO.
 	 * 
+	 * @param hoje
 	 * @param pessoa
 	 * @param exemplar
+	 * @param multa
 	 */
-	public Emprestimo(Pessoa pessoa, Exemplar exemplar) {
-		dtInicioEmprestimo = LocalDate.now();
+	public Emprestimo(LocalDate hoje, Pessoa pessoa, Exemplar exemplar, Multa multa) {
+		dtInicioEmprestimo = hoje;
 		dtDevolucaoPrevista = calcularDataDeDevolucao();
 		status = StatusEmprestimo.RESERVADO;
-		multa = 0.0;
-		statusPagamento = StatusPagamento.NAO_APLICAVEL;
 		this.pessoa = pessoa;
 		this.exemplar = exemplar;
+		this.multa = multa;
 	}
 	
 	/**
 	 * Cria uma instância do empréstimo com data de devolução prevista definida manualmente.
-	 * A data de início do empréstimo é definida com a data em que foi instanciado, o status inicia definido 
-	 * como RESERVADO e o statusPagamento como NAO_APLICAVEL.
+	 * O status inicia definido como RESERVADO.
 	 * 
+	 * @param hoje
 	 * @param dtDevolucaoPrevista
 	 * @param pessoa
 	 * @param exemplar
+	 * @param multa
 	 */
-	public Emprestimo(LocalDate dtDevolucaoPrevista, Pessoa pessoa, Exemplar exemplar) {
-		dtInicioEmprestimo = LocalDate.now();
+	public Emprestimo(LocalDate hoje, LocalDate dtDevolucaoPrevista, Pessoa pessoa, Exemplar exemplar, Multa multa) {
+		dtInicioEmprestimo = hoje;
 		setDtDevolucaoPrevista(dtDevolucaoPrevista);
 		status = StatusEmprestimo.RESERVADO;
-		multa = 0.0;
-		statusPagamento = StatusPagamento.NAO_APLICAVEL;
 		this.pessoa = pessoa;
 		this.exemplar = exemplar;
+		this.multa = multa;
 	}
 
 	public Long getIdEmprestimo() {
@@ -124,12 +123,12 @@ public class Emprestimo {
 		return status;
 	}
 
-	public StatusPagamento getStatusPagamento() {
-		return statusPagamento;
+	public Pessoa getPessoa() {
+		return pessoa;
 	}
-	
-	public double getMulta() {
-		return multa;
+
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
 	}
 
 	public Exemplar getExemplar() {
@@ -140,12 +139,25 @@ public class Emprestimo {
 		this.exemplar = exemplar;
 	}
 	
+	public Multa getMulta() {
+		return multa;
+	}
+	
+	public void setMulta(Multa multa) {
+		this.multa = multa;
+	}
+
 	/**
 	 * Registra a retirada do Exemplar.
 	 * 
-	 * Muda o status para EM_ANDAMENTO e atribui a data atual à variável dtRetiradaExemplar.
+	 * Muda o status para EM_ANDAMENTO e atribui o valor do parâmetro 'hoje' à variável dtRetiradaExemplar.
+	 * 
+	 * @param hoje
 	 */
-	public void retirarExemplar() {
+	public void retirarExemplar(LocalDate hoje) {
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
 		}
@@ -154,16 +166,21 @@ public class Emprestimo {
 		}
 		
 		status = StatusEmprestimo.EM_ANDAMENTO;
-		dtRetiradaExemplar = LocalDate.now();
+		dtRetiradaExemplar = hoje;
 	}
 	
 	/**
 	 * Registra a devolução do exemplar.
 	 * 
-	 * Muda o status para DEVOLVIDO, atribui a data atual à variável dtDevolvidoExemplar
+	 * Muda o status para DEVOLVIDO, atribui o valor do parâmetro 'hoje' à variável dtDevolvidoExemplar
 	 * e muda o status do exemplar para DISPONIVEL.
+	 * 
+	 * @param hoje
 	 */
-	public void devolverExemplar() {
+	public void devolverExemplar(LocalDate hoje) {
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível devolver exemplar.");
 		}
@@ -178,7 +195,7 @@ public class Emprestimo {
 		}
 		
 		status = StatusEmprestimo.DEVOLVIDO;
-		dtDevolvidoExemplar = LocalDate.now();
+		dtDevolvidoExemplar = hoje;
 		exemplar.devolver();
 	}
 	
@@ -203,7 +220,7 @@ public class Emprestimo {
 		}
 		
 		status = StatusEmprestimo.EXEMPLAR_PERDIDO;
-		aplicarMultaPorPerda();
+		multa.aplicarMultaPorPerda();
 		exemplar.registrarPerda();
 	}
 	
@@ -212,7 +229,7 @@ public class Emprestimo {
 	 * 
 	 * Muda o status para ATRASADO, chama o método aplicarMulta e chama o método calcularMultaDiaria.
 	 */
-	public void registrarAtraso() {
+	public void registrarAtraso(LocalDate hoje) {
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo já foi cancelado.");
 		}
@@ -222,7 +239,7 @@ public class Emprestimo {
 		if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
 			throw new IllegalStateException("Erro: o exemplar foi perdido. Não é possível registrar o atraso.");
 		}
-		if (calcularDiasDeAtraso() <= 0) {
+		if (calcularDiasDeAtraso(hoje) <= 0) {
 			throw new IllegalStateException("Erro: o empréstimo ainda não está atrasado.");
 		}
 		if (status == StatusEmprestimo.ATRASADO) {
@@ -230,8 +247,7 @@ public class Emprestimo {
 		}
 		
 		status = StatusEmprestimo.ATRASADO;
-		aplicarMulta();
-		calcularMultaDiaria();
+		multa.aplicarMulta(calcularDiasDeAtraso(hoje));
 	}
 	
 	public void cancelarReserva() {
@@ -248,71 +264,37 @@ public class Emprestimo {
 		status = StatusEmprestimo.CANCELADO;
 	}
 	
-	/**
-	 * Aplica multa por perda do exemplar
-	 * 
-	 * Chama o método calcularMultaPorPerda, atribui o resultado na variável multa e
-	 * muda o statusPagamento para PENDENTE.
-	 */
-	public void aplicarMultaPorPerda() {
-		multa = calcularMultaPorPerda();
-		statusPagamento = StatusPagamento.PENDENTE;
-	}
-	
-	public double calcularMultaPorPerda() {
-		return 50.0;
-	}
-	
-	/**
-	 * Aplica multa por atraso.
-	 * 
-	 * Chama o método calcularMultaDiaria, atribui o resultado na variável multa e 
-	 * muda o statusPagamento para PENDENTE.
-	 */
-	public void aplicarMulta() {
-		multa = calcularMultaDiaria();
-		statusPagamento = StatusPagamento.PENDENTE;
-	}
-	
-	public double calcularMultaDiaria() {
-		return 1.0 * calcularDiasDeAtraso();
-	}
-	
-	public void pagarMulta() {
-		if (statusPagamento != StatusPagamento.PENDENTE) {
-			throw new IllegalStateException("Erro: não há multa pendente.");
+	public int calcularDiasDeAtraso(LocalDate hoje) {
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+		}
+		if (dtDevolucaoPrevista == null) {
+			throw new IllegalStateException("Erro: data de devolução prevista inválida.");
 		}
 		
-		statusPagamento = StatusPagamento.PAGO;
+		return (int) Math.max(0, ChronoUnit.DAYS.between(dtDevolucaoPrevista, hoje));
 	}
 	
-	public void perdoarMulta() {
-		if (statusPagamento != StatusPagamento.PENDENTE) {
-			throw new IllegalStateException("Erro: não há multa pendente.");
+	public int calcularDiasDeEmprestimo(LocalDate hoje) {
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
 		}
-		
-		statusPagamento = StatusPagamento.PERDOADO;
-	}
-	
-	public int calcularDiasDeAtraso() {
-		if (status != StatusEmprestimo.ATRASADO) {
-			throw new IllegalStateException("Erro: não há atraso.");
-		}
-		
-		return (int) ChronoUnit.DAYS.between(dtDevolucaoPrevista, LocalDate.now());
-	}
-	
-	public int calcularDiasDeEmprestimo() {
 		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.EM_ANDAMENTO, StatusEmprestimo.ATRASADO).contains(status)) {
 			throw new IllegalStateException("Erro: o empréstimo não está ativo.");
 		}
+		if (dtInicioEmprestimo == null) {
+			throw new IllegalStateException("Erro: data de início do empréstimo inválida.");
+		}
 		
-		return (int) ChronoUnit.DAYS.between(dtInicioEmprestimo, LocalDate.now());
+		return (int) Math.max(0, ChronoUnit.DAYS.between(dtInicioEmprestimo, hoje));
 	}
 	
 	public LocalDate calcularDataDeDevolucao() {
 		if (dtDevolucaoPrevista != null) {
 			throw new IllegalStateException("Erro: já tem data de devolução prevista.");
+		}
+		if (dtInicioEmprestimo == null) {
+			throw new IllegalStateException("Erro: data de início do empréstimo inválida.");
 		}
 		
 		int qtdPaginas = exemplar.getEdicao().getQtdPaginas();
@@ -333,11 +315,17 @@ public class Emprestimo {
 		}
 	}
 	
-	public int calcularDiasRestantes() {
+	public int calcularDiasRestantes(LocalDate hoje) {
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+		}
 		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.EM_ANDAMENTO).contains(status)) {
 			throw new IllegalStateException("Erro: O empréstimo não está ativo ou já está atrasado. Não é possível calcular dias restantes.");
 		}
+		if (dtDevolucaoPrevista == null) {
+			throw new IllegalStateException("Erro: data de devolução prevista inválida.");
+		}
 		
-		return (int) ChronoUnit.DAYS.between(LocalDate.now(), dtDevolucaoPrevista);
+		return (int) Math.max(0, ChronoUnit.DAYS.between(hoje, dtDevolucaoPrevista));
 	}
 }

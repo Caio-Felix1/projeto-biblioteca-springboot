@@ -3,12 +3,15 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 import com.projeto.sistemabiblioteca.repositories.ExemplarRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
+@Service
 public class ExemplarService {
 	
 	private ExemplarRepository exemplarRepository;
@@ -47,8 +50,8 @@ public class ExemplarService {
 		return exemplarRepository.save(exemplar1);
 	}
 	
-	private void atualizarDados(Exemplar e1, Exemplar e2) {
-		e1.setEstadoFisico(e2.getEstadoFisico());
-		e1.setEdicao(e2.getEdicao());
+	private void atualizarDados(Exemplar exemplar1, Exemplar exemplar2) {
+		exemplar1.setEstadoFisico(exemplar2.getEstadoFisico());
+		exemplar1.setEdicao(exemplar2.getEdicao());
 	}
 }

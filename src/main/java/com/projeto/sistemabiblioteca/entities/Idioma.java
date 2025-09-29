@@ -7,25 +7,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "categoria")
-public class Categoria {
+@Table(name = "idioma")
+public class Idioma {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long idCategoria;
+	private Long idIdioma;
 	
 	private String nome;
-
-	protected Categoria() {
+	
+	protected Idioma() {
 		
 	}
 
-	public Categoria(String nome) {
+	public Idioma(String nome) {
 		this.nome = nome;
 	}
-
-	public Long getIdCategoria() {
-		return idCategoria;
+	
+	public Long getIdIdioma() {
+		return idIdioma;
 	}
 
 	public String getNome() {

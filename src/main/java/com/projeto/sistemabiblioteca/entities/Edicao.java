@@ -3,7 +3,6 @@ package com.projeto.sistemabiblioteca.entities;
 import java.time.LocalDate;
 
 import com.projeto.sistemabiblioteca.entities.enums.ClassificacaoIndicativa;
-import com.projeto.sistemabiblioteca.entities.enums.Idioma;
 import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
 import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
 
@@ -34,9 +33,6 @@ public class Edicao {
 	private TamanhoEdicao tamanho;
 	
 	@Enumerated(EnumType.STRING)
-	private Idioma idioma;
-	
-	@Enumerated(EnumType.STRING)
 	private ClassificacaoIndicativa classificacao;
 	
 	private LocalDate dtPublicacao;
@@ -49,20 +45,24 @@ public class Edicao {
 	@JoinColumn(name = "id_editora")
 	private Editora editora;
 	
-	public Edicao() {
+	@ManyToOne
+	@JoinColumn(name = "id_idioma")
+	private Idioma idioma;
+	
+	protected Edicao() {
 		
 	}
 
-	public Edicao(TipoCapa tipoCapa, int qtdPaginas, TamanhoEdicao tamanho, Idioma idioma, 
-			ClassificacaoIndicativa classificacao, LocalDate dtPublicacao, Titulo titulo, Editora editora) {
+	public Edicao(TipoCapa tipoCapa, int qtdPaginas, TamanhoEdicao tamanho,  ClassificacaoIndicativa classificacao, 
+			LocalDate dtPublicacao, Titulo titulo, Editora editora, Idioma idioma) {
 		this.tipoCapa = tipoCapa;
 		setQtdPaginas(qtdPaginas);
 		this.tamanho = tamanho;
-		this.idioma = idioma;
 		this.classificacao = classificacao;
 		this.dtPublicacao = dtPublicacao;
 		this.titulo = titulo;
 		this.editora = editora;
+		this.idioma = idioma;
 	}
 	
 	public Long getIdEdicao() {
@@ -96,14 +96,6 @@ public class Edicao {
 		this.tamanho = tamanho;
 	}
 
-	public Idioma getIdioma() {
-		return idioma;
-	}
-
-	public void setIdioma(Idioma idioma) {
-		this.idioma = idioma;
-	}
-
 	public ClassificacaoIndicativa getClassificacao() {
 		return classificacao;
 	}
@@ -134,5 +126,13 @@ public class Edicao {
 
 	public void setEditora(Editora editora) {
 		this.editora = editora;
+	}
+	
+	public Idioma getIdioma() {
+		return idioma;
+	}
+
+	public void setIdioma(Idioma idioma) {
+		this.idioma = idioma;
 	}
 }

@@ -4,28 +4,35 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "categoria")
-public class Categoria {
+@Table(name = "estado")
+public class Estado {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long idCategoria;
+	private Long idEstado;
 	
 	private String nome;
-
-	protected Categoria() {
+	
+	@ManyToOne
+	@JoinColumn(name = "id_pais")
+	private Pais pais;
+	
+	protected Estado() {
 		
 	}
-
-	public Categoria(String nome) {
+	
+	public Estado(String nome, Pais pais) {
 		this.nome = nome;
+		this.pais = pais;
 	}
 
-	public Long getIdCategoria() {
-		return idCategoria;
+	public Long getIdEstado() {
+		return idEstado;
 	}
 
 	public String getNome() {
@@ -34,5 +41,13 @@ public class Categoria {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public Pais getPais() {
+		return pais;
+	}
+
+	public void setPais(Pais pais) {
+		this.pais = pais;
 	}
 }

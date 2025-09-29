@@ -1,7 +1,6 @@
 package com.projeto.sistemabiblioteca.entities;
 
 import com.projeto.sistemabiblioteca.entities.enums.EstadoFisico;
-import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 
 import jakarta.persistence.Entity;
@@ -32,7 +31,7 @@ public class Exemplar {
 	@JoinColumn(name = "id_edicao")
 	private Edicao edicao;
 	
-	public Exemplar() {
+	protected Exemplar() {
 		
 	}
 	

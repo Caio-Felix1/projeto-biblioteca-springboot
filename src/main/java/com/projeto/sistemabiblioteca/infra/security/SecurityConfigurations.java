@@ -67,6 +67,8 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.POST, "/editoras").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.PUT, "/editoras/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/editoras/**").hasRole("ADMIN")
+						
+						.requestMatchers(HttpMethod.POST, "livros/gerenciamento").permitAll()
                 )
                 .addFilterAfter(securityFilter, CorsFilter.class)
                 .build();

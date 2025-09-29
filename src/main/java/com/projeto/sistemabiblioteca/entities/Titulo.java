@@ -35,7 +35,7 @@ public class Titulo {
 	inverseJoinColumns = @JoinColumn(name = "id_autor"))
 	private Set<Autor> autores = new HashSet<>();
 	
-	public Titulo() {
+	protected Titulo() {
 		
 	}
 	
@@ -64,6 +64,14 @@ public class Titulo {
 		this.descricao = descricao;
 	}
 	
+	public Set<Categoria> getCategorias() {
+		return new HashSet<>(categorias);
+	}
+
+	public Set<Autor> getAutores() {
+		return new HashSet<>(autores);
+	}
+
 	public void removerCategoria(Categoria categoria) {
 		categorias.remove(categoria);
 	}

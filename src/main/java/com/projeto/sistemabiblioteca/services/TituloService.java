@@ -3,6 +3,8 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.entities.Titulo;
@@ -10,6 +12,7 @@ import com.projeto.sistemabiblioteca.repositories.TituloRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
+@Service
 public class TituloService {
 
 	private TituloRepository TituloRepository;
@@ -54,9 +57,9 @@ public class TituloService {
 		return TituloRepository.save(titulo1);
 	}
 	
-	private void atualizarDados(Titulo t1, Titulo t2) {
-		t1.setNome(t2.getNome());
-		t1.setDescricao(t2.getDescricao());
+	private void atualizarDados(Titulo titulo1, Titulo titulo2) {
+		titulo1.setNome(titulo2.getNome());
+		titulo1.setDescricao(titulo2.getDescricao());
 	}
 	
 	public void adicionarCategoria(Long idTitulo, Long idCategoria) {

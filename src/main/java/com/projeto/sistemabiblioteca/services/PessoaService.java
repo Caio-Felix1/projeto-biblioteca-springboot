@@ -80,15 +80,15 @@ public class PessoaService {
 		return pessoaRepository.save(pessoa1);
 	}
 	
-	private void atualizarDados(Pessoa p1, Pessoa p2) {
-		p1.setNome(p2.getNome());
-		p1.setCpf(p2.getCpf());
-		p1.setSexo(p2.getSexo());
-		p1.setFuncao(p2.getFuncao());
-		p1.setDtNascimento(p2.getDtNascimento());
-		p1.setTelefone(p2.getTelefone());
-		p1.setEmail(p2.getEmail());
-		p1.setSenhaHash(p2.getSenhaHash());
-		p1.setEndereco(p2.getEndereco());
+	private void atualizarDados(Pessoa pessoa1, Pessoa pessoa2) {
+		pessoa1.setNome(pessoa2.getNome());
+		pessoa1.setCpf(pessoa2.getCpf());
+		pessoa1.setSexo(pessoa2.getSexo());
+		pessoa1.setFuncao(pessoa2.getFuncao());
+		pessoa1.setDtNascimento(pessoa2.getDtNascimento());
+		pessoa1.setTelefone(pessoa2.getTelefone());
+		pessoa1.setEmail(pessoa2.getEmail());
+		pessoa1.setSenhaHash(pessoa2.getSenhaHash());
+		pessoa1.setEndereco(pessoa2.getEndereco());
 	}
 }

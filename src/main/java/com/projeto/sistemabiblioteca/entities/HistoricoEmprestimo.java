@@ -38,7 +38,7 @@ public class HistoricoEmprestimo {
 	@Enumerated(EnumType.STRING)
 	private StatusPagamento statusPagamento;
 	
-	public HistoricoEmprestimo() {
+	protected HistoricoEmprestimo() {
 		
 	}
 

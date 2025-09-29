@@ -7,25 +7,21 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "categoria")
-public class Categoria {
+@Table(name = "pais")
+public class Pais {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long idCategoria;
+	private Long idPais;
 	
 	private String nome;
 
-	protected Categoria() {
-		
-	}
-
-	public Categoria(String nome) {
+	public Pais(String nome) {
 		this.nome = nome;
 	}
-
-	public Long getIdCategoria() {
-		return idCategoria;
+	
+	public Long getIdPais() {
+		return idPais;
 	}
 
 	public String getNome() {

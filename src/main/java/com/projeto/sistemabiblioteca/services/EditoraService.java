@@ -29,7 +29,7 @@ public class EditoraService {
 	public Editora buscarPorId(Long id) {
 		Optional<Editora> editora = editoraRepository.findById(id);
 		if (editora.isEmpty()) {
-			throw new EntityNotFoundException("Erro: editora com id correspondente não foi encontrado.");
+			throw new EntityNotFoundException("Erro: editora com id correspondente não foi encontrada.");
 		}
 		return editora.get();
 	}
@@ -48,7 +48,7 @@ public class EditoraService {
 		return editoraRepository.save(editora1);
 	}
 	
-	private void atualizarDados(Editora e1, Editora e2) {
-		e1.setNome(e2.getNome());
+	private void atualizarDados(Editora editora1, Editora editora2) {
+		editora1.setNome(editora2.getNome());
 	}
 }
