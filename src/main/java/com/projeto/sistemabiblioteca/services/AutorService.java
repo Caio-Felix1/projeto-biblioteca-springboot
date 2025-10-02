@@ -3,11 +3,13 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.entities.Autor;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.AutorRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AutorService {
@@ -26,6 +28,10 @@ public class AutorService {
 		return autorRepository.findAllByNomeContainingIgnoreCase(nome);
 	}
 	
+	public List<Autor> buscarTodosComStatusIgualA(StatusAtivo status) {
+		return autorRepository.findAllByStatusEquals(status);
+	}
+	
 	public Autor buscarPorId(Long id) {
 		Optional<Autor> autor = autorRepository.findById(id);
 		if (autor.isEmpty()) {
@@ -38,8 +44,13 @@ public class AutorService {
 		return autorRepository.save(autor);
 	}
 	
-	public void deletar(Long id) {
-		autorRepository.deleteById(id);
+	public void inativar(Long id) {
+		Autor autor = buscarPorId(id);
+		if (autor.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalStateException("Erro: autor já está inativo.");
+		}
+		autor.inativar();
+		autorRepository.save(autor);
 	}
 	
 	public Autor atualizar(Long id, Autor autor2) {

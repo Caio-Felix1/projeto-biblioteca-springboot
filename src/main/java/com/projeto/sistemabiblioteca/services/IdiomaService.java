@@ -3,11 +3,13 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.entities.Idioma;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 
 @Service
 public class IdiomaService {
@@ -22,6 +24,10 @@ public class IdiomaService {
 		return idiomaRepository.findAll();
 	}
 	
+	public List<Idioma> buscarTodosComStatusIgualA(StatusAtivo status) {
+		return idiomaRepository.findAllByStatusEquals(status);
+	}
+	
 	public Idioma buscarPorId(Long id) {
 		Optional<Idioma> idioma = idiomaRepository.findById(id);
 		if (idioma.isEmpty()) {
@@ -34,8 +40,13 @@ public class IdiomaService {
 		return idiomaRepository.save(idioma);
 	}
 	
-	public void deletar(Long id) {
-		idiomaRepository.deleteById(id);
+	public void inativar(Long id) {
+		Idioma idioma = buscarPorId(id);
+		if (idioma.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalStateException("Erro: idioma já está inativo.");
+		}
+		idioma.inativar();
+		idiomaRepository.save(idioma);
 	}
 	
 	public Idioma atualizar(Long id, Idioma idioma2) {

@@ -18,7 +18,7 @@ public class CategoriaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Categoria>> getAll(@RequestParam(required = false) String nome) {
+    public ResponseEntity<List<Categoria>> buscarTodos(@RequestParam(required = false) String nome) {
         if (nome != null && !nome.isEmpty()) {
             return ResponseEntity.ok(categoriaService.buscarTodosComNomeContendo(nome));
         }
@@ -26,24 +26,24 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Categoria> getById(@PathVariable Long id) {
+    public ResponseEntity<Categoria> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(categoriaService.buscarPorId(id));
     }
 
     @PostMapping
-    public ResponseEntity<Categoria> create(@RequestBody Categoria categoria) {
+    public ResponseEntity<Categoria> cadastrar(@RequestBody Categoria categoria) {
         Categoria novaCategoria = categoriaService.inserir(categoria);
         return ResponseEntity.ok(novaCategoria);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Categoria> update(@PathVariable Long id, @RequestBody Categoria categoria) {
+    public ResponseEntity<Categoria> atualizar(@PathVariable Long id, @RequestBody Categoria categoria) {
         return ResponseEntity.ok(categoriaService.atualizar(id, categoria));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        categoriaService.deletar(id);
+    public ResponseEntity<Void> inativar(@PathVariable Long id) {
+        categoriaService.inativar(id);
         return ResponseEntity.noContent().build();
     }
 }

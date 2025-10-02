@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Edicao;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -23,6 +24,10 @@ public class EdicaoService {
 		return edicaoRepository.findAll();
 	}
 	
+	public List<Edicao> buscarTodosComStatusIgualA(StatusAtivo status) {
+		return edicaoRepository.findAllByStatusEquals(status);
+	}
+	
 	public Edicao buscarPorId(Long id) {
 		Optional<Edicao> edicao = edicaoRepository.findById(id);
 		if (edicao.isEmpty()) {
@@ -35,8 +40,13 @@ public class EdicaoService {
 		return edicaoRepository.save(edicao);
 	}
 	
-	public void deletar(Long id) {
-		edicaoRepository.deleteById(id);
+	public void inativar(Long id) {
+		Edicao edicao = buscarPorId(id);
+		if (edicao.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalStateException("Erro: edição já está inativa.");
+		}
+		edicao.inativar();
+		edicaoRepository.save(edicao);
 	}
 	
 	public Edicao atualizar(Long id, Edicao edicao2) {

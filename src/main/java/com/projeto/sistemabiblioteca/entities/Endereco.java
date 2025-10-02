@@ -1,6 +1,11 @@
 package com.projeto.sistemabiblioteca.entities;
 
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.entities.interfaces.Ativavel;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,7 +15,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "endereco")
-public class Endereco {
+public class Endereco implements Ativavel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +26,9 @@ public class Endereco {
 	private String complemento;
 	private String bairro;
 	private String cep;
+	
+	@Enumerated(EnumType.STRING)
+	private StatusAtivo status;
 	
 	@ManyToOne
 	@JoinColumn(name = "id_estado")
@@ -37,6 +45,7 @@ public class Endereco {
 		this.bairro = bairro;
 		this.cep = cep;
 		this.estado = estado;
+		ativar();
 	}
 
 	public Long getIdEndereco() {
@@ -90,4 +99,19 @@ public class Endereco {
 	public void setEstado(Estado estado) {
 		this.estado = estado;
 	} 	
+	
+	@Override
+	public StatusAtivo getStatusAtivo() {
+		return status;
+	}
+
+	@Override
+	public void ativar() {
+		status = StatusAtivo.ATIVO;
+	}
+
+	@Override
+	public void inativar() {
+		status = StatusAtivo.INATIVO;
+	}
 }

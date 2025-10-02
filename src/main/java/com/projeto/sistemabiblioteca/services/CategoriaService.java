@@ -3,11 +3,13 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.entities.Categoria;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CategoriaService {
@@ -26,6 +28,10 @@ public class CategoriaService {
 		return categoriaRepository.findAllByNomeContainingIgnoreCase(nome);
 	}
 	
+	public List<Categoria> buscarTodosComStatusIgualA(StatusAtivo status) {
+		return categoriaRepository.findAllByStatusEquals(status);
+	}
+	
 	public Categoria buscarPorId(Long id) {
 		Optional<Categoria> categoria = categoriaRepository.findById(id);
 		if (categoria.isEmpty()) {
@@ -38,8 +44,13 @@ public class CategoriaService {
 		return categoriaRepository.save(categoria);
 	}
 	
-	public void deletar(Long id) {
-		categoriaRepository.deleteById(id);
+	public void inativar(Long id) {
+		Categoria categoria = buscarPorId(id);
+		if (categoria.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalStateException("Erro: categoria já está inativa.");
+		}
+		categoria.inativar();
+		categoriaRepository.save(categoria);
 	}
 	
 	public Categoria atualizar(Long id, Categoria categoria2) {

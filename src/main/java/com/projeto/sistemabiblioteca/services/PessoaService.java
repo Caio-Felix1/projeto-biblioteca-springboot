@@ -70,6 +70,9 @@ public class PessoaService {
 	
 	public void inativar(Long id) {
 		Pessoa pessoa = buscarPorId(id);
+		if (pessoa.getStatusConta() == StatusConta.INATIVA) {
+			throw new IllegalStateException("Erro: usuário já está inativo.");
+		}
 		pessoa.inativarConta();
 		pessoaRepository.save(pessoa);
 	}

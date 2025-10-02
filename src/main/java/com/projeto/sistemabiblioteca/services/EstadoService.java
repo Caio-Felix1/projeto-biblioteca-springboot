@@ -3,11 +3,13 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.entities.Estado;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.EstadoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 
 @Service
 public class EstadoService {
@@ -22,6 +24,10 @@ public class EstadoService {
 		return estadoRepository.findAll();
 	}
 	
+	public List<Estado> buscarTodosComStatusIgualA(StatusAtivo status) {
+		return estadoRepository.findAllByStatusEquals(status);
+	}
+	
 	public Estado buscarPorId(Long id) {
 		Optional<Estado> estado = estadoRepository.findById(id);
 		if (estado.isEmpty()) {
@@ -34,8 +40,13 @@ public class EstadoService {
 		return estadoRepository.save(estado);
 	}
 	
-	public void deletar(Long id) {
-		estadoRepository.deleteById(id);
+	public void inativar(Long id) {
+		Estado estado = buscarPorId(id);
+		if (estado.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalStateException("Erro: estado já está inativo.");
+		}
+		estado.inativar();
+		estadoRepository.save(estado);
 	}
 	
 	public Estado atualizar(Long id, Estado estado2) {

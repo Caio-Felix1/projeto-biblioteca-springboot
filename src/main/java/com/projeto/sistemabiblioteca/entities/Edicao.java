@@ -3,8 +3,10 @@ package com.projeto.sistemabiblioteca.entities;
 import java.time.LocalDate;
 
 import com.projeto.sistemabiblioteca.entities.enums.ClassificacaoIndicativa;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
 import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
+import com.projeto.sistemabiblioteca.entities.interfaces.Ativavel;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,7 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "edicao")
-public class Edicao {
+public class Edicao implements Ativavel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,9 @@ public class Edicao {
 	private ClassificacaoIndicativa classificacao;
 	
 	private LocalDate dtPublicacao;
+	
+	@Enumerated(EnumType.STRING)
+	private StatusAtivo status;
 	
 	@ManyToOne
 	@JoinColumn(name = "id_titulo")
@@ -63,6 +68,7 @@ public class Edicao {
 		this.titulo = titulo;
 		this.editora = editora;
 		this.idioma = idioma;
+		ativar();
 	}
 	
 	public Long getIdEdicao() {
@@ -134,5 +140,20 @@ public class Edicao {
 
 	public void setIdioma(Idioma idioma) {
 		this.idioma = idioma;
+	}
+	
+	@Override
+	public StatusAtivo getStatusAtivo() {
+		return status;
+	}
+
+	@Override
+	public void ativar() {
+		status = StatusAtivo.ATIVO;
+	}
+
+	@Override
+	public void inativar() {
+		status = StatusAtivo.INATIVO;
 	}
 }

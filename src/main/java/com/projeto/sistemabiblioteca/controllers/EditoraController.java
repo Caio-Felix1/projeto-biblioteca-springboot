@@ -18,7 +18,7 @@ public class EditoraController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Editora>> getAll(@RequestParam(required = false) String nome) {
+    public ResponseEntity<List<Editora>> buscarTodos(@RequestParam(required = false) String nome) {
         if (nome != null && !nome.isEmpty()) {
             return ResponseEntity.ok(editoraService.buscarTodosComNomeContendo(nome));
         }
@@ -26,24 +26,24 @@ public class EditoraController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Editora> getById(@PathVariable Long id) {
+    public ResponseEntity<Editora> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(editoraService.buscarPorId(id));
     }
 
     @PostMapping
-    public ResponseEntity<Editora> create(@RequestBody Editora editora) {
+    public ResponseEntity<Editora> cadastrar(@RequestBody Editora editora) {
         Editora novaEditora = editoraService.inserir(editora);
         return ResponseEntity.ok(novaEditora);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Editora> update(@PathVariable Long id, @RequestBody Editora editora) {
+    public ResponseEntity<Editora> atualizar(@PathVariable Long id, @RequestBody Editora editora) {
         return ResponseEntity.ok(editoraService.atualizar(id, editora));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        editoraService.deletar(id);
+    public ResponseEntity<Void> inativar(@PathVariable Long id) {
+        editoraService.inativar(id);
         return ResponseEntity.noContent().build();
     }
 }

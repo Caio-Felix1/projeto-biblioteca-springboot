@@ -18,7 +18,7 @@ public class AutorController {
 
 
     @GetMapping
-    public ResponseEntity<List<Autor>> getAll(@RequestParam(required = false) String nome) {
+    public ResponseEntity<List<Autor>> buscarTodos(@RequestParam(required = false) String nome) {
         if (nome != null && !nome.isEmpty()) {
             return ResponseEntity.ok(autorService.buscarTodosComNomeContendo(nome));
         }
@@ -27,27 +27,27 @@ public class AutorController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Autor> getById(@PathVariable Long id) {
+    public ResponseEntity<Autor> buscarPorId(@PathVariable Long id) {
             return ResponseEntity.ok(autorService.buscarPorId(id));
     }
 
 
     @PostMapping
-    public ResponseEntity<Autor> create(@RequestBody Autor autor) {
+    public ResponseEntity<Autor> cadastrar(@RequestBody Autor autor) {
         Autor novoAutor = autorService.inserir(autor);
         return ResponseEntity.ok(novoAutor);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Autor> update(@PathVariable Long id, @RequestBody Autor autor) {
+    public ResponseEntity<Autor> atualizar(@PathVariable Long id, @RequestBody Autor autor) {
             return ResponseEntity.ok(autorService.atualizar(id, autor));
     }
 
     // Deletar autor
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-            autorService.deletar(id);
+    public ResponseEntity<Void> inativar(@PathVariable Long id) {
+            autorService.inativar(id);
             return ResponseEntity.noContent().build();
     }
 

@@ -3,11 +3,13 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.entities.Editora;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 
 @Service
 public class EditoraService {
@@ -26,6 +28,10 @@ public class EditoraService {
 		return editoraRepository.findAllByNomeContainingIgnoreCase(nome);
 	}
 	
+	public List<Editora> buscarTodosComStatusIgualA(StatusAtivo status) {
+		return editoraRepository.findAllByStatusEquals(status);
+	}
+	
 	public Editora buscarPorId(Long id) {
 		Optional<Editora> editora = editoraRepository.findById(id);
 		if (editora.isEmpty()) {
@@ -38,8 +44,13 @@ public class EditoraService {
 		return editoraRepository.save(editora);
 	}
 	
-	public void deletar(Long id) {
-		editoraRepository.deleteById(id);
+	public void inativar(Long id) {
+		Editora editora = buscarPorId(id);
+		if (editora.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalStateException("Erro: editora já está inativa.");
+		}
+		editora.inativar();
+		editoraRepository.save(editora);
 	}
 	
 	public Editora atualizar(Long id, Editora editora2) {

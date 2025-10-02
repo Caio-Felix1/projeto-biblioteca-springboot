@@ -26,6 +26,7 @@ public class Emprestimo {
 	private Long idEmprestimo;
 	
 	private LocalDate dtInicioEmprestimo;
+	private LocalDate dtSeparacaoExemplar;
 	private LocalDate dtRetiradaExemplar;
 	private LocalDate dtDevolucaoPrevista;
 	private LocalDate dtDevolvidoExemplar;
@@ -49,37 +50,11 @@ public class Emprestimo {
 		
 	}
 	
-	/**
-	 * Cria uma instância de empréstimo com a data de devolução prevista definida automaticamente.
-	 * O status inicia definido como RESERVADO.
-	 * 
-	 * @param hoje
-	 * @param pessoa
-	 * @param exemplar
-	 * @param multa
-	 */
-	public Emprestimo(LocalDate hoje, Pessoa pessoa, Exemplar exemplar, Multa multa) {
-		dtInicioEmprestimo = hoje;
-		dtDevolucaoPrevista = calcularDataDeDevolucao();
-		status = StatusEmprestimo.RESERVADO;
-		this.pessoa = pessoa;
-		this.exemplar = exemplar;
-		this.multa = multa;
-	}
-	
-	/**
-	 * Cria uma instância do empréstimo com data de devolução prevista definida manualmente.
-	 * O status inicia definido como RESERVADO.
-	 * 
-	 * @param hoje
-	 * @param dtDevolucaoPrevista
-	 * @param pessoa
-	 * @param exemplar
-	 * @param multa
-	 */
-	public Emprestimo(LocalDate hoje, LocalDate dtDevolucaoPrevista, Pessoa pessoa, Exemplar exemplar, Multa multa) {
-		dtInicioEmprestimo = hoje;
-		setDtDevolucaoPrevista(dtDevolucaoPrevista);
+	public Emprestimo(LocalDate dtInicioEmprestimo, Pessoa pessoa, Exemplar exemplar, Multa multa) {
+		if (dtInicioEmprestimo == null) {
+			throw new IllegalArgumentException("Erro: a data de início do empréstimo não pode ser configurada como nula.");
+		}
+		this.dtInicioEmprestimo = dtInicioEmprestimo;
 		status = StatusEmprestimo.RESERVADO;
 		this.pessoa = pessoa;
 		this.exemplar = exemplar;
@@ -94,6 +69,10 @@ public class Emprestimo {
 		return dtInicioEmprestimo;
 	}
 	
+	public LocalDate getDtSeparacaoExemplar() {
+		return dtSeparacaoExemplar;
+	}
+
 	public LocalDate getDtRetiradaExemplar() {
 		return dtRetiradaExemplar;
 	}
@@ -103,6 +82,12 @@ public class Emprestimo {
 	}
 
 	public void setDtDevolucaoPrevista(LocalDate dtDevolucaoPrevista) {
+		if (dtDevolucaoPrevista == null) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser configurada como nula.");
+		}
+		if (status != StatusEmprestimo.EM_ANDAMENTO) {
+			throw new IllegalArgumentException("Erro: só é possível definir a data de devolução prevista quando o empréstimo estiver em andamento.");
+		}
 		if (dtDevolucaoPrevista.isBefore(dtInicioEmprestimo)) {
 			throw new IllegalArgumentException("Erro: a data de devolução prevista é anterior à data de início do empréstimo.");
 		}
@@ -146,27 +131,70 @@ public class Emprestimo {
 	public void setMulta(Multa multa) {
 		this.multa = multa;
 	}
-
+	
 	/**
-	 * Registra a retirada do Exemplar.
+	 * Registra que o Exemplar foi separado para retirada.
 	 * 
-	 * Muda o status para EM_ANDAMENTO e atribui o valor do parâmetro 'hoje' à variável dtRetiradaExemplar.
+	 * Muda o status para SEPARADO e atribui o valor do parâmetro 'hoje' à variável dtSeparacaoExemplar.
 	 * 
 	 * @param hoje
 	 */
-	public void retirarExemplar(LocalDate hoje) {
+	public void separarExemplar(LocalDate hoje) {
 		if (hoje == null) {
 			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
 		}
+		if (status == StatusEmprestimo.SEPARADO) {
+			throw new IllegalStateException("Erro: o exemplar já foi separado.");
+		}
 		if (status != StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: o exemplar já foi retirado.");
+		}
+		
+		status = StatusEmprestimo.SEPARADO;
+		dtSeparacaoExemplar = hoje;
+	}
+
+	/**
+	 * Registra a retirada do Exemplar com data de devolução prevista inserida manualmente.
+	 * 
+	 * Muda o status para EM_ANDAMENTO, atribui o valor do parâmetro 'hoje' à variável dtRetiradaExemplar e
+	 * o valor do parâmetro 'dtDevolucaoPrevista' à varíavel dtDevolucaoPrevista.
+	 * 
+	 * @param hoje
+	 * @param dtDevolucaoPrevista
+	 */
+	public void retirarExemplar(LocalDate hoje, LocalDate dtDevolucaoPrevista) {
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+		}
+		if (status == StatusEmprestimo.CANCELADO) {
+			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
+		}
+		if (status == StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: o exemplar ainda não foi separado.");
+		}
+		if (status != StatusEmprestimo.SEPARADO) {
 			throw new IllegalStateException("Erro: o exemplar já foi retirado.");
 		}
 		
 		status = StatusEmprestimo.EM_ANDAMENTO;
 		dtRetiradaExemplar = hoje;
+		setDtDevolucaoPrevista(dtDevolucaoPrevista);
+	}
+	
+	/**
+	 * Registra a retirada do Exemplar com data de devolução prevista calculada automaticamente.
+	 * 
+	 * Chama o método retirarExemplar com dois parâmetros, passando o valor do parâmetro 'hoje' e o 
+	 * resultado do cálculo da data de devolução prevista.
+	 * 
+	 * @param hoje
+	 */
+	public void retirarExemplar(LocalDate hoje) {
+		retirarExemplar(hoje, calcularDataDeDevolucao());
 	}
 	
 	/**
@@ -184,7 +212,7 @@ public class Emprestimo {
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível devolver exemplar.");
 		}
-		if (status == StatusEmprestimo.RESERVADO) {
+		if (status == StatusEmprestimo.RESERVADO || status == StatusEmprestimo.SEPARADO) {
 			throw new IllegalStateException("Erro: o exemplar ainda não foi retirado.");
 		}
 		if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
@@ -202,14 +230,14 @@ public class Emprestimo {
 	/**
 	 * Registra a perda do exemplar.
 	 * 
-	 * Muda o status para EXEMPLAR_PERDIDO, chama o método aplicarMultaPorPerda e 
+	 * Muda o status para EXEMPLAR_PERDIDO, chama o método aplicarMultaPorPerda do atributo multa e 
 	 * muda o status do exemplar para PERDIDO.
 	 */
 	public void registrarPerdaDoExemplar() {
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível registrar a perda do exemplar.");
 		}
-		if (status == StatusEmprestimo.RESERVADO) {
+		if (status == StatusEmprestimo.RESERVADO || status == StatusEmprestimo.SEPARADO) {
 			throw new IllegalStateException("Erro: o exemplar ainda não foi retirado.");
 		}
 		if (status == StatusEmprestimo.DEVOLVIDO) {
@@ -227,11 +255,16 @@ public class Emprestimo {
 	/**
 	 * Registra o atraso do empréstimo.
 	 * 
-	 * Muda o status para ATRASADO, chama o método aplicarMulta e chama o método calcularMultaDiaria.
+	 * Muda o status para ATRASADO e chama o método aplicarMulta do atributo multa.
+	 * 
+	 * @param hoje
 	 */
 	public void registrarAtraso(LocalDate hoje) {
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo já foi cancelado.");
+		}
+		if (status == StatusEmprestimo.RESERVADO || status == StatusEmprestimo.SEPARADO) {
+			throw new IllegalStateException("Erro: o exemplar ainda não foi retirado.");
 		}
 		if (status == StatusEmprestimo.DEVOLVIDO) {
 			throw new IllegalStateException("Erro: o exemplar já foi devolvido.");
@@ -257,7 +290,10 @@ public class Emprestimo {
 		if (status == StatusEmprestimo.DEVOLVIDO) {
 			throw new IllegalStateException("Erro: o exemplar já foi devolvido.");
 		}
-		if (status != StatusEmprestimo.RESERVADO) {
+		if (status == StatusEmprestimo.RESERVADO) {
+			throw new IllegalStateException("Erro: o exemplar ainda não foi separado.");
+		}
+		if (status != StatusEmprestimo.SEPARADO) {
 			throw new IllegalStateException("Erro: o exemplar já foi retirado.");
 		}
 		
@@ -279,7 +315,7 @@ public class Emprestimo {
 		if (hoje == null) {
 			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
 		}
-		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.EM_ANDAMENTO, StatusEmprestimo.ATRASADO).contains(status)) {
+		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.SEPARADO, StatusEmprestimo.EM_ANDAMENTO, StatusEmprestimo.ATRASADO).contains(status)) {
 			throw new IllegalStateException("Erro: o empréstimo não está ativo.");
 		}
 		if (dtInicioEmprestimo == null) {
@@ -319,8 +355,11 @@ public class Emprestimo {
 		if (hoje == null) {
 			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
 		}
-		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.EM_ANDAMENTO).contains(status)) {
-			throw new IllegalStateException("Erro: O empréstimo não está ativo ou já está atrasado. Não é possível calcular dias restantes.");
+		if (status == StatusEmprestimo.ATRASADO) {
+			throw new IllegalStateException("Erro: O empréstimo já está atrasado. Não é possível calcular dias restantes.");
+		}
+		if (status != StatusEmprestimo.EM_ANDAMENTO) {
+			throw new IllegalStateException("Erro: O empréstimo não está ativo. Não é possível calcular dias restantes.");
 		}
 		if (dtDevolucaoPrevista == null) {
 			throw new IllegalStateException("Erro: data de devolução prevista inválida.");

@@ -3,7 +3,12 @@ package com.projeto.sistemabiblioteca.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.entities.interfaces.Ativavel;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,7 +19,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "titulo")
-public class Titulo {
+public class Titulo implements Ativavel {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +27,9 @@ public class Titulo {
 	
 	private String nome;
 	private String descricao;
+	
+	@Enumerated(EnumType.STRING)
+	private StatusAtivo status;
 	
 	@ManyToMany
 	@JoinTable(name = "titulo_categoria",        
@@ -42,6 +50,7 @@ public class Titulo {
 	public Titulo(String nome, String descricao) {
 		this.nome = nome;
 		this.descricao = descricao;
+		ativar();
 	}
 	
 	public Long getIdTitulo() {
@@ -86,5 +95,20 @@ public class Titulo {
 	
 	public void adicionarAutor(Autor autor) {
 		autores.add(autor);
+	}
+	
+	@Override
+	public StatusAtivo getStatusAtivo() {
+		return status;
+	}
+
+	@Override
+	public void ativar() {
+		status = StatusAtivo.ATIVO;
+	}
+
+	@Override
+	public void inativar() {
+		status = StatusAtivo.INATIVO;
 	}
 }
