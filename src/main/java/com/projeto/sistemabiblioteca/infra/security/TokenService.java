@@ -36,7 +36,6 @@ public class TokenService {
 
     public DecodedJWT verifyToken(String token) {
         try{
-        Algorithm algorithm = Algorithm.HMAC256(secret);
         return  JWT.require(algorithm).withIssuer("auth-api").build().verify(token);
         }catch (JWTVerificationException exception){
             return  null;
