@@ -24,13 +24,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 	
-    private TokenService tokenSevice;
+    private TokenService tokenService;
 
-    private PessoaService  pessoaService;
 
-    public SecurityFilter(TokenService tokenSevice, PessoaService pessoaService) {
-        this.tokenSevice = tokenSevice;
-        this.pessoaService = pessoaService;
+
+    public SecurityFilter(TokenService tokenService) {
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -42,41 +41,27 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         String token = this.recoverToken(request);
         if (token != null) {
-            DecodedJWT decoded = JWT.require(Algorithm.HMAC256("secret"))
-                    .withIssuer("auth-api")
-                    .build()
-                    .verify(token);
+            try {
+                DecodedJWT decoded = tokenService.verifyToken(token);
+                if (decoded != null) {
+                    String email = decoded.getSubject();
 
-            System.out.println("Token inteiro: " + decoded.getToken());
-            System.out.println("Header: " + decoded.getHeader());
-            System.out.println("Payload: " + decoded.getPayload());
-            System.out.println("Assinatura: " + decoded.getSignature());
+                    String role = decoded.getClaim("role").asString().toUpperCase();
+                    GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
 
-            System.out.println("Subject: " + decoded.getSubject());
-            System.out.println("Role: " + decoded.getClaim("role").asString());
+                    UserDetails user = User.builder()
+                            .username(email)
+                            .password("") // tem que ter senha pra esse objeto funcionar
+                            .authorities(authority)
+                            .build();
+                    UsernamePasswordAuthenticationToken authAutentication =
+                            new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-            // pega info direto do token
-            String email = decoded.getSubject();
-
-
-            String role = decoded.getClaim("role").asString().toUpperCase();
-            GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
-
-
-
-            UserDetails user = User.builder()
-                    .username(email)
-                    .password("") // tem que ter senha pra esse objeto funcionar
-                    .authorities(authority)
-                    .build();
-
-            // cria o objeto de autenticação
-            UsernamePasswordAuthenticationToken authAutentication =
-                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
-            // coloca no contexto do Spring Security e continua o handler
-            SecurityContextHolder.getContext().setAuthentication(authAutentication);
-            System.out.println("cheguei ao fim do sessao ");
+                    SecurityContextHolder.getContext().setAuthentication(authAutentication);
+                }
+            }catch (Exception e) {
+                System.out.println("Token inválido: " + e.getMessage());
+            }
         }
 
         filterChain.doFilter(request, response);
