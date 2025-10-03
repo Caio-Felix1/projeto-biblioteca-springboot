@@ -17,7 +17,11 @@ public class TokenService {
     public String generateToken(Pessoa pessoa) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create().withIssuer("auth-api").withSubject(pessoa.getEmail().getEndereco()).withExpiresAt(genExpirationDate()).sign(algorithm);
+            String token = JWT.create().withIssuer("auth-api")
+                    .withSubject(pessoa.getEmail().getEndereco())
+                    .withClaim("role", pessoa.getFuncao().name())
+                    .withExpiresAt(genExpirationDate())
+                    .sign(algorithm);
             return token;
         }catch (JWTCreationException exception){
             throw new RuntimeException("erro gerar token", exception);

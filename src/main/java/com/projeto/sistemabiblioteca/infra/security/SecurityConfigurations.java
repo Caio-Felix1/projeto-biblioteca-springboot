@@ -31,43 +31,47 @@ public class SecurityConfigurations {
 		this.securityFilter = securityFilter;
 	}
 
-	// REMOVER APÓS RETIRAR O H2 CONSOLE.
-	// Serve para ignorar o filtro quando utilizaro h2.
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web
-	      .ignoring()
-	      .requestMatchers("/h2-console/**");
-	}
+
     
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
+
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .headers(headers -> headers.frameOptions().disable()) // remover depois de tirar o H2
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                		.requestMatchers("/h2-console/**").permitAll() // remover depois de tirar o H2
+
                 		.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
 
 						.requestMatchers(HttpMethod.GET, "/autores/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/autores").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/autores/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/autores/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/autores").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.PUT, "/autores/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.DELETE, "/autores/**").hasRole("ADMINISTRADOR")
 
 						.requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/categorias").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/categorias/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/categorias").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.PUT, "/categorias/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.DELETE, "/categorias/**").hasRole("ADMINISTRADOR")
 
 						.requestMatchers(HttpMethod.GET, "/editoras/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/editoras").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/editoras/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/editoras/**").hasRole("ADMIN")
-						
+						.requestMatchers(HttpMethod.POST, "/editoras").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.PUT, "/editoras/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.DELETE, "/editoras/**").hasRole("ADMINISTRADOR")
+
+						.requestMatchers(HttpMethod.GET, "/edicoes/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/edicoes").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.PUT, "/edicoes/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.DELETE, "/edicoes/**").hasRole("ADMINISTRADOR")
+
+						.requestMatchers(HttpMethod.GET, "/idiomas/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/idiomas").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.PUT, "/idiomas/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.DELETE, "/idiomas/**").hasRole("ADMINISTRADOR")
+
 						.requestMatchers(HttpMethod.POST, "livros/gerenciamento").permitAll()
                 )
                 .addFilterAfter(securityFilter, CorsFilter.class)
