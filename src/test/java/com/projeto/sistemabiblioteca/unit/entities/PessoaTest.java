@@ -14,23 +14,46 @@ public class PessoaTest {
 	
 	private StatusConta statusContaPadrao = StatusConta.ATIVA;
 	
-	@Test
-	void deveInstanciarPessoaComStatusAtiva() {		
-		Pessoa pessoa = Assertions.assertDoesNotThrow(
-				() -> new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null),
-				"Era esperado que a instanciação funcionasse com status ATIVA");
-		
-		Assertions.assertEquals(StatusConta.ATIVA, pessoa.getStatusConta(),
-				"Era esperado que o valor retornado fosse ATIVA");
+	private Pessoa criarPessoaComStatusAtiva() {
+		return new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+	}
+	
+	private Pessoa criarPessoaComStatusInativa() {
+		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		pessoa.inativarConta();
+		return pessoa;
+	}
+	
+	private Pessoa criarPessoaComStatusEmAnaliseAprovacao() {
+		return new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+	}
+	
+	private Pessoa criarPessoaComStatusRejeitada() {
+		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		pessoa.rejeitarConta();
+		return pessoa;
+	}
+	
+	private Pessoa criarPessoaComStatusEmAnaliseExclusao() {
+		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		pessoa.solicitarExclusaoConta();;
+		return pessoa;
 	}
 	
 	@Test
-	void deveInstanciarPessoaComStatusEmAnaliseAprovacao() {
-		Pessoa pessoa = Assertions.assertDoesNotThrow(
-				() -> new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null),
+	void deveInstanciarPessoaComStatusValido() {		
+		Pessoa pessoa1 = Assertions.assertDoesNotThrow(
+				() -> criarPessoaComStatusAtiva(),
+				"Era esperado que a instanciação funcionasse com status ATIVA");
+		
+		Assertions.assertEquals(StatusConta.ATIVA, pessoa1.getStatusConta(),
+				"Era esperado que o valor retornado fosse ATIVA");
+		
+		Pessoa pessoa2 = Assertions.assertDoesNotThrow(
+				() -> criarPessoaComStatusEmAnaliseAprovacao(),
 				"Era esperado que a instanciação funcionasse com status EM_ANALISE_APROVACAO");
 				
-		Assertions.assertEquals(StatusConta.EM_ANALISE_APROVACAO, pessoa.getStatusConta(),
+		Assertions.assertEquals(StatusConta.EM_ANALISE_APROVACAO, pessoa2.getStatusConta(),
 				"Era esperado que o valor retornado fosse EM_ANALISE_APROVACAO");
 	}
 	
@@ -63,7 +86,10 @@ public class PessoaTest {
 	void deveValidarDataDeNascimento(String dtStringTeste) {
 		LocalDate hoje = LocalDate.parse("2020-12-01");
 		LocalDate nascimento = LocalDate.parse(dtStringTeste);
-		Pessoa pessoa = new Pessoa(null, null, null, null, nascimento, null, null, null, statusContaPadrao, null);
+		
+		Pessoa pessoa = criarPessoaComStatusAtiva();
+		pessoa.setDtNascimento(nascimento);
+		
 		int idadeMinima = 18;
 		
 		if (nascimento.isAfter(hoje.minusYears(idadeMinima))) {
@@ -84,7 +110,10 @@ public class PessoaTest {
 	void deveValidarValorDaIdadeMinima() {
 		LocalDate hoje = LocalDate.parse("2020-12-01");
 		LocalDate nascimento = LocalDate.parse("2002-12-01");
-		Pessoa pessoa = new Pessoa(null, null, null, null, nascimento, null, null, null, statusContaPadrao, null);
+		
+		Pessoa pessoa = criarPessoaComStatusAtiva();
+		pessoa.setDtNascimento(nascimento);
+		
 		int idadeMinima1 = 0;
 		int idadeMinima2 = -1;
 		
@@ -99,9 +128,8 @@ public class PessoaTest {
 	
 	@Test
 	void deveInativarContaComStatusValido() {
-		Pessoa pessoa1 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		Pessoa pessoa2 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa2.solicitarExclusaoConta();
+		Pessoa pessoa1 = criarPessoaComStatusAtiva();
+		Pessoa pessoa2 = criarPessoaComStatusEmAnaliseExclusao();
 		
 		Assertions.assertDoesNotThrow(() -> pessoa1.inativarConta(),
 				"Era esperado que funcionasse o método inativarConta no objeto com status ATIVA");
@@ -118,11 +146,9 @@ public class PessoaTest {
 	
 	@Test
 	void deveLancarExcecaoAoInativarContaComStatusInvalido() {
-		Pessoa pessoa1 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa1.inativarConta();
-		Pessoa pessoa2 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
-		pessoa2.rejeitarConta();
-		Pessoa pessoa3 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		Pessoa pessoa1 = criarPessoaComStatusInativa();
+		Pessoa pessoa2 = criarPessoaComStatusRejeitada();
+		Pessoa pessoa3 = criarPessoaComStatusEmAnaliseAprovacao();
 		
 		Assertions.assertThrows(IllegalStateException.class, () -> pessoa1.inativarConta(),
 				"Era esperado que fosse lançada exceção ao tentar utilizar o método inativarConta em um objeto com status INATIVA");
@@ -136,7 +162,7 @@ public class PessoaTest {
 	
 	@Test
 	void deveAprovarContaComStatusEmAnaliseAprovacao() {
-		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		Pessoa pessoa = criarPessoaComStatusEmAnaliseAprovacao();
 		
 		Assertions.assertDoesNotThrow(() -> pessoa.aprovarConta(),
 				"Era esperado que funcionasse o método aprovarConta no objeto com status EM_ANALISE_APROVACAO");
@@ -147,13 +173,10 @@ public class PessoaTest {
 	
 	@Test
 	void deveLancarExcecaoAoAprovarContaComStatusInvalido() {
-		Pessoa pessoa1 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa1.inativarConta();
-		Pessoa pessoa2 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
-		pessoa2.rejeitarConta();
-		Pessoa pessoa3 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa3.solicitarExclusaoConta();
-		Pessoa pessoa4 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		Pessoa pessoa1 = criarPessoaComStatusInativa();
+		Pessoa pessoa2 = criarPessoaComStatusRejeitada();
+		Pessoa pessoa3 = criarPessoaComStatusEmAnaliseExclusao();
+		Pessoa pessoa4 = criarPessoaComStatusAtiva();
 		
 		Assertions.assertThrows(IllegalStateException.class, () -> pessoa1.aprovarConta(),
 				"Era esperado que fosse lançada exceção ao tentar utilizar o método aprovarConta em um objeto com status INATIVA");
@@ -170,7 +193,7 @@ public class PessoaTest {
 	
 	@Test
 	void deveRejeitarContaComStatusEmAnaliseAprovacao() {
-		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		Pessoa pessoa = criarPessoaComStatusEmAnaliseAprovacao();
 		
 		Assertions.assertDoesNotThrow(() -> pessoa.rejeitarConta(),
 				"Era esperado que funcionasse o método rejeitarConta no objeto com status EM_ANALISE_APROVACAO");
@@ -181,13 +204,10 @@ public class PessoaTest {
 	
 	@Test
 	void deveLancarExcecaoAoRejeitarContaComStatusInvalido() {
-		Pessoa pessoa1 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa1.inativarConta();
-		Pessoa pessoa2 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
-		pessoa2.rejeitarConta();
-		Pessoa pessoa3 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa3.solicitarExclusaoConta();
-		Pessoa pessoa4 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		Pessoa pessoa1 = criarPessoaComStatusInativa();
+		Pessoa pessoa2 = criarPessoaComStatusRejeitada();
+		Pessoa pessoa3 = criarPessoaComStatusEmAnaliseExclusao();
+		Pessoa pessoa4 = criarPessoaComStatusAtiva();
 		
 		Assertions.assertThrows(IllegalStateException.class, () -> pessoa1.rejeitarConta(),
 				"Era esperado que fosse lançada exceção ao tentar utilizar o método rejeitarConta em um objeto com status INATIVA");
@@ -204,7 +224,7 @@ public class PessoaTest {
 	
 	@Test
 	void deveSolicitarExclusaoContaComStatusAtiva() {
-		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		Pessoa pessoa = criarPessoaComStatusAtiva();
 		
 		Assertions.assertDoesNotThrow(() -> pessoa.solicitarExclusaoConta(),
 				"Era esperado que funcionasse o método solicitarExclusaoConta no objeto com status ATIVA");
@@ -215,13 +235,10 @@ public class PessoaTest {
 	
 	@Test
 	void deveLancarExcecaoAoSolicitarExclusaoContaComStatusInvalido() {
-		Pessoa pessoa1 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa1.inativarConta();
-		Pessoa pessoa2 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
-		pessoa2.rejeitarConta();
-		Pessoa pessoa3 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa3.solicitarExclusaoConta();
-		Pessoa pessoa4 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		Pessoa pessoa1 = criarPessoaComStatusInativa();
+		Pessoa pessoa2 = criarPessoaComStatusRejeitada();
+		Pessoa pessoa3 = criarPessoaComStatusEmAnaliseExclusao();
+		Pessoa pessoa4 = criarPessoaComStatusEmAnaliseAprovacao();
 		
 		Assertions.assertThrows(IllegalStateException.class, () -> pessoa1.solicitarExclusaoConta(),
 				"Era esperado que fosse lançada exceção ao tentar utilizar o método solicitarExclusaoConta em um objeto com status INATIVA");
@@ -238,8 +255,7 @@ public class PessoaTest {
 	
 	@Test
 	void deveRejeitarSolicitacaoExclusaoComStatusEmAnaliseExclusao() {
-		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa.solicitarExclusaoConta();
+		Pessoa pessoa = criarPessoaComStatusEmAnaliseExclusao();
 		
 		Assertions.assertDoesNotThrow(() -> pessoa.rejeitarSolicitacaoExclusao(),
 				"Era esperado que funcionasse o método rejeitarSolicitacaoExclusao no objeto com status EM_ANALISE_EXCLUSAO");
@@ -250,12 +266,10 @@ public class PessoaTest {
 	
 	@Test
 	void deveLancarExcecaoAoRejeitarSolicitacaoExclusaoComStatusInvalido() {
-		Pessoa pessoa1 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		pessoa1.inativarConta();
-		Pessoa pessoa2 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
-		pessoa2.rejeitarConta();
-		Pessoa pessoa3 = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
-		Pessoa pessoa4 = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		Pessoa pessoa1 = criarPessoaComStatusInativa();
+		Pessoa pessoa2 = criarPessoaComStatusRejeitada();
+		Pessoa pessoa3 = criarPessoaComStatusAtiva();
+		Pessoa pessoa4 = criarPessoaComStatusEmAnaliseAprovacao();
 		
 		Assertions.assertThrows(IllegalStateException.class, () -> pessoa1.rejeitarSolicitacaoExclusao(),
 				"Era esperado que fosse lançada exceção ao tentar utilizar o método rejeitarSolicitacaoExclusao em um objeto com status INATIVA");
