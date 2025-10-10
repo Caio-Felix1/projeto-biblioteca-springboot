@@ -13,6 +13,7 @@ import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
+import com.projeto.sistemabiblioteca.validation.Telefone;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -45,7 +46,9 @@ public class Pessoa implements UserDetails {
 	private FuncaoUsuario funcao;
 	
 	private LocalDate dtNascimento;
-	private String telefone;
+	
+	@Embedded
+	private Telefone telefone;
 	
 	@Embedded
 	private Email email;
@@ -63,23 +66,23 @@ public class Pessoa implements UserDetails {
 		
 	}
 
-//	public Pessoa(String nome, Cpf cpf, Sexo sexo, FuncaoPessoa funcao, LocalDate dtNascimento,
-//			String telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
-//		if (statusConta != StatusConta.EM_ANALISE_APROVACAO && statusConta != StatusConta.ATIVA) {
-//			throw new IllegalArgumentException("Erro: cadastro com status da conta inválido.");
-//		}
-//
-//		this.nome = nome;
-//		this.cpf = cpf;
-//		this.sexo = sexo;
-//		this.funcao = funcao;
-//		this.dtNascimento = dtNascimento;
-//		this.telefone = telefone;
-//		this.email = email;
-//		this.senhaHash = senhaHash;
-//		this.statusConta = statusConta;
-//		this.endereco = endereco;
-//	}
+	public Pessoa(String nome, Cpf cpf, Sexo sexo, FuncaoUsuario funcao, LocalDate dtNascimento,
+			Telefone telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
+		if (statusConta != StatusConta.EM_ANALISE_APROVACAO && statusConta != StatusConta.ATIVA) {
+			throw new IllegalArgumentException("Erro: cadastro com status da conta inválido.");
+		}
+
+		this.nome = nome;
+		this.cpf = cpf;
+		this.sexo = sexo;
+		this.funcao = funcao;
+		this.dtNascimento = dtNascimento;
+		this.telefone = telefone;
+		this.email = email;
+		this.senhaHash = senhaHash;
+		this.statusConta = statusConta;
+		this.endereco = endereco;
+	}
 
 	public Pessoa(Email email, String encryptedPassword, FuncaoUsuario funcao) {
 		this.email = email;
@@ -132,11 +135,11 @@ public class Pessoa implements UserDetails {
 		this.dtNascimento = dtNascimento;
 	}
 
-	public String getTelefone() {
+	public Telefone getTelefone() {
 		return telefone;
 	}
 
-	public void setTelefone(String telefone) {
+	public void setTelefone(Telefone telefone) {
 		this.telefone = telefone;
 	}
 
@@ -166,6 +169,15 @@ public class Pessoa implements UserDetails {
 
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
+	}
+	
+	public void validarIdadeMinima(LocalDate hoje, int idadeMinima) {
+		if (idadeMinima <= 0) {
+			throw new IllegalArgumentException("Erro: o valor da idade mínima deve ser maior que zero.");
+		}
+		if (dtNascimento.isAfter(hoje.minusYears(idadeMinima))) {
+			throw new IllegalArgumentException("Erro: usuário deve ter no mínimo " + idadeMinima  + " anos de idade.");
+		}
 	}
 	
 	public void inativarConta() {

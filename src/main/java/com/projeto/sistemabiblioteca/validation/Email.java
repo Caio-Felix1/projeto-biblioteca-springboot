@@ -4,11 +4,12 @@ import com.projeto.sistemabiblioteca.exceptions.EmailInvalidoException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.regex.Pattern;
+
 @Embeddable
-public final class Email{
+public final class Email {
 
 	private static final Pattern EMAIL_REGEX =
-			Pattern.compile("[a-z0-9]+@[a-z]+\\.com(\\.br)?");
+			Pattern.compile("^[a-z0-9]+@[a-z]+\\.com(\\.br)?$");
 
 	@Column(name = "email", nullable = false, unique = true)
 	private String endereco;

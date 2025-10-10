@@ -42,7 +42,9 @@ public class SecurityConfigurations {
                 .headers(headers -> headers.frameOptions().disable()) // remover depois de tirar o H2
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-
+                		
+                		.requestMatchers("/h2-console/**").permitAll()
+                		
                 		.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
