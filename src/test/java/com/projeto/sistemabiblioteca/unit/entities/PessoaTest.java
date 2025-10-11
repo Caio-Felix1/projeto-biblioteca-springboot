@@ -58,7 +58,7 @@ public class PessoaTest {
 	}
 	
 	@Test
-	void deveLancarExcecaoParaInstanciacaoComStatusContaInvalido() {
+	void deveLancarExcecaoAoInstanciarPessoaComStatusContaInvalido() {
 		Assertions.assertThrows(IllegalArgumentException.class, () ->
 			new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_EXCLUSAO, null),
 			"Era esperado que fosse lançada uma exceção para instanciação com status EM_ANALISE_EXCLUSAO"

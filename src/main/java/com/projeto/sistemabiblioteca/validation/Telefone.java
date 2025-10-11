@@ -1,11 +1,12 @@
 package com.projeto.sistemabiblioteca.validation;
 
-import com.projeto.sistemabiblioteca.exceptions.EmailInvalidoException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-
 import java.util.Objects;
 import java.util.regex.Pattern;
+
+import com.projeto.sistemabiblioteca.exceptions.TelefoneInvalidoException;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public final class Telefone {
@@ -22,12 +23,12 @@ public final class Telefone {
 
 	public Telefone(String numero) {
 		if (numero == null || !TELEFONE_REGEX.matcher(numero).matches()) {
-			throw new EmailInvalidoException("Erro: telefone com formato inválido.");
+			throw new TelefoneInvalidoException("Erro: telefone com formato inválido.");
 		}
 		this.numero = numero;
 	}
 
-	public String getEndereco() {
+	public String getNumero() {
 		return numero;
 	}
 
