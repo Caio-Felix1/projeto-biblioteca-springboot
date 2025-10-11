@@ -18,13 +18,13 @@ public class Multa {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long idMulta;
 	
-	private double valor = 0.0;
+	private double valor;
 	
 	@Enumerated(EnumType.STRING)
-	private StatusPagamento statusPagamento = StatusPagamento.NAO_APLICAVEL;
+	private StatusPagamento statusPagamento;
 	
 	protected Multa() {
-
+		statusPagamento = StatusPagamento.NAO_APLICAVEL;
 	}
 	
 	public static Multa criarMultaVazia() {
@@ -50,8 +50,14 @@ public class Multa {
 	 * muda o statusPagamento para PENDENTE.
 	 */
 	public void aplicarMultaPorPerda() {
+		if (statusPagamento == StatusPagamento.PAGO) {
+			throw new IllegalStateException("Erro: a multa já foi paga.");
+		}
 		if (statusPagamento == StatusPagamento.PERDOADO) {
 			throw new IllegalStateException("Erro: a multa já foi perdoada.");
+		}
+		if (statusPagamento == StatusPagamento.PENDENTE) {
+			throw new IllegalStateException("Erro: já existe multa pendente.");
 		}
 		
 		valor = calcularMultaPorPerda();
@@ -74,11 +80,17 @@ public class Multa {
 		if (dias <= 0) {
 			throw new IllegalArgumentException("Erro: o parãmetro 'dias' deve ser maior que zero.");
 		}
+		if (statusPagamento == StatusPagamento.PAGO) {
+			throw new IllegalStateException("Erro: a multa já foi paga.");
+		}
 		if (statusPagamento == StatusPagamento.PERDOADO) {
 			throw new IllegalStateException("Erro: a multa já foi perdoada.");
 		}
 		
 		double resultado = calcularMultaDiaria(dias);
+		if (resultado < valor) {
+			throw new IllegalArgumentException("Erro: o valor da multa não pode diminuir.");
+		}
 		if (resultado >= 50.0) {
 			valor = 50.0;
 		}
@@ -96,6 +108,12 @@ public class Multa {
 	}
 	
 	public void pagarMulta() {
+		if (statusPagamento == StatusPagamento.PAGO) {
+			throw new IllegalStateException("Erro: a multa já foi paga.");
+		}
+		if (statusPagamento == StatusPagamento.PERDOADO) {
+			throw new IllegalStateException("Erro: a multa já foi perdoada.");
+		}
 		if (statusPagamento != StatusPagamento.PENDENTE) {
 			throw new IllegalStateException("Erro: não há multa pendente.");
 		}
@@ -104,6 +122,12 @@ public class Multa {
 	}
 	
 	public void perdoarMulta() {
+		if (statusPagamento == StatusPagamento.PAGO) {
+			throw new IllegalStateException("Erro: a multa já foi paga.");
+		}
+		if (statusPagamento == StatusPagamento.PERDOADO) {
+			throw new IllegalStateException("Erro: a multa já foi perdoada.");
+		}
 		if (statusPagamento != StatusPagamento.PENDENTE) {
 			throw new IllegalStateException("Erro: não há multa pendente.");
 		}

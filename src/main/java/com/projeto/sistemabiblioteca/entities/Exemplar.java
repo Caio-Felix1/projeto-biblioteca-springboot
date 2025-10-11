@@ -82,6 +82,9 @@ public class Exemplar {
 	}
 	
 	public void registrarPerda() {
+		if (status == StatusExemplar.PERDIDO) {
+			throw new IllegalStateException("Erro: já foi registrado a perda do exemplar.");
+		}
 		if (status == StatusExemplar.REMOVIDO) {
 			throw new IllegalStateException("Erro: o exemplar já foi removido. Não é possível registrar a perda.");
 		}
@@ -110,7 +113,7 @@ public class Exemplar {
 	
 	public void remover() {
 		if (status != StatusExemplar.DISPONIVEL && status != StatusExemplar.EM_ANALISE_EXCLUSAO) {
-			throw new IllegalStateException("Erro: o exemplar não está disponível. Não é possível remover.");
+			throw new IllegalStateException("Erro: o exemplar não está disponível ou em análise para exclusão. Não é possível remover.");
 		}
 		
 		status = StatusExemplar.REMOVIDO;
