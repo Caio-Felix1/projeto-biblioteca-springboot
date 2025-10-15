@@ -9,5 +9,5 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
 
 public interface MultaRepository extends JpaRepository<Multa, Long> {
 	
-	List<Multa> findByStatusPagamentoEquals(StatusPagamento statusPagamento);
+	List<Multa> findAllByStatusPagamentoEquals(StatusPagamento statusPagamento);
 }

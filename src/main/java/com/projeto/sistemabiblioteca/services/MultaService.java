@@ -24,8 +24,8 @@ public class MultaService {
 		return multaRepository.findAll();
 	}
 	
-	public List<Multa> buscarPorStatusPagamentoIgualA(StatusPagamento statusPagamento) {
-		return multaRepository.findByStatusPagamentoEquals(statusPagamento);
+	public List<Multa> buscarTodosComStatusPagamentoIgualA(StatusPagamento statusPagamento) {
+		return multaRepository.findAllByStatusPagamentoEquals(statusPagamento);
 	}
 	
 	public Multa buscarPorId(Long id) {

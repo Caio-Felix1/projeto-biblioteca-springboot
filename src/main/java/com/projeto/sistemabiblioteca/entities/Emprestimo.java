@@ -113,10 +113,6 @@ public class Emprestimo {
 		return multa;
 	}
 	
-	public void setMulta(Multa multa) {
-		this.multa = multa;
-	}
-	
 	public void definirDataDevolucaoPrevista(LocalDate dtDevolucaoPrevista, LocalDate hoje) {
 		validarDataDevolucaoPrevista(dtDevolucaoPrevista, hoje);
 		setDtDevolucaoPrevista(dtDevolucaoPrevista);
