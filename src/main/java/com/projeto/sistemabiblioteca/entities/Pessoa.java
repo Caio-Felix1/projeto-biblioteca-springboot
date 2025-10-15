@@ -29,6 +29,9 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "pessoa")
 public class Pessoa implements UserDetails {
+	
+	private static final int IDADE_MINIMA = 18;
+	private static final int IDADE_MAXIMA = 120;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,11 +69,12 @@ public class Pessoa implements UserDetails {
 		
 	}
 
-	public Pessoa(String nome, Cpf cpf, Sexo sexo, FuncaoUsuario funcao, LocalDate dtNascimento,
+	public Pessoa(String nome, Cpf cpf, Sexo sexo, FuncaoUsuario funcao, LocalDate dtNascimento, LocalDate hoje,
 			Telefone telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
 		if (statusConta != StatusConta.EM_ANALISE_APROVACAO && statusConta != StatusConta.ATIVA) {
 			throw new IllegalArgumentException("Erro: cadastro com status da conta inválido.");
 		}
+		validarDataNascimento(dtNascimento, hoje);
 
 		this.nome = nome;
 		this.cpf = cpf;
@@ -131,7 +135,7 @@ public class Pessoa implements UserDetails {
 		return dtNascimento;
 	}
 
-	public void setDtNascimento(LocalDate dtNascimento) {
+	private void setDtNascimento(LocalDate dtNascimento) {
 		this.dtNascimento = dtNascimento;
 	}
 
@@ -171,12 +175,23 @@ public class Pessoa implements UserDetails {
 		this.endereco = endereco;
 	}
 	
-	public void validarIdadeMinima(LocalDate hoje, int idadeMinima) {
-		if (idadeMinima <= 0) {
-			throw new IllegalArgumentException("Erro: o valor da idade mínima deve ser maior que zero.");
+	public void definirDataNascimento(LocalDate dtNascimento, LocalDate hoje) {
+		validarDataNascimento(dtNascimento, hoje);
+		setDtNascimento(dtNascimento);
+	}
+	
+	private void validarDataNascimento(LocalDate dtNascimento, LocalDate hoje) {
+		if (dtNascimento == null) {
+			throw new IllegalArgumentException("Erro: a data de nascimento não pode ser nula.");
 		}
-		if (dtNascimento.isAfter(hoje.minusYears(idadeMinima))) {
-			throw new IllegalArgumentException("Erro: usuário deve ter no mínimo " + idadeMinima  + " anos de idade.");
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
+		}
+		if (dtNascimento.isAfter(hoje.minusYears(IDADE_MINIMA))) {
+			throw new IllegalArgumentException("Erro: usuário deve ter no mínimo " + IDADE_MINIMA  + " anos de idade.");
+		}
+		if (dtNascimento.isBefore(hoje.minusYears(IDADE_MAXIMA))) {
+			throw new IllegalArgumentException("Erro: usuário deve ter no máximo " + IDADE_MAXIMA  + " anos de idade.");
 		}
 	}
 	

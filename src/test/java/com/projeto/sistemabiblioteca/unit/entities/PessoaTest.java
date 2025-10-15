@@ -13,29 +13,31 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 public class PessoaTest {
 	
 	private StatusConta statusContaPadrao = StatusConta.ATIVA;
+	private LocalDate dtHojePadrao = LocalDate.parse("2025-10-10");
+	private LocalDate dtNascimentoPadrao = dtHojePadrao.minusYears(18);
 	
 	private Pessoa criarPessoaComStatusContaAtiva() {
-		return new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		return new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, statusContaPadrao, null);
 	}
 	
 	private Pessoa criarPessoaComStatusContaInativa() {
-		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		Pessoa pessoa = new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, statusContaPadrao, null);
 		pessoa.inativarConta();
 		return pessoa;
 	}
 	
 	private Pessoa criarPessoaComStatusContaEmAnaliseAprovacao() {
-		return new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		return new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
 	}
 	
 	private Pessoa criarPessoaComStatusContaRejeitada() {
-		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
+		Pessoa pessoa = new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, StatusConta.EM_ANALISE_APROVACAO, null);
 		pessoa.rejeitarConta();
 		return pessoa;
 	}
 	
 	private Pessoa criarPessoaComStatusContaEmAnaliseExclusao() {
-		Pessoa pessoa = new Pessoa(null, null, null, null, null, null, null, null, statusContaPadrao, null);
+		Pessoa pessoa = new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, statusContaPadrao, null);
 		pessoa.solicitarExclusaoConta();;
 		return pessoa;
 	}
@@ -60,19 +62,37 @@ public class PessoaTest {
 	@Test
 	void deveLancarExcecaoAoInstanciarPessoaComStatusContaInvalido() {
 		Assertions.assertThrows(IllegalArgumentException.class, () ->
-			new Pessoa(null, null, null, null, null, null, null, null, StatusConta.EM_ANALISE_EXCLUSAO, null),
+			new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, StatusConta.EM_ANALISE_EXCLUSAO, null),
 			"Era esperado que fosse lançada uma exceção para instanciação com status EM_ANALISE_EXCLUSAO"
 		);
 		
 		Assertions.assertThrows(IllegalArgumentException.class, () -> 
-			new Pessoa(null, null, null, null, null, null, null, null, StatusConta.INATIVA, null),
+			new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, StatusConta.INATIVA, null),
 			"Era esperado que fosse lançada uma exceção para instanciação com status INATIVA"
 		);
 		
 		Assertions.assertThrows(IllegalArgumentException.class, () ->
-			new Pessoa(null, null, null, null, null, null, null, null, StatusConta.REJEITADA, null),
+			new Pessoa(null, null, null, null, dtNascimentoPadrao, dtHojePadrao, null, null, null, StatusConta.REJEITADA, null),
 			"Era esperado que fosse lançada uma exceção para instanciação com status REJEITADA"
 		);
+	}
+	
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"2002-12-01", // maior de idade - 18 anos
+			"2001-12-01", // maior de idade - 19 anos
+			"1900-12-01" // maior de idade - 120 anos
+	})
+	void deveInstanciarPessoaComDataDeNascimentoValida(String dtStringTeste) {	
+		LocalDate hoje = LocalDate.parse("2020-12-01");
+		LocalDate nascimento = LocalDate.parse(dtStringTeste);
+		
+		Pessoa pessoa = Assertions.assertDoesNotThrow(
+				() -> new Pessoa(null, null, null, null, nascimento, hoje, null, null, null, statusContaPadrao, null),
+				"Era esperado que a instanciação funcionasse com a data de nascimento " + nascimento);
+		
+		Assertions.assertEquals(nascimento, pessoa.getDtNascimento(),
+				"Era esperado que o valor retornado fosse " + nascimento);
 	}
 	
 	@ParameterizedTest
@@ -80,47 +100,70 @@ public class PessoaTest {
 			"2020-12-01", // hoje
 			"2020-12-02", // futuro
 			"2003-12-01", // menor de idade - 17 anos
-			"2002-12-01", // maior de idade - 18 anos
-			"2001-12-01" // maior de idade - 19 anos
+			"1899-12-01" // maior de idade acima do limite - 121 anos
 	})
-	void deveValidarIdadeMinimaComDatasDeNascimentoValidasEInvalidas(String dtStringTeste) {
+	void deveLancarExcecaoAoInstanciarPessoaComDataDeNascimentoInvalida(String dtStringTeste) {
+		LocalDate hoje = LocalDate.parse("2020-12-01");
+		LocalDate nascimento = LocalDate.parse(dtStringTeste);
+		
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
+		new Pessoa(null, null, null, null, nascimento, hoje, null, null, null, statusContaPadrao, null),
+		"Era esperado que fosse lançada uma exceção para instanciação com a data de nascimento " + nascimento
+		);
+	}
+	
+	@Test
+	void deveLancarExcecaoAoInstanciarPessoaComDataDeHojeNula() {
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
+		new Pessoa(null, null, null, null, dtNascimentoPadrao, null, null, null, null, statusContaPadrao, null),
+		"Era esperado que fosse lançada uma exceção para instanciação com a data de hoje nula"
+		);
+	}
+	
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"2002-12-01", // maior de idade - 18 anos
+			"2001-12-01", // maior de idade - 19 anos
+			"1900-12-01" // maior de idade - 120 anos
+	})
+	void deveDefinirDataNascimentoComDataDeNascimentoValida(String dtStringTeste) {	
 		LocalDate hoje = LocalDate.parse("2020-12-01");
 		LocalDate nascimento = LocalDate.parse(dtStringTeste);
 		
 		Pessoa pessoa = criarPessoaComStatusContaAtiva();
-		pessoa.setDtNascimento(nascimento);
 		
-		int idadeMinima = 18;
+		Assertions.assertDoesNotThrow(() -> pessoa.definirDataNascimento(nascimento, hoje),
+				"Era esperado que funcionasse o método definirDataNascimento com a data de nascimento " + nascimento + " no objeto");
 		
-		if (nascimento.isAfter(hoje.minusYears(idadeMinima))) {
-			Exception excecao = Assertions.assertThrows(IllegalArgumentException.class, 
-					() -> pessoa.validarIdadeMinima(hoje, idadeMinima),
-					"Era esperado que fosse lançada uma exceção para idade inferior a " + idadeMinima + " anos");
-			
-			Assertions.assertEquals("Erro: usuário deve ter no mínimo " + idadeMinima  + " anos de idade.", excecao.getMessage(),
-					"Era esperado que a mensagem da exceção fosse 'Erro: usuário deve ter no mínimo " + idadeMinima + " anos de idade.'");
-		}
-		else {
-			Assertions.assertDoesNotThrow(() -> pessoa.validarIdadeMinima(hoje, idadeMinima),
-					"Era esperado que não houvesse erro para idade igual ou maior que " + idadeMinima + " anos");
-		}
+		Assertions.assertEquals(nascimento, pessoa.getDtNascimento(),
+				"Era esperado que o valor retornado fosse " + nascimento);
+	}
+	
+	@ParameterizedTest
+	@ValueSource(strings = {
+			"2020-12-01", // hoje
+			"2020-12-02", // futuro
+			"2003-12-01", // menor de idade - 17 anos
+			"1899-12-01" // maior de idade acima do limite - 121 anos
+	})
+	void deveLancarExcecaoAoDefinirDataNascimentoComDataDeNascimentoInvalida(String dtStringTeste) {
+		LocalDate hoje = LocalDate.parse("2020-12-01");
+		LocalDate nascimento = LocalDate.parse(dtStringTeste);
+		
+		Pessoa pessoa = criarPessoaComStatusContaAtiva();
+		
+		Assertions.assertThrows(IllegalArgumentException.class, 
+				() -> pessoa.definirDataNascimento(nascimento, hoje),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método definirDataNascimento com a data de nascimento " + nascimento + " no objeto");
 	}
 	
 	@Test
-	void deveLancarExcecaoAoValidarIdadeMinimaComValorDaIdadeMinimaMenorOuIgualAZero() {
-		LocalDate hoje = LocalDate.parse("2020-12-01");
-		LocalDate nascimento = LocalDate.parse("2002-12-01");
-		
+	void deveLancarExcecaoAoDefinirDataNascimentoComDataDeHojeNula() {
 		Pessoa pessoa = criarPessoaComStatusContaAtiva();
-		pessoa.setDtNascimento(nascimento);
 		
 		Assertions.assertThrows(IllegalArgumentException.class, 
-				() -> pessoa.validarIdadeMinima(hoje, 0),
-				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método validarIdadeMinima com valor da idade mínima igual a zero");
-		
-		Assertions.assertThrows(IllegalArgumentException.class, 
-				() -> pessoa.validarIdadeMinima(hoje, -1),
-				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método validarIdadeMinima com valor da idade mínima negativo");
+				() -> pessoa.definirDataNascimento(dtNascimentoPadrao, null),
+		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método definirDataNascimento com a data de hoje nula");
 	}
 	
 	@Test

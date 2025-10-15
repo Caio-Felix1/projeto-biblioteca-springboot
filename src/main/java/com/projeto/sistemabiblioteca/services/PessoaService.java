@@ -1,5 +1,6 @@
 package com.projeto.sistemabiblioteca.services;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +89,7 @@ public class PessoaService {
 		pessoa1.setCpf(pessoa2.getCpf());
 		pessoa1.setSexo(pessoa2.getSexo());
 		pessoa1.setFuncao(pessoa2.getFuncao());
-		pessoa1.setDtNascimento(pessoa2.getDtNascimento());
+		pessoa1.definirDataNascimento(pessoa2.getDtNascimento(), LocalDate.now());
 		pessoa1.setTelefone(pessoa2.getTelefone());
 		pessoa1.setEmail(pessoa2.getEmail());
 		pessoa1.setSenhaHash(pessoa2.getSenhaHash());

@@ -81,22 +81,7 @@ public class Emprestimo {
 		return dtDevolucaoPrevista;
 	}
 
-	public void setDtDevolucaoPrevista(LocalDate dtDevolucaoPrevista) {
-		if (dtDevolucaoPrevista == null) {
-			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser configurada como nula.");
-		}
-		if (status != StatusEmprestimo.EM_ANDAMENTO) {
-			throw new IllegalArgumentException("Erro: só é possível definir a data de devolução prevista quando o empréstimo estiver em andamento.");
-		}
-		if (dtDevolucaoPrevista.isBefore(dtInicioEmprestimo)) {
-			throw new IllegalArgumentException("Erro: a data de devolução prevista é anterior à data de início do empréstimo.");
-		}
-		if (dtDevolucaoPrevista.isBefore(LocalDate.now())) {
-			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser no passado.");
-		}
-		if (ChronoUnit.DAYS.between(dtInicioEmprestimo, dtDevolucaoPrevista) >  90) {
-			throw new IllegalArgumentException("Erro: a data de devolução inserida ultrapassou o prazo máximo de 90 dias.");
-		}
+	private void setDtDevolucaoPrevista(LocalDate dtDevolucaoPrevista) {
 		this.dtDevolucaoPrevista = dtDevolucaoPrevista;
 	}
 	
@@ -132,6 +117,35 @@ public class Emprestimo {
 		this.multa = multa;
 	}
 	
+	public void definirDataDevolucaoPrevista(LocalDate dtDevolucaoPrevista, LocalDate hoje) {
+		validarDataDevolucaoPrevista(dtDevolucaoPrevista, hoje);
+		setDtDevolucaoPrevista(dtDevolucaoPrevista);
+	}
+	
+	private void validarDataDevolucaoPrevista(LocalDate dtDevolucaoPrevista, LocalDate hoje) {
+		if (dtDevolucaoPrevista == null) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser configurada como nula.");
+		}
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
+		}
+		if (status != StatusEmprestimo.EM_ANDAMENTO) {
+			throw new IllegalArgumentException("Erro: só é possível definir a data de devolução prevista quando o empréstimo estiver em andamento.");
+		}
+		if (dtDevolucaoPrevista.isBefore(dtInicioEmprestimo)) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista é anterior à data de início do empréstimo.");
+		}
+		if (dtDevolucaoPrevista.isBefore(hoje)) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser no passado.");
+		}
+		if (dtDevolucaoPrevista.isEqual(hoje)) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista deve ser posterior à data atual.");
+		}
+		if (ChronoUnit.DAYS.between(dtInicioEmprestimo, dtDevolucaoPrevista) >  90) {
+			throw new IllegalArgumentException("Erro: a data de devolução inserida ultrapassou o prazo máximo de 90 dias.");
+		}
+	}
+	
 	/**
 	 * Registra que o Exemplar foi separado para retirada.
 	 * 
@@ -141,7 +155,7 @@ public class Emprestimo {
 	 */
 	public void separarExemplar(LocalDate hoje) {
 		if (hoje == null) {
-			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
@@ -167,8 +181,11 @@ public class Emprestimo {
 	 * @param dtDevolucaoPrevista
 	 */
 	public void retirarExemplar(LocalDate hoje, LocalDate dtDevolucaoPrevista) {
+		if (dtDevolucaoPrevista == null) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser configurada como nula.");
+		}
 		if (hoje == null) {
-			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
@@ -182,7 +199,7 @@ public class Emprestimo {
 		
 		status = StatusEmprestimo.EM_ANDAMENTO;
 		dtRetiradaExemplar = hoje;
-		setDtDevolucaoPrevista(dtDevolucaoPrevista);
+		definirDataDevolucaoPrevista(dtDevolucaoPrevista, hoje);
 	}
 	
 	/**
@@ -207,7 +224,7 @@ public class Emprestimo {
 	 */
 	public void devolverExemplar(LocalDate hoje) {
 		if (hoje == null) {
-			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível devolver exemplar.");
@@ -260,6 +277,9 @@ public class Emprestimo {
 	 * @param hoje
 	 */
 	public void registrarAtraso(LocalDate hoje) {
+		if (hoje == null) {
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
+		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo já foi cancelado.");
 		}
@@ -302,7 +322,7 @@ public class Emprestimo {
 	
 	public int calcularDiasDeAtraso(LocalDate hoje) {
 		if (hoje == null) {
-			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (dtDevolucaoPrevista == null) {
 			throw new IllegalStateException("Erro: data de devolução prevista inválida.");
@@ -313,7 +333,7 @@ public class Emprestimo {
 	
 	public int calcularDiasDeEmprestimo(LocalDate hoje) {
 		if (hoje == null) {
-			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.SEPARADO, StatusEmprestimo.EM_ANDAMENTO, StatusEmprestimo.ATRASADO).contains(status)) {
 			throw new IllegalStateException("Erro: o empréstimo não está ativo.");
@@ -353,7 +373,7 @@ public class Emprestimo {
 	
 	public int calcularDiasRestantes(LocalDate hoje) {
 		if (hoje == null) {
-			throw new IllegalArgumentException("Erro: O parâmetro 'hoje' não pode ser nulo.");
+			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (status == StatusEmprestimo.ATRASADO) {
 			throw new IllegalStateException("Erro: O empréstimo já está atrasado. Não é possível calcular dias restantes.");
