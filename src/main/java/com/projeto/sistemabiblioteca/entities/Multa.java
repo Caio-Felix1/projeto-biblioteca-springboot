@@ -56,9 +56,6 @@ public class Multa {
 		if (statusPagamento == StatusPagamento.PERDOADO) {
 			throw new IllegalStateException("Erro: a multa já foi perdoada.");
 		}
-		if (statusPagamento == StatusPagamento.PENDENTE) {
-			throw new IllegalStateException("Erro: já existe multa pendente.");
-		}
 		
 		valor = calcularMultaPorPerda();
 		statusPagamento = StatusPagamento.PENDENTE;

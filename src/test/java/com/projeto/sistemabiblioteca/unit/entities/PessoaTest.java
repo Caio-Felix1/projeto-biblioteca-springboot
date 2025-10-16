@@ -113,6 +113,14 @@ public class PessoaTest {
 	}
 	
 	@Test
+	void deveLancarExcecaoAoInstanciarPessoaComDataDeNascimentoNula() {
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
+		new Pessoa(null, null, null, null, null, dtHojePadrao, null, null, null, statusContaPadrao, null),
+		"Era esperado que fosse lançada uma exceção para instanciação com a data de nascimento nula"
+		);
+	}
+	
+	@Test
 	void deveLancarExcecaoAoInstanciarPessoaComDataDeHojeNula() {
 		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		new Pessoa(null, null, null, null, dtNascimentoPadrao, null, null, null, null, statusContaPadrao, null),
@@ -158,9 +166,18 @@ public class PessoaTest {
 	}
 	
 	@Test
-	void deveLancarExcecaoAoDefinirDataNascimentoComDataDeHojeNula() {
+	void deveLancarExcecaoAoDefinirDataNascimentoComDataDeDeNascimentoNula() {
 		Pessoa pessoa = criarPessoaComStatusContaAtiva();
 		
+		Assertions.assertThrows(IllegalArgumentException.class, 
+				() -> pessoa.definirDataNascimento(null, dtHojePadrao),
+		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método definirDataNascimento com a data de nascimento nula");
+	}
+	
+	@Test
+	void deveLancarExcecaoAoDefinirDataNascimentoComDataDeHojeNula() {
+		Pessoa pessoa = criarPessoaComStatusContaAtiva();
+	
 		Assertions.assertThrows(IllegalArgumentException.class, 
 				() -> pessoa.definirDataNascimento(dtNascimentoPadrao, null),
 		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método definirDataNascimento com a data de hoje nula");

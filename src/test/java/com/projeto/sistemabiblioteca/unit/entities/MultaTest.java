@@ -48,32 +48,38 @@ public class MultaTest {
 	}
 	
 	@Test
-	void deveAplicarMultaPorPerdaComStatusPagamentoNaoAplicavel() {
-		Multa multa = criarMultaComStatusPagamentoNaoAplicavel();
+	void deveAplicarMultaPorPerdaComStatusPagamentoValido() {
+		Multa multa1 = criarMultaComStatusPagamentoNaoAplicavel();
+		Multa multa2 = criarMultaComStatusPagamentoPendente();
 		
-		Assertions.assertDoesNotThrow(() -> multa.aplicarMultaPorPerda(),
+		Assertions.assertDoesNotThrow(() -> multa1.aplicarMultaPorPerda(),
 				"Era esperado que funcionasse o método aplicarMultaPorPerda no objeto com status NAO_APLICAVEL");
 		
-		Assertions.assertEquals(StatusPagamento.PENDENTE, multa.getStatusPagamento(),
+		Assertions.assertEquals(StatusPagamento.PENDENTE, multa1.getStatusPagamento(),
 				"Era esperado que o valor retornado fosse PENDENTE");
 		
-		Assertions.assertEquals(50.0, multa.getValor(),
+		Assertions.assertEquals(50.0, multa1.getValor(),
+				"Era esperado que o valor retornado fosse 50.0");
+		
+		Assertions.assertDoesNotThrow(() -> multa2.aplicarMultaPorPerda(),
+				"Era esperado que funcionasse o método aplicarMultaPorPerda no objeto com status NAO_APLICAVEL");
+		
+		Assertions.assertEquals(StatusPagamento.PENDENTE, multa2.getStatusPagamento(),
+				"Era esperado que o valor retornado fosse PENDENTE");
+		
+		Assertions.assertEquals(50.0, multa2.getValor(),
 				"Era esperado que o valor retornado fosse 50.0");
 	}
 	
 	@Test
 	void deveLancarExcecaoAoAplicarMultaPorPerdaComStatusInvalido() {
-		Multa multa1 = criarMultaComStatusPagamentoPendente();
-		Multa multa2 = criarMultaComStatusPagamentoPago();
-		Multa multa3 = criarMultaComStatusPagamentoPerdoado();
-		
+		Multa multa1 = criarMultaComStatusPagamentoPago();
+		Multa multa2 = criarMultaComStatusPagamentoPerdoado();
+
 		Assertions.assertThrows(IllegalStateException.class, () -> multa1.aplicarMultaPorPerda(),
-				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método aplicarMultaPorPerda em um objeto com status PENDENTE");
-		
-		Assertions.assertThrows(IllegalStateException.class, () -> multa2.aplicarMultaPorPerda(),
 				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método aplicarMultaPorPerda em um objeto com status PAGO");
 		
-		Assertions.assertThrows(IllegalStateException.class, () -> multa3.aplicarMultaPorPerda(),
+		Assertions.assertThrows(IllegalStateException.class, () -> multa2.aplicarMultaPorPerda(),
 				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método aplicarMultaPorPerda em um objeto com status PERDOADO");
 	}
 	

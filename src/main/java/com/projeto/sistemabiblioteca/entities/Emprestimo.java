@@ -21,6 +21,8 @@ import jakarta.persistence.Table;
 @Table(name = "emprestimo")
 public class Emprestimo {
 	
+	private static final int MAXIMO_DIAS = 90;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long idEmprestimo;
@@ -98,14 +100,28 @@ public class Emprestimo {
 	}
 
 	public void setPessoa(Pessoa pessoa) {
+		if (status != StatusEmprestimo.RESERVADO && status != StatusEmprestimo.SEPARADO) {
+			throw new IllegalStateException("Erro: o exemplar já foi retirado. Não é possível alterar o cliente ligado ao empréstimo.");
+		}
 		this.pessoa = pessoa;
 	}
 
 	public Exemplar getExemplar() {
 		return exemplar;
 	}
-
+	
+	/**
+	 * Altera o exemplar ligado ao empréstimo.
+	 * 
+	 * Muda o status do exemplar anterior para DISPONIVEL e atribui o valor do parâmetro 'exemplar' à variável exemplar.
+	 * 
+	 * @param exemplar
+	 */
 	public void setExemplar(Exemplar exemplar) {
+		if (status != StatusEmprestimo.RESERVADO && status != StatusEmprestimo.SEPARADO) {
+			throw new IllegalStateException("Erro: o exemplar já foi retirado. Não é possível alterar o exemplar ligado ao empréstimo.");
+		}
+		this.exemplar.devolver();
 		this.exemplar = exemplar;
 	}
 	
@@ -126,19 +142,22 @@ public class Emprestimo {
 			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (status != StatusEmprestimo.EM_ANDAMENTO) {
-			throw new IllegalArgumentException("Erro: só é possível definir a data de devolução prevista quando o empréstimo estiver em andamento.");
+			throw new IllegalStateException("Erro: só é possível definir a data de devolução prevista quando o empréstimo estiver em andamento.");
 		}
-		if (dtDevolucaoPrevista.isBefore(dtInicioEmprestimo)) {
-			throw new IllegalArgumentException("Erro: a data de devolução prevista é anterior à data de início do empréstimo.");
+//		if (dtInicioEmprestimo.isAfter(hoje)) {
+//			throw new IllegalArgumentException("Erro: a data atual não pode ser anterior à data de início do empréstimo.");
+//		} 
+		if (this.dtDevolucaoPrevista != null && !dtDevolucaoPrevista.isAfter(this.dtDevolucaoPrevista)) {
+			throw new IllegalArgumentException("Erro: a data de devolução prevista nova deve ser posterior à data de devolução prevista anterior.");
 		}
-		if (dtDevolucaoPrevista.isBefore(hoje)) {
-			throw new IllegalArgumentException("Erro: a data de devolução prevista não pode ser no passado.");
-		}
-		if (dtDevolucaoPrevista.isEqual(hoje)) {
+//		if (!dtDevolucaoPrevista.isAfter(dtInicioEmprestimo)) {
+//			throw new IllegalArgumentException("Erro: a data de devolução prevista deve ser posterior à data de início do empréstimo.");
+//		}
+		if (!dtDevolucaoPrevista.isAfter(hoje)) {
 			throw new IllegalArgumentException("Erro: a data de devolução prevista deve ser posterior à data atual.");
 		}
-		if (ChronoUnit.DAYS.between(dtInicioEmprestimo, dtDevolucaoPrevista) >  90) {
-			throw new IllegalArgumentException("Erro: a data de devolução inserida ultrapassou o prazo máximo de 90 dias.");
+		if (ChronoUnit.DAYS.between(dtInicioEmprestimo, dtDevolucaoPrevista) >  MAXIMO_DIAS) {
+			throw new IllegalArgumentException("Erro: a data de devolução inserida ultrapassou o prazo máximo de " + MAXIMO_DIAS + " dias.");
 		}
 	}
 	
@@ -153,13 +172,13 @@ public class Emprestimo {
 		if (hoje == null) {
 			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
+		if (dtInicioEmprestimo.isAfter(hoje)) {
+			throw new IllegalArgumentException("Erro: a data de separação do exemplar não pode ser anterior à data de início do empréstimo.");
+		}
 		if (status == StatusEmprestimo.CANCELADO) {
 			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
 		}
-		if (status == StatusEmprestimo.SEPARADO) {
-			throw new IllegalStateException("Erro: o exemplar já foi separado.");
-		}
-		if (status != StatusEmprestimo.RESERVADO) {
+		if (status != StatusEmprestimo.RESERVADO && status != StatusEmprestimo.SEPARADO) {
 			throw new IllegalStateException("Erro: o exemplar já foi retirado.");
 		}
 		
@@ -183,11 +202,14 @@ public class Emprestimo {
 		if (hoje == null) {
 			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
-		if (status == StatusEmprestimo.CANCELADO) {
-			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
-		}
 		if (status == StatusEmprestimo.RESERVADO) {
 			throw new IllegalStateException("Erro: o exemplar ainda não foi separado.");
+		}
+		if (dtSeparacaoExemplar.isAfter(hoje)) {
+			throw new IllegalArgumentException("Erro: a data de retirada do exemplar não pode ser anterior à data de separação do exemplar.");
+		}
+		if (status == StatusEmprestimo.CANCELADO) {
+			throw new IllegalStateException("Erro: o empréstimo foi cancelado anteriormente. Não é possível retirar exemplar.");
 		}
 		if (status != StatusEmprestimo.SEPARADO) {
 			throw new IllegalStateException("Erro: o exemplar já foi retirado.");
@@ -207,7 +229,7 @@ public class Emprestimo {
 	 * @param hoje
 	 */
 	public void retirarExemplar(LocalDate hoje) {
-		retirarExemplar(hoje, calcularDataDeDevolucao());
+		retirarExemplar(hoje, calcularDataDeDevolucaoPrevista());
 	}
 	
 	/**
@@ -228,11 +250,17 @@ public class Emprestimo {
 		if (status == StatusEmprestimo.RESERVADO || status == StatusEmprestimo.SEPARADO) {
 			throw new IllegalStateException("Erro: o exemplar ainda não foi retirado.");
 		}
+		if (dtRetiradaExemplar.isAfter(hoje)) {
+			throw new IllegalArgumentException("Erro: a data de devolução do exemplar não pode ser anterior à data de retirada do exemplar.");
+		}
 		if (status == StatusEmprestimo.EXEMPLAR_PERDIDO) {
 			throw new IllegalStateException("Erro: o exemplar foi perdido. Não é mais possível devolver.");
 		}
 		if (status == StatusEmprestimo.DEVOLVIDO) {
 			throw new IllegalStateException("Erro: o exemplar já foi devolvido.");
+		}
+		if (status == StatusEmprestimo.ATRASADO && !hoje.isAfter(dtDevolucaoPrevista)) {
+			throw new IllegalArgumentException("Erro: a data de devolução do exemplar não pode ser anterior à data de devolução prevista quando foi registrado o atraso.");
 		}
 		
 		status = StatusEmprestimo.DEVOLVIDO;
@@ -314,6 +342,7 @@ public class Emprestimo {
 		}
 		
 		status = StatusEmprestimo.CANCELADO;
+		exemplar.devolver();
 	}
 	
 	public int calcularDiasDeAtraso(LocalDate hoje) {
@@ -321,49 +350,52 @@ public class Emprestimo {
 			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
 		if (dtDevolucaoPrevista == null) {
-			throw new IllegalStateException("Erro: data de devolução prevista inválida.");
+			throw new IllegalStateException("Erro: data de devolução prevista não foi definida.");
 		}
 		
 		return (int) Math.max(0, ChronoUnit.DAYS.between(dtDevolucaoPrevista, hoje));
 	}
 	
-	public int calcularDiasDeEmprestimo(LocalDate hoje) {
+	public boolean isPrazoDeRetiradaExpirado(LocalDate hoje, int prazoRetirada) {
 		if (hoje == null) {
 			throw new IllegalArgumentException("Erro: o parâmetro 'hoje' não pode ser nulo.");
 		}
-		if (!Arrays.asList(StatusEmprestimo.RESERVADO, StatusEmprestimo.SEPARADO, StatusEmprestimo.EM_ANDAMENTO, StatusEmprestimo.ATRASADO).contains(status)) {
-			throw new IllegalStateException("Erro: o empréstimo não está ativo.");
+		if (prazoRetirada <= 0) {
+			throw new IllegalArgumentException("Erro: o prazo de retirada deve ser maior que zero.");
 		}
-		if (dtInicioEmprestimo == null) {
-			throw new IllegalStateException("Erro: data de início do empréstimo inválida.");
+		if (dtSeparacaoExemplar == null) {
+			throw new IllegalStateException("Erro: data de separação do exemplar não foi definida.");
+		}
+		if (dtSeparacaoExemplar.isAfter(hoje)) {
+			throw new IllegalArgumentException("Erro: data de hoje deve ser igual ou posterior à data de separação do exemplar.");
 		}
 		
-		return (int) Math.max(0, ChronoUnit.DAYS.between(dtInicioEmprestimo, hoje));
+		return ChronoUnit.DAYS.between(dtSeparacaoExemplar, hoje) > prazoRetirada;
 	}
 	
-	public LocalDate calcularDataDeDevolucao() {
+	public LocalDate calcularDataDeDevolucaoPrevista() {
 		if (dtDevolucaoPrevista != null) {
 			throw new IllegalStateException("Erro: já tem data de devolução prevista.");
 		}
-		if (dtInicioEmprestimo == null) {
-			throw new IllegalStateException("Erro: data de início do empréstimo inválida.");
+		if (dtSeparacaoExemplar == null) {
+			throw new IllegalStateException("Erro: data de separação do exemplar não foi definida.");
 		}
 		
 		int qtdPaginas = exemplar.getEdicao().getQtdPaginas();
 		if (qtdPaginas <= 100) {
-			return dtInicioEmprestimo.plusDays(9);
+			return dtSeparacaoExemplar.plusDays(9);
 		}
 		else if (qtdPaginas <= 500) {
-			return dtInicioEmprestimo.plusDays(16);
+			return dtSeparacaoExemplar.plusDays(16);
 		}
 		else if (qtdPaginas <= 1000) {
-			return dtInicioEmprestimo.plusDays(23);
+			return dtSeparacaoExemplar.plusDays(23);
 		}
 		else if (qtdPaginas <= 3000){
-			return dtInicioEmprestimo.plusDays(30);
+			return dtSeparacaoExemplar.plusDays(30);
 		}
 		else {
-			return dtInicioEmprestimo.plusDays(37);
+			return dtSeparacaoExemplar.plusDays(37);
 		}
 	}
 	
@@ -376,9 +408,6 @@ public class Emprestimo {
 		}
 		if (status != StatusEmprestimo.EM_ANDAMENTO) {
 			throw new IllegalStateException("Erro: O empréstimo não está ativo. Não é possível calcular dias restantes.");
-		}
-		if (dtDevolucaoPrevista == null) {
-			throw new IllegalStateException("Erro: data de devolução prevista inválida.");
 		}
 		
 		return (int) Math.max(0, ChronoUnit.DAYS.between(hoje, dtDevolucaoPrevista));

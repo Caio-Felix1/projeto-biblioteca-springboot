@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
-import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.repositories.EmprestimoRepository;
 
