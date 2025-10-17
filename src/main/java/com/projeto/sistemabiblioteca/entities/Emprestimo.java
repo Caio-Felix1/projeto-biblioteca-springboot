@@ -2,7 +2,6 @@ package com.projeto.sistemabiblioteca.entities;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 

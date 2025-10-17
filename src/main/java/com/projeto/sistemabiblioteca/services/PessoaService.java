@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
-import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
 import com.projeto.sistemabiblioteca.exceptions.EmailJaCadastradoException;
+import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -94,5 +94,41 @@ public class PessoaService {
 		pessoa1.setEmail(pessoa2.getEmail());
 		pessoa1.setSenhaHash(pessoa2.getSenhaHash());
 		pessoa1.setEndereco(pessoa2.getEndereco());
+	}
+	
+	public void aprovarConta(Long id) {
+		Pessoa pessoa = buscarPorId(id);
+		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
+			throw new IllegalArgumentException("Erro: apenas clientes podem ser aprovados.");
+		}
+		pessoa.aprovarConta();
+		pessoaRepository.save(pessoa);
+	}
+	
+	public void rejeitarConta(Long id) {
+		Pessoa pessoa = buscarPorId(id);
+		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
+			throw new IllegalArgumentException("Erro: apenas clientes podem ser rejeitados.");
+		}
+		pessoa.rejeitarConta();
+		pessoaRepository.save(pessoa);
+	}
+	
+	public void solicitarExclusaoConta(Long id) {
+		Pessoa pessoa = buscarPorId(id);
+		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
+			throw new IllegalArgumentException("Erro: a solicitação de exclusão de conta só pode ser realizada em contas de clientes.");
+		}
+		pessoa.solicitarExclusaoConta();
+		pessoaRepository.save(pessoa);
+	}
+	
+	public void rejeitarSolicitacaoExclusao(Long id) {
+		Pessoa pessoa = buscarPorId(id);
+		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
+			throw new IllegalArgumentException("Erro: a rejeição de exclusão de conta só pode ser realizada em contas de clientes.");
+		}
+		pessoa.rejeitarSolicitacaoExclusao();
+		pessoaRepository.save(pessoa);
 	}
 }

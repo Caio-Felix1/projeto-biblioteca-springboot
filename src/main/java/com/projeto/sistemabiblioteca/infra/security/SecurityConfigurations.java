@@ -75,6 +75,11 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.DELETE, "/idiomas/**").hasRole("ADMINISTRADOR")
 
 						.requestMatchers(HttpMethod.POST, "livros/gerenciamento").permitAll()
+						
+						.requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/usuarios/**").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/usuarios/**").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/usuarios/**").permitAll()
                 )
                 .addFilterAfter(securityFilter, CorsFilter.class)
                 .build();
