@@ -74,6 +74,16 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.PUT, "/idiomas/**").hasRole("ADMINISTRADOR")
 						.requestMatchers(HttpMethod.DELETE, "/idiomas/**").hasRole("ADMINISTRADOR")
 
+						.requestMatchers(HttpMethod.GET, "/titulos/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/titulos").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.PUT, "/titulos/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.DELETE, "/titulos/**").hasRole("ADMINISTRADOR")
+
+						.requestMatchers(HttpMethod.GET, "/exemplares/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/exemplares").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.PUT, "/exemplares/**").hasRole("ADMINISTRADOR")
+						.requestMatchers(HttpMethod.DELETE, "/exemplares/**").hasRole("ADMINISTRADOR")
+
 						.requestMatchers(HttpMethod.POST, "livros/gerenciamento").permitAll()
 						
 						.requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()

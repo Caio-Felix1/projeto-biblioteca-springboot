@@ -3,6 +3,8 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.projeto.sistemabiblioteca.DTOs.ExemplarCreateDTO;
+import com.projeto.sistemabiblioteca.entities.Edicao;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Exemplar;
@@ -15,9 +17,11 @@ import jakarta.persistence.EntityNotFoundException;
 public class ExemplarService {
 	
 	private ExemplarRepository exemplarRepository;
+	private final EdicaoService edicaoService;
 
-	public ExemplarService(ExemplarRepository exemplarRepository) {
+	public ExemplarService(ExemplarRepository exemplarRepository,EdicaoService edicaoService) {
 		this.exemplarRepository = exemplarRepository;
+		this.edicaoService = edicaoService;
 	}
 	
 	public List<Exemplar> buscarTodos() {
@@ -36,7 +40,12 @@ public class ExemplarService {
 		return exemplar.get();
 	}
 	
-	public Exemplar inserir(Exemplar exemplar) {
+	public Exemplar inserir(ExemplarCreateDTO dto) {
+		Edicao edicao = edicaoService.buscarPorId(dto.edicaoId());
+		if (edicao == null) {
+			throw new EntityNotFoundException();
+		}
+		Exemplar exemplar = new Exemplar(dto.estadoFisico(), edicao);
 		return exemplarRepository.save(exemplar);
 	}
 	
