@@ -3,6 +3,10 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.projeto.sistemabiblioteca.DTOs.EdicaoCreateDTO;
+import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
+import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
+import com.projeto.sistemabiblioteca.repositories.TituloRepository;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Edicao;
@@ -13,11 +17,22 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class EdicaoService {
-	
-	private EdicaoRepository edicaoRepository;
 
-	public EdicaoService(EdicaoRepository edicaoRepository) {
+	private EdicaoRepository edicaoRepository;
+	private TituloRepository tituloRepository;
+	private EditoraRepository editoraRepository;
+	private IdiomaRepository idiomaRepository;
+
+	public EdicaoService(
+			EdicaoRepository edicaoRepository,
+			TituloRepository tituloRepository,
+			EditoraRepository editoraRepository,
+			IdiomaRepository idiomaRepository
+	) {
 		this.edicaoRepository = edicaoRepository;
+		this.tituloRepository = tituloRepository;
+		this.editoraRepository = editoraRepository;
+		this.idiomaRepository = idiomaRepository;
 	}
 	
 	public List<Edicao> buscarTodos() {
@@ -35,10 +50,31 @@ public class EdicaoService {
 		}
 		return edicao.get();
 	}
-	
-	public Edicao inserir(Edicao edicao) {
+
+	public Edicao inserir(EdicaoCreateDTO dto) {
+		var titulo = tituloRepository.findById(dto.tituloId())
+				.orElseThrow(() -> new RuntimeException("Título não encontrado"));
+		var editora = editoraRepository.findById(dto.editoraId())
+				.orElseThrow(() -> new RuntimeException("Editora não encontrada"));
+		var idioma = idiomaRepository.findById(dto.idiomaId())
+				.orElseThrow(() -> new RuntimeException("Idioma não encontrado"));
+
+		var edicao = new Edicao(
+				dto.tipoCapa(),
+				dto.qtdPaginas(),
+				dto.tamanho(),
+				dto.classificacao(),
+				dto.dtPublicacao(),
+				titulo,
+				editora,
+				idioma
+		);
+
 		return edicaoRepository.save(edicao);
 	}
+
+
+
 	
 	public void inativar(Long id) {
 		Edicao edicao = buscarPorId(id);
