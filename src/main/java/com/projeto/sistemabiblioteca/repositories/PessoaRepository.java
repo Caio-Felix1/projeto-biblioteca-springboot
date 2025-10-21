@@ -11,6 +11,8 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
 	 boolean existsByEmailEndereco(String email);
+	 
+	 boolean existsByCpfValor(String cpf);
 	
      Pessoa findByEmailEndereco(String email);
 

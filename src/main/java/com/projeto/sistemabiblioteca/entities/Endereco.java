@@ -26,6 +26,7 @@ public class Endereco implements Ativavel {
 	private String complemento;
 	private String bairro;
 	private String cep;
+	private String cidade;
 	
 	@Enumerated(EnumType.STRING)
 	private StatusAtivo status;
@@ -38,12 +39,13 @@ public class Endereco implements Ativavel {
 		
 	}
 
-	public Endereco(String nomeLogradouro, String numero, String complemento, String bairro, String cep, Estado estado) {
+	public Endereco(String nomeLogradouro, String numero, String complemento, String bairro, String cep, String cidade, Estado estado) {
 		this.nomeLogradouro = nomeLogradouro;
 		this.numero = numero;
 		this.complemento = complemento;
 		this.bairro = bairro;
 		this.cep = cep;
+		this.cidade = cidade;
 		this.estado = estado;
 		ativar();
 	}
@@ -90,6 +92,14 @@ public class Endereco implements Ativavel {
 
 	public void setCep(String cep) {
 		this.cep = cep;
+	}
+	
+	public String getCidade() {
+		return cidade;
+	}
+
+	public void setCidade(String cidade) {
+		this.cidade = cidade;
 	}
 
 	public Estado getEstado() {

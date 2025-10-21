@@ -56,18 +56,19 @@ public class AutenticacaoController {
 
     @PostMapping("/registro")
     public ResponseEntity<String> registrar(@Valid @RequestBody RegistroDTO request) {
+    	/*
+        pessoaService.verificarEmailDisponivel(request.email());
 
-            pessoaService.verificarEmailDisponivel(request.email());
+        Email email = new Email(request.email());
 
-            Email email = new Email(request.email());
+        String encryptedPassword = passwordEncoder.encode(request.senha());
 
-            String encryptedPassword = passwordEncoder.encode(request.senha());
-
-            Pessoa pessoa = new Pessoa(email, encryptedPassword, request.funcao());
-
-            pessoaService.inserir(pessoa);
-
-            return ResponseEntity.ok("Registro efetuado com sucesso.");
+        Pessoa pessoa = new Pessoa(email, encryptedPassword, request.funcao());
+		*/
+    	
+    	pessoaService.cadastrarUsuario(request);
+    	
+    	return ResponseEntity.ok("Registro efetuado com sucesso.");
 
     }
 }

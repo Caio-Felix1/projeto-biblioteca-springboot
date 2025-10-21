@@ -7,10 +7,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.projeto.sistemabiblioteca.entities.Estado;
+import com.projeto.sistemabiblioteca.entities.Pais;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.services.EstadoService;
+import com.projeto.sistemabiblioteca.services.PaisService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
 import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
@@ -23,8 +27,21 @@ public class TestConfig implements CommandLineRunner {
 	@Autowired
 	private PessoaService pessoaService;
 	
+	@Autowired
+	private PaisService paisService;
+	
+	@Autowired
+	private EstadoService estadoService;
+	
 	@Override
 	public void run(String... args) throws Exception {
+		
+		Pais pais = new Pais("Brasil");
+		
+		Estado estado = new Estado("São Paulo", pais);
+		
+		paisService.inserir(pais);
+		estadoService.inserir(estado);
 		
 		// testar aprovacao e rejeição de cadastro
 		Pessoa p1 = new Pessoa("teste1", new Cpf("00000000000"), Sexo.MASCULINO, FuncaoUsuario.CLIENTE, LocalDate.parse("2000-10-10"), LocalDate.now(), new Telefone("1234567891"), new Email("teste1@gmail.com"), "123", StatusConta.EM_ANALISE_APROVACAO, null);

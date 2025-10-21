@@ -4,23 +4,43 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.projeto.sistemabiblioteca.DTOs.EnderecoDTO;
+import com.projeto.sistemabiblioteca.DTOs.PessoaDTO;
+import com.projeto.sistemabiblioteca.DTOs.RegistroDTO;
+import com.projeto.sistemabiblioteca.entities.Endereco;
+import com.projeto.sistemabiblioteca.entities.Estado;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.exceptions.CpfJaCadastradoException;
 import com.projeto.sistemabiblioteca.exceptions.EmailJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
+import com.projeto.sistemabiblioteca.validation.Cpf;
+import com.projeto.sistemabiblioteca.validation.Email;
+import com.projeto.sistemabiblioteca.validation.Telefone;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PessoaService {
 	
 	private PessoaRepository pessoaRepository;
 	
-	public PessoaService(PessoaRepository pessoaRepository) {
+	private PasswordEncoder passwordEncoder;
+	
+	private EstadoService estadoService;
+	
+	private EnderecoService enderecoService;
+	
+	public PessoaService(PessoaRepository pessoaRepository, PasswordEncoder passwordEncoder, EstadoService estadoService, EnderecoService enderecoService) {
 		this.pessoaRepository = pessoaRepository;
+		this.passwordEncoder = passwordEncoder;
+		this.estadoService = estadoService;
+		this.enderecoService = enderecoService;
 	}
 	
 	public List<Pessoa> buscarTodos() {
@@ -49,6 +69,12 @@ public class PessoaService {
 		}
 	}
 	
+	public void verificarCpfDisponivel(String cpf) {
+		if (pessoaRepository.existsByCpfValor(cpf)) {
+			throw new CpfJaCadastradoException("Erro: cpf já foi cadastrado.");
+		}
+	}
+	
 	public Pessoa buscarPorEmail(String email) {
 		Pessoa pessoa = pessoaRepository.findByEmailEndereco(email);
 		if (pessoa == null) {
@@ -65,8 +91,93 @@ public class PessoaService {
 		return pessoa;
 	}
 	
-	public Pessoa inserir(Pessoa pessoa) {
-		return pessoaRepository.save(pessoa);
+	private Endereco instanciarEndereco(EnderecoDTO enderecoDTO) {
+		Estado estado = estadoService.buscarPorId(enderecoDTO.idEstado());
+		
+		return new Endereco(
+				enderecoDTO.nomeLogradouro(),
+				enderecoDTO.numero(),
+				enderecoDTO.complemento(),
+				enderecoDTO.bairro(),
+				enderecoDTO.cep(),
+				enderecoDTO.cidade(),
+				estado);
+	}
+	
+	private Pessoa instanciarPessoa(PessoaDTO pessoaDTO, Cpf cpf, Telefone telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
+		return new Pessoa(
+				pessoaDTO.nome(),
+				cpf, 
+				pessoaDTO.sexo(), 
+				pessoaDTO.funcao(), 
+				pessoaDTO.dtNascimento(),
+				LocalDate.now(),
+				telefone, 
+				email, 
+				senhaHash, 
+				statusConta, 
+				endereco);
+	}
+	
+	private Pessoa instanciarPessoa(RegistroDTO registroDTO, Cpf cpf, FuncaoUsuario funcao, Telefone telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
+		return new Pessoa(
+				registroDTO.nome(),
+				cpf, 
+				registroDTO.sexo(), 
+				funcao, 
+				registroDTO.dtNascimento(),
+				LocalDate.now(),
+				telefone, 
+				email, 
+				senhaHash, 
+				statusConta, 
+				endereco);
+	}
+	
+	@Transactional
+	public void cadastrarUsuario(RegistroDTO registroDTO) {
+		Email email = new Email(registroDTO.email());
+		Cpf cpf = new Cpf(registroDTO.cpf());
+		
+		verificarEmailDisponivel(email.getEndereco());
+		verificarCpfDisponivel(cpf.getValor());
+		
+		Telefone telefone = new Telefone(registroDTO.telefone());
+		
+		String encryptedPassword = passwordEncoder.encode(registroDTO.senha());
+		
+		Endereco endereco = instanciarEndereco(registroDTO.endereco());
+		
+		enderecoService.inserir(endereco);
+		
+		Pessoa pessoa = instanciarPessoa(registroDTO, cpf, FuncaoUsuario.CLIENTE, telefone, email, encryptedPassword, StatusConta.EM_ANALISE_APROVACAO, endereco);
+		
+		inserir(pessoa);
+	}
+	
+	@Transactional
+	public void cadastrarUsuarioPorAdmin(PessoaDTO pessoaDTO) {
+		Email email = new Email(pessoaDTO.email());
+		Cpf cpf = new Cpf(pessoaDTO.cpf());
+		
+		verificarEmailDisponivel(email.getEndereco());
+		verificarCpfDisponivel(cpf.getValor());
+		
+		Telefone telefone = new Telefone(pessoaDTO.telefone());
+		
+		String encryptedPassword = passwordEncoder.encode(pessoaDTO.senha());
+		
+		Endereco endereco = instanciarEndereco(pessoaDTO.endereco());
+		
+		enderecoService.inserir(endereco);
+		
+		Pessoa pessoa = instanciarPessoa(pessoaDTO, cpf, telefone, email, encryptedPassword, StatusConta.ATIVA, endereco);
+		
+		inserir(pessoa);
+	}
+	
+	public void inserir(Pessoa pessoa) {
+		pessoaRepository.save(pessoa);
 	}
 	
 	public void inativar(Long id) {
@@ -80,6 +191,9 @@ public class PessoaService {
 	
 	public Pessoa atualizar(Long id, Pessoa pessoa2) {
 		Pessoa pessoa1 = buscarPorId(id);
+		if (pessoa1.getFuncao() == FuncaoUsuario.CLIENTE && pessoa1.getFuncao() != pessoa2.getFuncao()) {
+			throw new IllegalStateException("Erro: não é possível alterar o nível de acesso do cliente.");
+		}
 		atualizarDados(pessoa1, pessoa2);
 		return pessoaRepository.save(pessoa1);
 	}

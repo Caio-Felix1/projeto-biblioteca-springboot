@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.controllers;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,12 +14,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.sistemabiblioteca.DTOs.PessoaDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.services.EstadoService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
 import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -26,7 +31,7 @@ public class PessoaController {
 	
 	private final PessoaService pessoaService;
 	
-	public PessoaController(PessoaService pessoaService) {
+	public PessoaController(PessoaService pessoaService, PasswordEncoder passwordEncoder, EstadoService estadoService) {
 		this.pessoaService = pessoaService;
 	}
 	
@@ -78,9 +83,9 @@ public class PessoaController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Pessoa> cadastrarUsuario(@RequestBody Pessoa pessoa) {
-		Pessoa novaPessoa = pessoaService.inserir(pessoa);
-		return ResponseEntity.ok(novaPessoa);
+	public ResponseEntity<String> cadastrarUsuario(@Valid @RequestBody PessoaDTO pessoaDTO) {
+		pessoaService.cadastrarUsuarioPorAdmin(pessoaDTO);
+		return ResponseEntity.ok("Registro efetuado com sucesso.");
 	}
 	
 	@PutMapping("/{id}")

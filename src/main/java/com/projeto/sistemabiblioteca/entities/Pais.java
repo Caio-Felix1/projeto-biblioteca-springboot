@@ -24,6 +24,10 @@ public class Pais implements Ativavel {
 	@Enumerated(EnumType.STRING)
 	private StatusAtivo status;
 	
+	protected Pais() {
+		
+	}
+	
 	public Pais(String nome) {
 		this.nome = nome;
 		ativar();

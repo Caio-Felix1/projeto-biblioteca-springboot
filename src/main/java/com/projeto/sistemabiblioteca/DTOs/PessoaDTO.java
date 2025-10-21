@@ -6,17 +6,10 @@ import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record RegistroDTO(
-		/*
-        @NotBlank  String email,
-        @NotBlank String senha,
-        @NotNull FuncaoUsuario funcao
-        */
-		
+public record PessoaDTO(
 		@NotBlank(message = "Nome é obrigatório")
 		String nome,
 		
@@ -25,6 +18,9 @@ public record RegistroDTO(
 		
 		@NotNull(message = "Sexo é obrigatório")
 		Sexo sexo,
+		
+		@NotNull(message = "Função do usuário é obrigatória")
+		FuncaoUsuario funcao,
 		
 		@NotNull(message = "Data de nascimento é obrigatória")
 		LocalDate dtNascimento,
@@ -41,4 +37,6 @@ public record RegistroDTO(
 		@NotNull(message = "Endereço é obrigatório")
 		@Valid
 		EnderecoDTO endereco
-) {}
+		) {
+
+}
