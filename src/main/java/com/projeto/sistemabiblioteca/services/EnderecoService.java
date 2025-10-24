@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.projeto.sistemabiblioteca.DTOs.EnderecoDTO;
 import com.projeto.sistemabiblioteca.entities.Endereco;
+import com.projeto.sistemabiblioteca.entities.Estado;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.EnderecoRepository;
 
@@ -15,9 +17,12 @@ import jakarta.persistence.EntityNotFoundException;
 public class EnderecoService {
 	
 	private EnderecoRepository enderecoRepository;
+	
+	private EstadoService estadoService;
 
-	public EnderecoService(EnderecoRepository enderecoRepository) {
+	public EnderecoService(EnderecoRepository enderecoRepository, EstadoService estadoService) {
 		this.enderecoRepository = enderecoRepository;
+		this.estadoService = estadoService;
 	}
 	
 	public List<Endereco> buscarTodos() {
@@ -49,8 +54,20 @@ public class EnderecoService {
 		enderecoRepository.save(endereco);
 	}
 	
-	public Endereco atualizar(Long id, Endereco endereco2) {
+	public Endereco atualizar(Long id, EnderecoDTO enderecoDTO) {
 		Endereco endereco1 = buscarPorId(id);
+		
+		Estado estado = estadoService.buscarPorId(enderecoDTO.idEstado());
+		
+		Endereco endereco2 = new Endereco(
+				enderecoDTO.nomeLogradouro(), 
+				enderecoDTO.numero(), 
+				enderecoDTO.complemento(), 
+				enderecoDTO.bairro(), 
+				enderecoDTO.cep(), 
+				enderecoDTO.cidade(), 
+				estado);
+		
 		atualizarDados(endereco1, endereco2);
 		return enderecoRepository.save(endereco1);
 	}

@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.controllers;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import com.projeto.sistemabiblioteca.DTOs.PessoaDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.exceptions.AcessoNegadoException;
 import com.projeto.sistemabiblioteca.services.EstadoService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
 import com.projeto.sistemabiblioteca.validation.Cpf;
@@ -89,8 +91,21 @@ public class PessoaController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Pessoa> atualizarUsuario(@PathVariable Long id, @RequestBody Pessoa pessoa) {
-		return ResponseEntity.ok(pessoaService.atualizar(id, pessoa));
+	public ResponseEntity<Pessoa> atualizarUsuario(@PathVariable Long id, @RequestBody PessoaDTO pessoaDTO, Authentication authentication) {
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
+		String usernameAutenticado = authentication.getName();
+		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
+		
+		if (usuarioAutenticado.getIdPessoa().equals(id)) {
+			if (usuarioAutenticado.getFuncao() != pessoaDTO.funcao()) {
+				throw new IllegalArgumentException("Erro: usuário não pode alterar seu próprio nível de acesso.");
+			}
+		}
+		
+		return ResponseEntity.ok(pessoaService.atualizar(id, pessoaDTO, usuarioAutenticado));
 	}
 	
 	@PutMapping("/em-analise-aprovacao/aprovar-conta/{id}") 
@@ -118,7 +133,14 @@ public class PessoaController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> inativarUsuario(@PathVariable Long id) {
+	public ResponseEntity<Void> inativarUsuario(@PathVariable Long id, Authentication authentication) {
+		String usernameAutenticado = authentication.getName();
+		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
+		
+		if (usuarioAutenticado.getIdPessoa().equals(id)) {
+			throw new IllegalArgumentException("Erro: administrador não pode inativar sua própria conta.");
+		}
+		
 		pessoaService.inativar(id);
 		return ResponseEntity.noContent().build();
 	}

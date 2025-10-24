@@ -15,6 +15,7 @@ import com.projeto.sistemabiblioteca.entities.Estado;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.exceptions.AcessoNegadoException;
 import com.projeto.sistemabiblioteca.exceptions.CpfJaCadastradoException;
 import com.projeto.sistemabiblioteca.exceptions.EmailJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
@@ -104,43 +105,25 @@ public class PessoaService {
 				estado);
 	}
 	
-	private Pessoa instanciarPessoa(PessoaDTO pessoaDTO, Cpf cpf, Telefone telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
-		return new Pessoa(
-				pessoaDTO.nome(),
-				cpf, 
-				pessoaDTO.sexo(), 
-				pessoaDTO.funcao(), 
-				pessoaDTO.dtNascimento(),
-				LocalDate.now(),
-				telefone, 
-				email, 
-				senhaHash, 
-				statusConta, 
-				endereco);
+	private Email validarEmail(String email) {
+		Email emailFormatoValido = new Email(email);
+		verificarEmailDisponivel(emailFormatoValido.getEndereco());
+		
+		return emailFormatoValido;
 	}
 	
-	private Pessoa instanciarPessoa(RegistroDTO registroDTO, Cpf cpf, FuncaoUsuario funcao, Telefone telefone, Email email, String senhaHash, StatusConta statusConta, Endereco endereco) {
-		return new Pessoa(
-				registroDTO.nome(),
-				cpf, 
-				registroDTO.sexo(), 
-				funcao, 
-				registroDTO.dtNascimento(),
-				LocalDate.now(),
-				telefone, 
-				email, 
-				senhaHash, 
-				statusConta, 
-				endereco);
+	private Cpf validarCpf(String cpf) {
+		Cpf cpfFormatoValido = new Cpf(cpf);
+		verificarCpfDisponivel(cpfFormatoValido.getValor());
+		
+		return cpfFormatoValido;
 	}
 	
 	@Transactional
 	public void cadastrarUsuario(RegistroDTO registroDTO) {
-		Email email = new Email(registroDTO.email());
-		Cpf cpf = new Cpf(registroDTO.cpf());
+		Email email = validarEmail(registroDTO.email());
 		
-		verificarEmailDisponivel(email.getEndereco());
-		verificarCpfDisponivel(cpf.getValor());
+		Cpf cpf = validarCpf(registroDTO.cpf());
 		
 		Telefone telefone = new Telefone(registroDTO.telefone());
 		
@@ -150,18 +133,27 @@ public class PessoaService {
 		
 		enderecoService.inserir(endereco);
 		
-		Pessoa pessoa = instanciarPessoa(registroDTO, cpf, FuncaoUsuario.CLIENTE, telefone, email, encryptedPassword, StatusConta.EM_ANALISE_APROVACAO, endereco);
-		
+		Pessoa pessoa = new Pessoa(
+				registroDTO.nome(),
+				cpf,
+				registroDTO.sexo(),
+				FuncaoUsuario.CLIENTE,
+				registroDTO.dtNascimento(),
+				LocalDate.now(),
+				telefone,
+				email,
+				encryptedPassword,
+				StatusConta.EM_ANALISE_APROVACAO,
+				endereco);
+				
 		inserir(pessoa);
 	}
 	
 	@Transactional
 	public void cadastrarUsuarioPorAdmin(PessoaDTO pessoaDTO) {
-		Email email = new Email(pessoaDTO.email());
-		Cpf cpf = new Cpf(pessoaDTO.cpf());
+		Email email = validarEmail(pessoaDTO.email());
 		
-		verificarEmailDisponivel(email.getEndereco());
-		verificarCpfDisponivel(cpf.getValor());
+		Cpf cpf = validarCpf(pessoaDTO.cpf());
 		
 		Telefone telefone = new Telefone(pessoaDTO.telefone());
 		
@@ -171,8 +163,19 @@ public class PessoaService {
 		
 		enderecoService.inserir(endereco);
 		
-		Pessoa pessoa = instanciarPessoa(pessoaDTO, cpf, telefone, email, encryptedPassword, StatusConta.ATIVA, endereco);
-		
+		Pessoa pessoa = new Pessoa(
+				pessoaDTO.nome(),
+				cpf,
+				pessoaDTO.sexo(),
+				pessoaDTO.funcao(),
+				pessoaDTO.dtNascimento(),
+				LocalDate.now(),
+				telefone,
+				email,
+				encryptedPassword,
+				StatusConta.ATIVA,
+				endereco);
+				
 		inserir(pessoa);
 	}
 	
@@ -189,11 +192,58 @@ public class PessoaService {
 		pessoaRepository.save(pessoa);
 	}
 	
-	public Pessoa atualizar(Long id, Pessoa pessoa2) {
+	private boolean podeAtualizar(Pessoa usuarioAlvo, Pessoa usuarioLogado) {
+		if (usuarioLogado.getFuncao() == FuncaoUsuario.ADMINISTRADOR) {
+			return true;
+		}
+		if (usuarioLogado.getFuncao() == FuncaoUsuario.BIBLIOTECARIO) {
+			return usuarioLogado.getIdPessoa().equals(usuarioAlvo.getIdPessoa()) || usuarioAlvo.getFuncao() == FuncaoUsuario.CLIENTE;
+		}
+		return usuarioLogado.getIdPessoa().equals(usuarioAlvo.getIdPessoa());
+	}
+	
+	@Transactional
+	public Pessoa atualizar(Long id, PessoaDTO pessoaDTO, Pessoa usuarioLogado) {
 		Pessoa pessoa1 = buscarPorId(id);
-		if (pessoa1.getFuncao() == FuncaoUsuario.CLIENTE && pessoa1.getFuncao() != pessoa2.getFuncao()) {
+		
+		if (pessoa1.getStatusConta() != StatusConta.ATIVA) {
+			throw new IllegalStateException("Erro: não é possível atualizar usuário que não está ativo.");
+		}
+		if (!podeAtualizar(pessoa1, usuarioLogado)) {
+			throw new AcessoNegadoException("Erro: não tem permissão para atualizar este usuário.");
+		} 
+		if (pessoa1.getFuncao() == FuncaoUsuario.CLIENTE && pessoa1.getFuncao() != pessoaDTO.funcao()) {
 			throw new IllegalStateException("Erro: não é possível alterar o nível de acesso do cliente.");
 		}
+		if (pessoa1.getFuncao() == FuncaoUsuario.BIBLIOTECARIO && pessoaDTO.funcao() == FuncaoUsuario.CLIENTE) {
+			throw new IllegalStateException("Erro: não é possível alterar o nível de acesso do funcionário para cliente.");
+		}
+		if (pessoa1.getFuncao() == FuncaoUsuario.ADMINISTRADOR && pessoaDTO.funcao() == FuncaoUsuario.CLIENTE) {
+			throw new IllegalStateException("Erro: não é possível alterar o nível de acesso do administrador para cliente.");
+		}
+		
+		Email email = (pessoa1.getEmail().getEndereco().equals(pessoaDTO.email())) ? pessoa1.getEmail() : validarEmail(pessoaDTO.email());
+		
+		Cpf cpf = (pessoa1.getCpf().getValor().equals(pessoaDTO.cpf())) ? pessoa1.getCpf() : validarCpf(pessoaDTO.cpf());
+		
+		Telefone telefone = new Telefone(pessoaDTO.telefone());
+		
+		String encryptedPassword = passwordEncoder.encode(pessoaDTO.senha());
+		
+		Pessoa pessoa2 = new Pessoa(
+				pessoaDTO.nome(),
+				cpf,
+				pessoaDTO.sexo(),
+				pessoaDTO.funcao(),
+				pessoaDTO.dtNascimento(),
+				LocalDate.now(),
+				telefone,
+				email,
+				encryptedPassword,
+				StatusConta.ATIVA,
+				null);
+		
+		enderecoService.atualizar(pessoa1.getEndereco().getIdEndereco(), pessoaDTO.endereco());
 		atualizarDados(pessoa1, pessoa2);
 		return pessoaRepository.save(pessoa1);
 	}
@@ -207,7 +257,6 @@ public class PessoaService {
 		pessoa1.setTelefone(pessoa2.getTelefone());
 		pessoa1.setEmail(pessoa2.getEmail());
 		pessoa1.setSenhaHash(pessoa2.getSenhaHash());
-		pessoa1.setEndereco(pessoa2.getEndereco());
 	}
 	
 	public void aprovarConta(Long id) {
