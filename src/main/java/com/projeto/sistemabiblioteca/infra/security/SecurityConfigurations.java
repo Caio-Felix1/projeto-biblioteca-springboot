@@ -90,6 +90,21 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.POST, "/usuarios/**").permitAll()
 						.requestMatchers(HttpMethod.PUT, "/usuarios/**").permitAll()
 						.requestMatchers(HttpMethod.DELETE, "/usuarios/**").permitAll()
+						
+						.requestMatchers(HttpMethod.GET, "/enderecos/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/enderecos/**").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/enderecos/**").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/enderecos/**").permitAll()
+						
+						.requestMatchers(HttpMethod.GET, "/estados/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/estados/**").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/estados/**").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/estados/**").permitAll()
+						
+						.requestMatchers(HttpMethod.GET, "/paises/**").permitAll()
+						.requestMatchers(HttpMethod.POST, "/paises/**").permitAll()
+						.requestMatchers(HttpMethod.PUT, "/paises/**").permitAll()
+						.requestMatchers(HttpMethod.DELETE, "/paises/**").permitAll()
                 )
                 .addFilterAfter(securityFilter, CorsFilter.class)
                 .build();

@@ -57,7 +57,17 @@ public class EnderecoService {
 	public Endereco atualizar(Long id, EnderecoDTO enderecoDTO) {
 		Endereco endereco1 = buscarPorId(id);
 		
-		Estado estado = estadoService.buscarPorId(enderecoDTO.idEstado());
+		Estado estado;
+		if (endereco1.getEstado().getIdEstado().equals(enderecoDTO.idEstado())) {
+			estado = endereco1.getEstado();
+		}
+		else {
+			estado = estadoService.buscarPorId(enderecoDTO.idEstado());
+			
+			if (estado.getStatusAtivo() == StatusAtivo.INATIVO) {
+				throw new IllegalArgumentException("Erro: não é possível associar um endereço a um estado com status inativo ao atualizar.");
+			}
+		}
 		
 		Endereco endereco2 = new Endereco(
 				enderecoDTO.nomeLogradouro(), 

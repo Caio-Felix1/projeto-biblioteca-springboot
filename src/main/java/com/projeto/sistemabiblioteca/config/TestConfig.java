@@ -44,13 +44,15 @@ public class TestConfig implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
+		/*
+		Pais pais1 = new Pais("Brasil");
+		Pais pais2 = new Pais("Estados Unidos");
 		
-		Pais pais = new Pais("Brasil");
+		Estado estado1 = new Estado("São Paulo", pais1);
+		Estado estado2 = new Estado("Rio de Janeiro", pais1);
 		
-		Estado estado1 = new Estado("São Paulo", pais);
-		Estado estado2 = new Estado("Rio de Janeiro", pais);
-		
-		paisService.inserir(pais);
+		paisService.inserir(pais1);
+		paisService.inserir(pais2);
 		estadoService.inserir(estado1);
 		estadoService.inserir(estado2);
 		
@@ -61,7 +63,7 @@ public class TestConfig implements CommandLineRunner {
 		
 		// testar aprovacao e rejeição de cadastro
 		Pessoa p1 = new Pessoa("teste1", new Cpf("00000000000"), Sexo.MASCULINO, FuncaoUsuario.CLIENTE, LocalDate.parse("2000-10-10"), LocalDate.now(), new Telefone("1234567891"), new Email("teste1@gmail.com"), senhaHash, StatusConta.EM_ANALISE_APROVACAO, null);
-		Pessoa p2 = new Pessoa("teste2", new Cpf("11111111111"), Sexo.MASCULINO, FuncaoUsuario.CLIENTE, LocalDate.parse("2000-10-10"), LocalDate.now(), new Telefone("1234567891"), new Email("teste2@gmail.com"), senhaHash, StatusConta.EM_ANALISE_APROVACAO, null);
+		Pessoa p2 = new Pessoa("teste2", new Cpf("11111111111"), Sexo.MASCULINO, FuncaoUsuario.CLIENTE, LocalDate.parse("2000-10-10"), LocalDate.now(), new Telefone("1234567891"), new Email("teste2@gmail.com"), senhaHash, StatusConta.EM_ANALISE_APROVACAO, endereco);
 		
 		// testar solicitação de exclusão de conta e rejeitar ou inativar conta depois
 		Pessoa p3 = new Pessoa("teste3", new Cpf("22222222222"), Sexo.MASCULINO, FuncaoUsuario.CLIENTE, LocalDate.parse("2000-10-10"), LocalDate.now(), new Telefone("1234567891"), new Email("teste3@gmail.com"), senhaHash, StatusConta.ATIVA, null);
@@ -77,5 +79,6 @@ public class TestConfig implements CommandLineRunner {
 		pessoaService.inserir(p4);
 		pessoaService.inserir(p5);
 		pessoaService.inserir(p6);
+		*/
 	}
 }

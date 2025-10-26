@@ -14,6 +14,7 @@ import com.projeto.sistemabiblioteca.entities.Endereco;
 import com.projeto.sistemabiblioteca.entities.Estado;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.exceptions.AcessoNegadoException;
 import com.projeto.sistemabiblioteca.exceptions.CpfJaCadastradoException;
@@ -94,6 +95,10 @@ public class PessoaService {
 	
 	private Endereco instanciarEndereco(EnderecoDTO enderecoDTO) {
 		Estado estado = estadoService.buscarPorId(enderecoDTO.idEstado());
+		
+		if (estado.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalArgumentException("Erro: não é possível associar um novo endereço a um estado com status inativo.");
+		}
 		
 		return new Endereco(
 				enderecoDTO.nomeLogradouro(),
@@ -183,11 +188,13 @@ public class PessoaService {
 		pessoaRepository.save(pessoa);
 	}
 	
+	@Transactional
 	public void inativar(Long id) {
 		Pessoa pessoa = buscarPorId(id);
 		if (pessoa.getStatusConta() == StatusConta.INATIVA) {
 			throw new IllegalStateException("Erro: usuário já está inativo.");
 		}
+		enderecoService.inativar(pessoa.getEndereco().getIdEndereco());
 		pessoa.inativarConta();
 		pessoaRepository.save(pessoa);
 	}
@@ -268,11 +275,13 @@ public class PessoaService {
 		pessoaRepository.save(pessoa);
 	}
 	
+	@Transactional
 	public void rejeitarConta(Long id) {
 		Pessoa pessoa = buscarPorId(id);
 		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
 			throw new IllegalArgumentException("Erro: apenas clientes podem ser rejeitados.");
 		}
+		enderecoService.inativar(pessoa.getEndereco().getIdEndereco());
 		pessoa.rejeitarConta();
 		pessoaRepository.save(pessoa);
 	}
