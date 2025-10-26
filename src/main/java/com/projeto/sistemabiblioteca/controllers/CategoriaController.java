@@ -1,11 +1,23 @@
 package com.projeto.sistemabiblioteca.controllers;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.projeto.sistemabiblioteca.DTOs.CategoriaDTO;
 import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.services.CategoriaService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/categorias")
@@ -31,14 +43,16 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<Categoria> cadastrar(@RequestBody Categoria categoria) {
+    public ResponseEntity<Categoria> cadastrar(@Valid @RequestBody CategoriaDTO categoriaDTO) {
+    	Categoria categoria = new Categoria(categoriaDTO.nome());
         Categoria novaCategoria = categoriaService.inserir(categoria);
         return ResponseEntity.ok(novaCategoria);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Categoria> atualizar(@PathVariable Long id, @RequestBody Categoria categoria) {
-        return ResponseEntity.ok(categoriaService.atualizar(id, categoria));
+    public ResponseEntity<Categoria> atualizar(@PathVariable Long id, @Valid @RequestBody CategoriaDTO categoriaDTO) {
+    	Categoria categoria = new Categoria(categoriaDTO.nome());
+    	return ResponseEntity.ok(categoriaService.atualizar(id, categoria));
     }
 
     @DeleteMapping("/{id}")

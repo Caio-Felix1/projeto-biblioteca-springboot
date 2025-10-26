@@ -2,9 +2,12 @@ package com.projeto.sistemabiblioteca.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import com.projeto.sistemabiblioteca.DTOs.TituloDTO;
+import com.projeto.sistemabiblioteca.DTOs.TituloUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.entities.Titulo;
@@ -12,6 +15,7 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.TituloRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class TituloService {
@@ -48,6 +52,30 @@ public class TituloService {
 		return titulo.get();
 	}
 	
+	@Transactional
+	public Titulo cadastrarTitulo(TituloDTO tituloDTO) {
+		List<Autor> autores = autorService.buscarTodosPorId(tituloDTO.idsAutores());
+		boolean temAutorInativo = autores.stream().anyMatch(a -> a.getStatusAtivo() == StatusAtivo.INATIVO);
+		
+		if (temAutorInativo) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a um autor com status inativo.");
+		}
+		
+		List<Categoria> categorias = categoriaService.buscarTodosPorId(tituloDTO.idsCategorias());
+		boolean temCategoriaInativa = categorias.stream().anyMatch(c -> c.getStatusAtivo() == StatusAtivo.INATIVO);
+		
+		if (temCategoriaInativa) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a uma categoria com status inativo.");
+		}
+		
+		Titulo titulo = new Titulo(tituloDTO.nome(), tituloDTO.descricao());
+		
+		autores.forEach(titulo::adicionarAutor);
+		categorias.forEach(titulo::adicionarCategoria);
+		
+		return inserir(titulo);
+	}
+	
 	public Titulo inserir(Titulo Titulo) {
 		return tituloRepository.save(Titulo);
 	}
@@ -61,9 +89,12 @@ public class TituloService {
 		tituloRepository.save(titulo);
 	}
 	
-	public Titulo atualizar(Long id, Titulo Titulo2) {
+	public Titulo atualizar(Long id, TituloUpdateDTO tituloUpdateDTO) {
 		Titulo titulo1 = buscarPorId(id);
-		atualizarDados(titulo1, Titulo2);
+		
+		Titulo titulo2 = new Titulo(tituloUpdateDTO.nome(), tituloUpdateDTO.descricao());
+		
+		atualizarDados(titulo1, titulo2);
 		return tituloRepository.save(titulo1);
 	}
 	
@@ -75,7 +106,26 @@ public class TituloService {
 	public void adicionarCategoria(Long idTitulo, Long idCategoria) {
 		Titulo titulo = buscarPorId(idTitulo);
 		Categoria categoria = categoriaService.buscarPorId(idCategoria);
+		
+		if (categoria.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a uma categoria com status inativo ao atualizar.");
+		}
+		
 		titulo.adicionarCategoria(categoria);
+		tituloRepository.save(titulo);
+	}
+	
+	@Transactional
+	public void adicionarCategorias(Long idTitulo, Set<Long> idsCategorias) {
+		Titulo titulo = buscarPorId(idTitulo);
+		List<Categoria> categorias = categoriaService.buscarTodosPorId(idsCategorias);
+		boolean temInativo = categorias.stream().anyMatch(c -> c.getStatusAtivo() == StatusAtivo.INATIVO);
+		
+		if (temInativo) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a uma categoria com status inativo ao atualizar.");
+		}
+		
+		categorias.forEach(titulo::adicionarCategoria);
 		tituloRepository.save(titulo);
 	}
 	
@@ -86,10 +136,37 @@ public class TituloService {
 		tituloRepository.save(titulo);
 	}
 	
+	@Transactional
+	public void removerCategorias(Long idTitulo, Set<Long> idsCategorias) {
+		Titulo titulo = buscarPorId(idTitulo);
+		List<Categoria> categorias = categoriaService.buscarTodosPorId(idsCategorias);
+		categorias.forEach(titulo::removerCategoria);
+		tituloRepository.save(titulo);
+	}
+	
 	public void adicionarAutor(Long idTitulo, Long idAutor) {
 		Titulo titulo = buscarPorId(idTitulo);
 		Autor autor = autorService.buscarPorId(idAutor);
+		
+		if (autor.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a um autor com status inativo ao atualizar.");
+		}
+		
 		titulo.adicionarAutor(autor);
+		tituloRepository.save(titulo);
+	}
+	
+	@Transactional
+	public void adicionarAutores(Long idTitulo, Set<Long> idsAutores) {
+		Titulo titulo = buscarPorId(idTitulo);
+		List<Autor> autores = autorService.buscarTodosPorId(idsAutores);
+		boolean temInativo = autores.stream().anyMatch(a -> a.getStatusAtivo() == StatusAtivo.INATIVO);
+		
+		if (temInativo) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a um autor com status inativo ao atualizar.");
+		}
+		
+		autores.forEach(titulo::adicionarAutor);
 		tituloRepository.save(titulo);
 	}
 	
@@ -97,6 +174,14 @@ public class TituloService {
 		Titulo titulo = buscarPorId(idTitulo);
 		Autor autor = autorService.buscarPorId(idAutor);
 		titulo.removerAutor(autor);
+		tituloRepository.save(titulo);
+	}
+	
+	@Transactional
+	public void removerAutores(Long idTitulo, Set<Long> idsAutores) {
+		Titulo titulo = buscarPorId(idTitulo);
+		List<Autor> autores = autorService.buscarTodosPorId(idsAutores);
+		autores.forEach(titulo::removerAutor);
 		tituloRepository.save(titulo);
 	}
 }

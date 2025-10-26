@@ -1,12 +1,27 @@
 package com.projeto.sistemabiblioteca.controllers;
 
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.projeto.sistemabiblioteca.DTOs.TituloDTO;
+import com.projeto.sistemabiblioteca.DTOs.TituloUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Titulo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.services.TituloService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/titulos")
@@ -44,15 +59,15 @@ public class TituloController {
 
 
     @PostMapping
-    public ResponseEntity<Titulo> criar(@RequestBody Titulo titulo) {
-        Titulo novo = tituloService.inserir(titulo);
+    public ResponseEntity<Titulo> criar(@Valid @RequestBody TituloDTO tituloDTO) {
+        Titulo novo = tituloService.cadastrarTitulo(tituloDTO);
         return ResponseEntity.ok(novo);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Titulo> atualizar(@PathVariable Long id, @RequestBody Titulo titulo) {
-        Titulo atualizado = tituloService.atualizar(id, titulo);
+    public ResponseEntity<Titulo> atualizar(@PathVariable Long id, @Valid @RequestBody TituloUpdateDTO tituloUpdateDTO) {
+        Titulo atualizado = tituloService.atualizar(id, tituloUpdateDTO);
         return ResponseEntity.ok(atualizado);
     }
 
@@ -69,11 +84,23 @@ public class TituloController {
         tituloService.adicionarCategoria(idTitulo, idCategoria);
         return ResponseEntity.noContent().build();
     }
+    
+    @PostMapping("/{idTitulo}/categorias")
+    public ResponseEntity<Void> adicionarCategorias(@PathVariable Long idTitulo, @RequestBody Set<Long> idsCategorias) {
+        tituloService.adicionarCategorias(idTitulo, idsCategorias);
+        return ResponseEntity.noContent().build();
+    }
 
 
     @DeleteMapping("/{idTitulo}/categorias/{idCategoria}")
     public ResponseEntity<Void> removerCategoria(@PathVariable Long idTitulo, @PathVariable Long idCategoria) {
         tituloService.removerCategoria(idTitulo, idCategoria);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @DeleteMapping("/{idTitulo}/categorias")
+    public ResponseEntity<Void> removerCategorias(@PathVariable Long idTitulo, @RequestBody Set<Long> idsCategorias) {
+        tituloService.removerCategorias(idTitulo, idsCategorias);
         return ResponseEntity.noContent().build();
     }
 
@@ -83,11 +110,22 @@ public class TituloController {
         tituloService.adicionarAutor(idTitulo, idAutor);
         return ResponseEntity.noContent().build();
     }
-
+    
+    @PostMapping("/{idTitulo}/autores")
+    public ResponseEntity<Void> adicionarAutores(@PathVariable Long idTitulo, @RequestBody Set<Long> idsAutores) {
+        tituloService.adicionarAutores(idTitulo, idsAutores);
+        return ResponseEntity.noContent().build();
+    }
 
     @DeleteMapping("/{idTitulo}/autores/{idAutor}")
     public ResponseEntity<Void> removerAutor(@PathVariable Long idTitulo, @PathVariable Long idAutor) {
         tituloService.removerAutor(idTitulo, idAutor);
+        return ResponseEntity.noContent().build();
+    }
+    
+    @DeleteMapping("/{idTitulo}/autores")
+    public ResponseEntity<Void> removerAutores(@PathVariable Long idTitulo, @RequestBody Set<Long> idsAutores) {
+        tituloService.removerAutores(idTitulo, idsAutores);
         return ResponseEntity.noContent().build();
     }
 }

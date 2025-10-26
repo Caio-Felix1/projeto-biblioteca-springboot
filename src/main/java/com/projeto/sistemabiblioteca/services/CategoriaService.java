@@ -2,6 +2,7 @@ package com.projeto.sistemabiblioteca.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,10 @@ public class CategoriaService {
 	
 	public List<Categoria> buscarTodosComStatusIgualA(StatusAtivo status) {
 		return categoriaRepository.findAllByStatusEquals(status);
+	}
+	
+	public List<Categoria> buscarTodosPorId(Set<Long> ids) {
+		return categoriaRepository.findAllById(ids);
 	}
 	
 	public Categoria buscarPorId(Long id) {

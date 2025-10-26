@@ -1,10 +1,23 @@
 package com.projeto.sistemabiblioteca.controllers;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.projeto.sistemabiblioteca.DTOs.AutorDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.services.AutorService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
+
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -33,15 +46,17 @@ public class AutorController {
 
 
     @PostMapping
-    public ResponseEntity<Autor> cadastrar(@RequestBody Autor autor) {
+    public ResponseEntity<Autor> cadastrar(@Valid @RequestBody AutorDTO autorDTO) {
+    	Autor autor = new Autor(autorDTO.nome());
         Autor novoAutor = autorService.inserir(autor);
         return ResponseEntity.ok(novoAutor);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Autor> atualizar(@PathVariable Long id, @RequestBody Autor autor) {
-            return ResponseEntity.ok(autorService.atualizar(id, autor));
+    public ResponseEntity<Autor> atualizar(@PathVariable Long id, @Valid @RequestBody AutorDTO autorDTO) {
+    	Autor autor = new Autor(autorDTO.nome());
+    	return ResponseEntity.ok(autorService.atualizar(id, autor));
     }
 
     // Deletar autor

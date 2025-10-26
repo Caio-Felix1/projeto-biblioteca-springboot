@@ -1,10 +1,19 @@
 package com.projeto.sistemabiblioteca.DTOs;
 
-import java.util.List;
+import java.util.Set;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 public record TituloDTO(
-		Long idTitulo,
+		@NotBlank(message = "Título é obrigatório")
 		String nome,
+		
+		@NotBlank(message = "Descrição do título é obrigatória")
 		String descricao,
-		List<CategoriaDTO> categorias,
-		List<AutorDTO> autores) {}
+		
+		@NotEmpty(message = "É necessário inserir pelo menos uma categoria")
+		Set<Long> idsCategorias,
+		
+		@NotEmpty(message = "É necessário inserir pelo menos um autor")
+		Set<Long> idsAutores) {}
