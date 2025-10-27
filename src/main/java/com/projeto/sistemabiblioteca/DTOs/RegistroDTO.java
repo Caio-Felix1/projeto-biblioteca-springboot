@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 
 public record RegistroDTO(
 		/*
@@ -27,6 +28,7 @@ public record RegistroDTO(
 		Sexo sexo,
 		
 		@NotNull(message = "Data de nascimento é obrigatória")
+		@Past(message = "Data de nascimento deve ser no passado")
 		LocalDate dtNascimento,
 		
 		@NotBlank(message = "Telefone é obrigatório")

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.AutorDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.services.AutorService;
 
 import jakarta.validation.Valid;
@@ -37,13 +38,21 @@ public class AutorController {
         }
         return ResponseEntity.ok(autorService.buscarTodos());
     }
-
+    
+    @GetMapping("/ativos")
+    public ResponseEntity<List<Autor>> buscarAtivos() {
+    	return ResponseEntity.ok(autorService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO));
+    }
+    
+    @GetMapping("/inativos")
+    public ResponseEntity<List<Autor>> buscarInativos() {
+    	return ResponseEntity.ok(autorService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Autor> buscarPorId(@PathVariable Long id) {
             return ResponseEntity.ok(autorService.buscarPorId(id));
     }
-
 
     @PostMapping
     public ResponseEntity<Autor> cadastrar(@Valid @RequestBody AutorDTO autorDTO) {
@@ -51,7 +60,6 @@ public class AutorController {
         Autor novoAutor = autorService.inserir(autor);
         return ResponseEntity.ok(novoAutor);
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<Autor> atualizar(@PathVariable Long id, @Valid @RequestBody AutorDTO autorDTO) {
@@ -65,5 +73,4 @@ public class AutorController {
             autorService.inativar(id);
             return ResponseEntity.noContent().build();
     }
-
 }

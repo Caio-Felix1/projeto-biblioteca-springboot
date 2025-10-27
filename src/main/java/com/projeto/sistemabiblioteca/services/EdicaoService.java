@@ -3,36 +3,37 @@ package com.projeto.sistemabiblioteca.services;
 import java.util.List;
 import java.util.Optional;
 
-import com.projeto.sistemabiblioteca.DTOs.EdicaoCreateDTO;
-import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
-import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
-import com.projeto.sistemabiblioteca.repositories.TituloRepository;
 import org.springframework.stereotype.Service;
 
+import com.projeto.sistemabiblioteca.DTOs.EdicaoDTO;
 import com.projeto.sistemabiblioteca.entities.Edicao;
+import com.projeto.sistemabiblioteca.entities.Editora;
+import com.projeto.sistemabiblioteca.entities.Idioma;
+import com.projeto.sistemabiblioteca.entities.Titulo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class EdicaoService {
 
 	private EdicaoRepository edicaoRepository;
-	private TituloRepository tituloRepository;
-	private EditoraRepository editoraRepository;
-	private IdiomaRepository idiomaRepository;
+	private TituloService tituloService;
+	private EditoraService editoraService;
+	private IdiomaService idiomaService;
 
 	public EdicaoService(
 			EdicaoRepository edicaoRepository,
-			TituloRepository tituloRepository,
-			EditoraRepository editoraRepository,
-			IdiomaRepository idiomaRepository
+			TituloService tituloService,
+			EditoraService editoraService,
+			IdiomaService idiomaService
 	) {
 		this.edicaoRepository = edicaoRepository;
-		this.tituloRepository = tituloRepository;
-		this.editoraRepository = editoraRepository;
-		this.idiomaRepository = idiomaRepository;
+		this.tituloService = tituloService;
+		this.editoraService = editoraService;
+		this.idiomaService = idiomaService;
 	}
 	
 	public List<Edicao> buscarTodos() {
@@ -43,6 +44,18 @@ public class EdicaoService {
 		return edicaoRepository.findAllByStatusEquals(status);
 	}
 	
+	public List<Edicao> buscarTodosComAutorComNomeContendo(String nome) {
+		return edicaoRepository.findAllByTituloAutoresNomeContainingIgnoreCase(nome);
+	}
+	
+	public List<Edicao> buscarTodosComTituloComNomeContendo(String nome) {
+		return edicaoRepository.findAllByTituloNomeContainingIgnoreCase(nome);
+	}
+	
+	public List<Edicao> buscarTodosComCategoriaComIdIgualA(Long id) {
+		return edicaoRepository.findAllByTituloCategoriasIdCategoria(id);
+	}
+	
 	public Edicao buscarPorId(Long id) {
 		Optional<Edicao> edicao = edicaoRepository.findById(id);
 		if (edicao.isEmpty()) {
@@ -50,31 +63,40 @@ public class EdicaoService {
 		}
 		return edicao.get();
 	}
+	
+	@Transactional
+	public Edicao cadastrarEdicao(EdicaoDTO edicaoDTO) {
+		Titulo titulo = tituloService.buscarPorId(edicaoDTO.tituloId());
+		Editora editora = editoraService.buscarPorId(edicaoDTO.editoraId());
+		Idioma idioma = idiomaService.buscarPorId(edicaoDTO.idiomaId());
+		
+		if (titulo.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalArgumentException("Erro: não é possível associar uma edição a um título com status inativo.");
+		}
+		if (editora.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalArgumentException("Erro: não é possível associar uma edição a uma editora com status inativo.");
+		}
+		if (idioma.getStatusAtivo() == StatusAtivo.INATIVO) {
+			throw new IllegalArgumentException("Erro: não é possível associar uma edição a uma idioma com status inativo.");
+		}
 
-	public Edicao inserir(EdicaoCreateDTO dto) {
-		var titulo = tituloRepository.findById(dto.tituloId())
-				.orElseThrow(() -> new RuntimeException("Título não encontrado"));
-		var editora = editoraRepository.findById(dto.editoraId())
-				.orElseThrow(() -> new RuntimeException("Editora não encontrada"));
-		var idioma = idiomaRepository.findById(dto.idiomaId())
-				.orElseThrow(() -> new RuntimeException("Idioma não encontrado"));
-
-		var edicao = new Edicao(
-				dto.tipoCapa(),
-				dto.qtdPaginas(),
-				dto.tamanho(),
-				dto.classificacao(),
-				dto.dtPublicacao(),
+		Edicao edicao = new Edicao(
+				edicaoDTO.tipoCapa(),
+				edicaoDTO.qtdPaginas(),
+				edicaoDTO.tamanho(),
+				edicaoDTO.classificacao(),
+				edicaoDTO.dtPublicacao(),
 				titulo,
 				editora,
 				idioma
 		);
-
+		
+		return inserir(edicao);
+	}
+	
+	public Edicao inserir(Edicao edicao) {
 		return edicaoRepository.save(edicao);
 	}
-
-
-
 	
 	public void inativar(Long id) {
 		Edicao edicao = buscarPorId(id);
@@ -85,8 +107,57 @@ public class EdicaoService {
 		edicaoRepository.save(edicao);
 	}
 	
-	public Edicao atualizar(Long id, Edicao edicao2) {
+	@Transactional
+	public Edicao atualizar(Long id, EdicaoDTO edicaoDTO) {
 		Edicao edicao1 = buscarPorId(id);
+		
+		Titulo titulo;
+		Editora editora;
+		Idioma idioma;
+		if (edicao1.getTitulo().getIdTitulo().equals(edicaoDTO.tituloId())) {
+			titulo = edicao1.getTitulo();
+		}
+		else {
+			titulo = tituloService.buscarPorId(edicaoDTO.tituloId());
+			
+			if (titulo.getStatusAtivo() == StatusAtivo.INATIVO) {
+				throw new IllegalArgumentException("Erro: não é possível associar uma edição a um título com status inativo ao atualizar.");
+			}
+		}
+		
+		if (edicao1.getEditora().getIdEditora().equals(edicaoDTO.editoraId())) {
+			editora = edicao1.getEditora();
+		}
+		else {
+			editora = editoraService.buscarPorId(edicaoDTO.editoraId());
+			
+			if (editora.getStatusAtivo() == StatusAtivo.INATIVO) {
+				throw new IllegalArgumentException("Erro: não é possível associar uma edição a uma editora com status inativo ao atualizar.");
+			}
+		}
+		
+		if (edicao1.getIdioma().getIdIdioma().equals(edicaoDTO.idiomaId())) {
+			idioma = edicao1.getIdioma();
+		}
+		else {
+			idioma = idiomaService.buscarPorId(edicaoDTO.idiomaId());
+			
+			if (idioma.getStatusAtivo() == StatusAtivo.INATIVO) {
+				throw new IllegalArgumentException("Erro: não é possível associar uma edição a um idioma com status inativo ao atualizar.");
+			}
+		}
+		
+		Edicao edicao2 = new Edicao(
+				edicaoDTO.tipoCapa(),
+				edicaoDTO.qtdPaginas(),
+				edicaoDTO.tamanho(),
+				edicaoDTO.classificacao(),
+				edicaoDTO.dtPublicacao(),
+				titulo,
+				editora,
+				idioma
+		);
+		
 		atualizarDados(edicao1, edicao2);
 		return edicaoRepository.save(edicao1);
 	}
@@ -95,10 +166,10 @@ public class EdicaoService {
 		edicao1.setTipoCapa(edicao2.getTipoCapa());
 		edicao1.setQtdPaginas(edicao2.getQtdPaginas());
 		edicao1.setTamanho(edicao2.getTamanho());
-		edicao1.setIdioma(edicao2.getIdioma());
 		edicao1.setClassificacao(edicao2.getClassificacao());
 		edicao1.setDtPublicacao(edicao2.getDtPublicacao());
 		edicao1.setTitulo(edicao2.getTitulo());
 		edicao1.setEditora(edicao2.getEditora());
+		edicao1.setIdioma(edicao2.getIdioma());
 	}
 }

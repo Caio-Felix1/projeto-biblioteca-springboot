@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.PaisDTO;
 import com.projeto.sistemabiblioteca.entities.Pais;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.services.PaisService;
 
 import jakarta.validation.Valid;
@@ -31,6 +32,16 @@ public class PaisController {
     @GetMapping
     public ResponseEntity<List<Pais>> buscarTodos() {
         return ResponseEntity.ok(paisService.buscarTodos());
+    }
+    
+    @GetMapping("/ativos")
+    public ResponseEntity<List<Pais>> buscarAtivos() {
+        return ResponseEntity.ok(paisService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO));
+    }
+    
+    @GetMapping("/inativos")
+    public ResponseEntity<List<Pais>> buscarInativos() {
+        return ResponseEntity.ok(paisService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
     }
 
     @GetMapping("/{id}")

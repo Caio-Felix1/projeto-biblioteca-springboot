@@ -42,6 +42,11 @@ public class PessoaController {
 		return ResponseEntity.ok(pessoaService.buscarTodos());
 	}
 	
+	@GetMapping("/status/{status}")
+	public ResponseEntity<List<Pessoa>> buscarTodosPorStatus(@PathVariable StatusConta statusConta) {
+		return ResponseEntity.ok(pessoaService.buscarTodosComStatusContaIgualA(statusConta));
+	}
+	
 	@GetMapping("/clientes")
 	public ResponseEntity<List<Pessoa>> buscarClientes() {
 		return ResponseEntity.ok(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.CLIENTE));

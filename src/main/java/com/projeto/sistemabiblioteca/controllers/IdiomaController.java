@@ -1,5 +1,6 @@
 package com.projeto.sistemabiblioteca.controllers;
 
+import com.projeto.sistemabiblioteca.DTOs.IdiomaDTO;
 import com.projeto.sistemabiblioteca.entities.Idioma;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.services.IdiomaService;
@@ -20,57 +21,49 @@ public class IdiomaController {
         this.idiomaService = idiomaService;
     }
 
-
+    
     @GetMapping
-    public List<Idioma> listarTodos() {
-        return idiomaService.buscarTodos();
+    public ResponseEntity<List<Idioma>> listarTodos() {
+        return ResponseEntity.ok(idiomaService.buscarTodos());
     }
-
 
     @GetMapping("/ativos")
-    public List<Idioma> listarAtivos() {
-        return idiomaService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO);
+    public ResponseEntity<List<Idioma>> listarAtivos() {
+        return ResponseEntity.ok(idiomaService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO));
     }
-
-
+    
+    @GetMapping("/inativos")
+    public ResponseEntity<List<Idioma>> listarInativos() {
+        return ResponseEntity.ok(idiomaService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
+    }
+    
     @GetMapping("/{id}")
     public ResponseEntity<Idioma> buscarPorId(@PathVariable Long id) {
-        try {
-            Idioma idioma = idiomaService.buscarPorId(id);
-            return ResponseEntity.ok(idioma);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+    	Idioma idioma = idiomaService.buscarPorId(id);
+        return ResponseEntity.ok(idioma);
     }
 
 
     @PostMapping
-    public ResponseEntity<Idioma> criar(@RequestBody Idioma idioma) {
+    public ResponseEntity<Idioma> criar(@RequestBody IdiomaDTO idiomaDTO) {
+    	Idioma idioma = new Idioma(idiomaDTO.nome());
         Idioma salvo = idiomaService.inserir(idioma);
-        return new ResponseEntity<>(salvo, HttpStatus.CREATED);
+        //return new ResponseEntity<>(salvo, HttpStatus.CREATED);
+        return ResponseEntity.ok(salvo);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Idioma> atualizar(@PathVariable Long id, @RequestBody Idioma idioma) {
-        try {
-            Idioma atualizado = idiomaService.atualizar(id, idioma);
-            return ResponseEntity.ok(atualizado);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Idioma> atualizar(@PathVariable Long id, @RequestBody IdiomaDTO idiomaDTO) {
+    	Idioma idioma = new Idioma(idiomaDTO.nome());
+    	Idioma atualizado = idiomaService.atualizar(id, idioma);
+        return ResponseEntity.ok(atualizado);
     }
 
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
-        try {
-            idiomaService.inativar(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    	idiomaService.inativar(id);
+        return ResponseEntity.noContent().build();
     }
 }

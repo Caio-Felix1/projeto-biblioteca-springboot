@@ -6,7 +6,6 @@ import java.util.Set;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,22 +34,22 @@ public class TituloController {
 
 
     @GetMapping
-    public ResponseEntity<List<Titulo>> listarTodos() {
+    public ResponseEntity<List<Titulo>> listarTodos(@RequestParam(required = false) String nome) {
+        if (nome != null && !nome.isEmpty()) {
+            return ResponseEntity.ok(tituloService.buscarTodosComNomeContendo(nome));
+        }
         return ResponseEntity.ok(tituloService.buscarTodos());
     }
-
-
-    @GetMapping("/buscar")
-    public ResponseEntity<List<Titulo>> buscarPorNome(@RequestParam String nome) {
-        return ResponseEntity.ok(tituloService.buscarTodosComNomeContendo(nome));
-    }
-
 
     @GetMapping("/ativos")
     public ResponseEntity<List<Titulo>> listarAtivos() {
         return ResponseEntity.ok(tituloService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO));
     }
-
+    
+    @GetMapping("/inativos")
+    public ResponseEntity<List<Titulo>> listarInativos() {
+        return ResponseEntity.ok(tituloService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Titulo> buscarPorId(@PathVariable Long id) {
@@ -71,14 +70,13 @@ public class TituloController {
         return ResponseEntity.ok(atualizado);
     }
 
-
-    @PatchMapping("/{id}/inativar")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
         tituloService.inativar(id);
         return ResponseEntity.noContent().build();
     }
 
-
+    
     @PostMapping("/{idTitulo}/categorias/{idCategoria}")
     public ResponseEntity<Void> adicionarCategoria(@PathVariable Long idTitulo, @PathVariable Long idCategoria) {
         tituloService.adicionarCategoria(idTitulo, idCategoria);

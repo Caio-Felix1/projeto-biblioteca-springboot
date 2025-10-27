@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.CategoriaDTO;
 import com.projeto.sistemabiblioteca.entities.Categoria;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.services.CategoriaService;
 
 import jakarta.validation.Valid;
@@ -35,6 +36,16 @@ public class CategoriaController {
             return ResponseEntity.ok(categoriaService.buscarTodosComNomeContendo(nome));
         }
         return ResponseEntity.ok(categoriaService.buscarTodos());
+    }
+    
+    @GetMapping("/ativos")
+    public ResponseEntity<List<Categoria>> buscarAtivos() {
+        return ResponseEntity.ok(categoriaService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO));
+    }
+    
+    @GetMapping("/inativos")
+    public ResponseEntity<List<Categoria>> buscarInativos() {
+        return ResponseEntity.ok(categoriaService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
     }
 
     @GetMapping("/{id}")

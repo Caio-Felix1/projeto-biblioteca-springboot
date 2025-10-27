@@ -10,4 +10,10 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 public interface EdicaoRepository extends JpaRepository<Edicao, Long> {
 	
 	List<Edicao> findAllByStatusEquals(StatusAtivo status);
+	
+	List<Edicao> findAllByTituloNomeContainingIgnoreCase(String nome);
+	
+	List<Edicao> findAllByTituloAutoresNomeContainingIgnoreCase(String nome);
+	
+	List<Edicao> findAllByTituloCategoriasIdCategoria(Long id);
 }
