@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.projeto.sistemabiblioteca.DTOs.TituloDTO;
+import com.projeto.sistemabiblioteca.DTOs.TituloCreateDTO;
 import com.projeto.sistemabiblioteca.DTOs.TituloUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.Categoria;
@@ -53,22 +53,22 @@ public class TituloService {
 	}
 	
 	@Transactional
-	public Titulo cadastrarTitulo(TituloDTO tituloDTO) {
-		List<Autor> autores = autorService.buscarTodosPorId(tituloDTO.idsAutores());
+	public Titulo cadastrarTitulo(TituloCreateDTO tituloCreateDTO) {
+		List<Autor> autores = autorService.buscarTodosPorId(tituloCreateDTO.idsAutores());
 		boolean temAutorInativo = autores.stream().anyMatch(a -> a.getStatusAtivo() == StatusAtivo.INATIVO);
 		
 		if (temAutorInativo) {
 			throw new IllegalArgumentException("Erro: não é possível associar um título a um autor com status inativo.");
 		}
 		
-		List<Categoria> categorias = categoriaService.buscarTodosPorId(tituloDTO.idsCategorias());
+		List<Categoria> categorias = categoriaService.buscarTodosPorId(tituloCreateDTO.idsCategorias());
 		boolean temCategoriaInativa = categorias.stream().anyMatch(c -> c.getStatusAtivo() == StatusAtivo.INATIVO);
 		
 		if (temCategoriaInativa) {
 			throw new IllegalArgumentException("Erro: não é possível associar um título a uma categoria com status inativo.");
 		}
 		
-		Titulo titulo = new Titulo(tituloDTO.nome(), tituloDTO.descricao());
+		Titulo titulo = new Titulo(tituloCreateDTO.nome(), tituloCreateDTO.descricao());
 		
 		autores.forEach(titulo::adicionarAutor);
 		categorias.forEach(titulo::adicionarCategoria);

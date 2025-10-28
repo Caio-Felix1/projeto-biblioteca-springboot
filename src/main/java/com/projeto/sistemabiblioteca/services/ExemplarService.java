@@ -1,11 +1,13 @@
 package com.projeto.sistemabiblioteca.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.projeto.sistemabiblioteca.DTOs.ExemplarDTO;
+import com.projeto.sistemabiblioteca.DTOs.ExemplarCreateDTO;
+import com.projeto.sistemabiblioteca.DTOs.ExemplarUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Edicao;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
@@ -39,8 +41,8 @@ public class ExemplarService {
 		return exemplarRepository.findAllByEdicaoIdEdicao(id);
 	}
 	
-	public Exemplar buscarPrimeiroComEdicaoComIdIgualA(Long id, StatusExemplar status) {
-		return exemplarRepository.findAllByEdicaoOrderByEstadoFisicoCustom(id, status)
+	public Exemplar buscarPrimeiroExemplarPorEdicaoEStatus(Long id, StatusExemplar status) {
+		return exemplarRepository.findAllByEdicaoAndStatusOrderByEstadoFisicoCustom(id, status)
 				.stream()
 				.findFirst()
 				.orElseThrow(() -> new ExemplarNaoDisponivelException("Erro: não tem exemplar disponível para essa edição."));
@@ -55,16 +57,20 @@ public class ExemplarService {
 	}
 	
 	@Transactional
-	public Exemplar cadastrarExemplar(ExemplarDTO exemplarDTO) {
-		Edicao edicao = edicaoService.buscarPorId(exemplarDTO.edicaoId());
+	public List<Exemplar> cadastrarExemplares(ExemplarCreateDTO exemplarCreateDTO) {
+		Edicao edicao = edicaoService.buscarPorId(exemplarCreateDTO.edicaoId());
 		
 		if (edicao.getStatusAtivo() == StatusAtivo.INATIVO) {
 			throw new IllegalArgumentException("Erro: não é possível associar um exemplar a uma edição com status inativo.");
 		}
 		
-		Exemplar exemplar = new Exemplar(exemplarDTO.estadoFisico(), edicao);
+		List<Exemplar> exemplares = new ArrayList<>();
+		for (int i = 0; i < exemplarCreateDTO.qtdEstoque(); i++) {
+			Exemplar exemplar = new Exemplar(exemplarCreateDTO.estadoFisico(), edicao);
+			exemplares.add(inserir(exemplar));
+		}
 		
-		return inserir(exemplar);
+		return exemplares;
 	}
 	
 	public Exemplar inserir(Exemplar exemplar) {
@@ -83,22 +89,22 @@ public class ExemplarService {
 	}
 	
 	@Transactional
-	public Exemplar atualizar(Long id, ExemplarDTO exemplarDTO) {
+	public Exemplar atualizar(Long id, ExemplarUpdateDTO exemplarUpdateDTO) {
 		Exemplar exemplar1 = buscarPorId(id);
 		
 		Edicao edicao;
-		if (exemplar1.getEdicao().getIdEdicao().equals(exemplarDTO.edicaoId())) {
+		if (exemplar1.getEdicao().getIdEdicao().equals(exemplarUpdateDTO.edicaoId())) {
 			edicao = exemplar1.getEdicao();
 		}
 		else {
-			edicao = edicaoService.buscarPorId(exemplarDTO.edicaoId());
+			edicao = edicaoService.buscarPorId(exemplarUpdateDTO.edicaoId());
 			
 			if (edicao.getStatusAtivo() == StatusAtivo.INATIVO) {
 				throw new IllegalArgumentException("Erro: não é possível associar um exemplar a uma edição com status inativo ao atualizar.");
 			}
 		}
 		
-		Exemplar exemplar2 = new Exemplar(exemplarDTO.estadoFisico(), edicao);
+		Exemplar exemplar2 = new Exemplar(exemplarUpdateDTO.estadoFisico(), edicao);
 		
 		atualizarDados(exemplar1, exemplar2);
 		return exemplarRepository.save(exemplar1);

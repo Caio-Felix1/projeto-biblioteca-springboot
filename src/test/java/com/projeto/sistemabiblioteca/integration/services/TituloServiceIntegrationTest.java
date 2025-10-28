@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.projeto.sistemabiblioteca.DTOs.TituloDTO;
+import com.projeto.sistemabiblioteca.DTOs.TituloCreateDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.entities.Titulo;
@@ -59,13 +59,13 @@ public class TituloServiceIntegrationTest {
 		Long categoria1Id = categoriaRepository.save(categoria1).getIdCategoria();
 		Long categoria2Id = categoriaRepository.save(categoria2).getIdCategoria();
 		
-		TituloDTO tituloDTO = new TituloDTO(
+		TituloCreateDTO tituloCreateDTO = new TituloCreateDTO(
 				"Titulo 1", 
 				"Descricao 1",
 				Set.of(categoria1Id, categoria2Id),
 				Set.of(autor1Id, autor2Id));
 		
-		Titulo titulo = tituloService.cadastrarTitulo(tituloDTO);
+		Titulo titulo = tituloService.cadastrarTitulo(tituloCreateDTO);
 		
 		Assertions.assertEquals("Titulo 1", titulo.getNome());
 		Assertions.assertEquals("Descricao 1", titulo.getDescricao());

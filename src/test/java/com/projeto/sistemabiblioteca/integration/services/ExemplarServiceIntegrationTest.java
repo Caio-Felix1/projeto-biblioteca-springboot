@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.projeto.sistemabiblioteca.DTOs.ExemplarDTO;
+import com.projeto.sistemabiblioteca.DTOs.ExemplarCreateDTO;
+import com.projeto.sistemabiblioteca.DTOs.ExemplarUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Edicao;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.enums.ClassificacaoIndicativa;
@@ -70,7 +71,7 @@ public class ExemplarServiceIntegrationTest {
 	}
 	
 	@Test
-	void buscarPrimeiroExemplarDisponivelFiltrandoPeloIdDaEdicaoEOrdenandoPeloEstadoFisico() {
+	void buscarPrimeiroExemplarDisponivelFiltrandoPeloIdDaEdicaoEStatusEOrdenandoPeloEstadoFisico() {
 		Edicao edicao1 = new Edicao(
 				TipoCapa.DURA,
 				100,
@@ -105,7 +106,7 @@ public class ExemplarServiceIntegrationTest {
 		exemplarService.inserir(exemplar3);
 		exemplarService.inserir(exemplar4);
 		
-		Exemplar exemplarObtido = exemplarService.buscarPrimeiroComEdicaoComIdIgualA(edicao1.getIdEdicao(), StatusExemplar.DISPONIVEL);
+		Exemplar exemplarObtido = exemplarService.buscarPrimeiroExemplarPorEdicaoEStatus(edicao1.getIdEdicao(), StatusExemplar.DISPONIVEL);
 		
 		Assertions.assertEquals(EstadoFisico.BOM, exemplarObtido.getEstadoFisico());
 		Assertions.assertEquals(StatusExemplar.DISPONIVEL, exemplarObtido.getStatus());
@@ -113,7 +114,7 @@ public class ExemplarServiceIntegrationTest {
 	}
 	
 	@Test
-	void deveCadastrarExemplar() {
+	void deveCadastrarExemplares() {
 		Edicao edicao = new Edicao(
 				TipoCapa.DURA,
 				100,
@@ -126,17 +127,22 @@ public class ExemplarServiceIntegrationTest {
 		
 		edicaoRepository.save(edicao);
 		
-		ExemplarDTO exemplarDTO = new ExemplarDTO(
+		ExemplarCreateDTO exemplarCreateDTO = new ExemplarCreateDTO(
 				EstadoFisico.BOM,
+				3,
 				edicao.getIdEdicao());
 		
-		Exemplar exemplar = exemplarService.cadastrarExemplar(exemplarDTO);
+		List<Exemplar> exemplares = exemplarService.cadastrarExemplares(exemplarCreateDTO);
 		
-		Assertions.assertEquals(EstadoFisico.BOM, exemplar.getEstadoFisico());
-		Assertions.assertEquals(TipoCapa.DURA, exemplar.getEdicao().getTipoCapa());
-		Assertions.assertEquals(100, exemplar.getEdicao().getQtdPaginas());
-		Assertions.assertEquals(TamanhoEdicao.MEDIO, exemplar.getEdicao().getTamanho());
-		Assertions.assertEquals(LocalDate.of(2025, 10, 10), exemplar.getEdicao().getDtPublicacao());
+		Assertions.assertEquals(3, exemplares.size());
+		
+		for (Exemplar exemplar : exemplares) {
+			Assertions.assertEquals(EstadoFisico.BOM, exemplar.getEstadoFisico());
+			Assertions.assertEquals(TipoCapa.DURA, exemplar.getEdicao().getTipoCapa());
+			Assertions.assertEquals(100, exemplar.getEdicao().getQtdPaginas());
+			Assertions.assertEquals(TamanhoEdicao.MEDIO, exemplar.getEdicao().getTamanho());
+			Assertions.assertEquals(LocalDate.of(2025, 10, 10), exemplar.getEdicao().getDtPublicacao());
+		}
 	}
 	
 	@Test
@@ -168,11 +174,11 @@ public class ExemplarServiceIntegrationTest {
 		
 		exemplarService.inserir(exemplar);
 		
-		ExemplarDTO exemplarDTO = new ExemplarDTO(
+		ExemplarUpdateDTO exemplarUpdateDTO = new ExemplarUpdateDTO(
 				EstadoFisico.RUIM,
 				edicao2.getIdEdicao());
 		
-		Exemplar exemplarAtualizado = exemplarService.atualizar(exemplar.getIdExemplar(), exemplarDTO);
+		Exemplar exemplarAtualizado = exemplarService.atualizar(exemplar.getIdExemplar(), exemplarUpdateDTO);
 		
 		Assertions.assertEquals(EstadoFisico.RUIM, exemplarAtualizado.getEstadoFisico());
 		Assertions.assertEquals(TipoCapa.MOLE, exemplarAtualizado.getEdicao().getTipoCapa());

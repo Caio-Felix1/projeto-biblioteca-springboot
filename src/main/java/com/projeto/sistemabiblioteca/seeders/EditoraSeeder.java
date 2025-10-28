@@ -1,14 +1,17 @@
 package com.projeto.sistemabiblioteca.seeders;
 
+import java.util.Locale;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
 import com.github.javafaker.Faker;
 import com.projeto.sistemabiblioteca.entities.Editora;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
-import java.util.Locale;
 
 @Component
+@Profile("dev")
 public class EditoraSeeder implements CommandLineRunner {
 
     private final EditoraRepository editoraRepository;

@@ -1,20 +1,21 @@
 package com.projeto.sistemabiblioteca.seeders;
 
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
 import com.github.javafaker.Faker;
 import com.projeto.sistemabiblioteca.entities.Edicao;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.enums.EstadoFisico;
-import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 import com.projeto.sistemabiblioteca.repositories.ExemplarRepository;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Random;
-
 @Component
+@Profile("dev")
 public class ExemplarSeeder implements CommandLineRunner {
 
     private final ExemplarRepository exemplarRepository;

@@ -29,5 +29,5 @@ public interface ExemplarRepository extends JpaRepository<Exemplar, Long> {
 			     	WHEN 'MUITO_RUIM' THEN 5
 			    END
 			""")
-	List<Exemplar> findAllByEdicaoOrderByEstadoFisicoCustom(@Param("idEdicao") Long idEdicao, @Param("status") StatusExemplar status);
+	List<Exemplar> findAllByEdicaoAndStatusOrderByEstadoFisicoCustom(@Param("idEdicao") Long idEdicao, @Param("status") StatusExemplar status);
 }

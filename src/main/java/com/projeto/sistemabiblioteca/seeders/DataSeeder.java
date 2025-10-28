@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Locale;
 
 @Component
+@Profile("dev")
 public class DataSeeder implements CommandLineRunner {
 
     private final PessoaRepository pessoaRepository;

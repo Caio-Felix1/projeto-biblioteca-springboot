@@ -1,20 +1,23 @@
 package com.projeto.sistemabiblioteca.seeders;
 
-import com.github.javafaker.Faker;
-import com.projeto.sistemabiblioteca.entities.Titulo;
-import com.projeto.sistemabiblioteca.entities.Categoria;
-import com.projeto.sistemabiblioteca.entities.Autor;
-import com.projeto.sistemabiblioteca.repositories.TituloRepository;
-import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
-import com.projeto.sistemabiblioteca.repositories.AutorRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
+import com.github.javafaker.Faker;
+import com.projeto.sistemabiblioteca.entities.Autor;
+import com.projeto.sistemabiblioteca.entities.Categoria;
+import com.projeto.sistemabiblioteca.entities.Titulo;
+import com.projeto.sistemabiblioteca.repositories.AutorRepository;
+import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
+import com.projeto.sistemabiblioteca.repositories.TituloRepository;
+
 @Component
+@Profile("dev")
 public class TituloSeeder implements CommandLineRunner {
 
     private final TituloRepository tituloRepository;

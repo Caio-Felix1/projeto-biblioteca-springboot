@@ -2,11 +2,18 @@ package com.projeto.sistemabiblioteca.controllers;
 
 import java.util.List;
 
-import com.projeto.sistemabiblioteca.DTOs.ExemplarDTO;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.sistemabiblioteca.DTOs.ExemplarCreateDTO;
+import com.projeto.sistemabiblioteca.DTOs.ExemplarUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 import com.projeto.sistemabiblioteca.services.ExemplarService;
@@ -44,7 +51,7 @@ public class ExemplarController {
     
     @GetMapping("/buscar-primeiro-exemplar-por-edicao/{idEdicao}/status/{status}")
     public ResponseEntity<Exemplar> listarPrimeiroDisponivelPorEdicao(@PathVariable Long idEdicao, @PathVariable StatusExemplar status) {
-        Exemplar exemplar = exemplarService.buscarPrimeiroComEdicaoComIdIgualA(idEdicao, status);
+        Exemplar exemplar = exemplarService.buscarPrimeiroExemplarPorEdicaoEStatus(idEdicao, status);
         return ResponseEntity.ok(exemplar);
     }
     
@@ -62,15 +69,15 @@ public class ExemplarController {
 
 
     @PostMapping
-    public ResponseEntity<Exemplar> criar(@Valid @RequestBody ExemplarDTO exemplarDTO) {
-        Exemplar novoExemplar = exemplarService.cadastrarExemplar(exemplarDTO);
+    public ResponseEntity<List<Exemplar>> cadastrarExemplares(@Valid @RequestBody ExemplarCreateDTO exemplarCreateDTO) {
+        List<Exemplar> novoExemplares = exemplarService.cadastrarExemplares(exemplarCreateDTO);
         // return ResponseEntity.status(HttpStatus.CREATED).body(novoExemplar);
-        return ResponseEntity.ok(novoExemplar);
+        return ResponseEntity.ok(novoExemplares);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Exemplar> atualizar(@PathVariable Long id, @Valid @RequestBody ExemplarDTO exemplarDTO) {
-        Exemplar atualizado = exemplarService.atualizar(id, exemplarDTO);
+    public ResponseEntity<Exemplar> atualizar(@PathVariable Long id, @Valid @RequestBody ExemplarUpdateDTO exemplarUpdateDTO) {
+        Exemplar atualizado = exemplarService.atualizar(id, exemplarUpdateDTO);
         return ResponseEntity.ok(atualizado);
     }
     

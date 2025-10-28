@@ -5,7 +5,7 @@ import java.util.Set;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
-public record TituloDTO(
+public record TituloCreateDTO(
 		@NotBlank(message = "Título é obrigatório")
 		String nome,
 		

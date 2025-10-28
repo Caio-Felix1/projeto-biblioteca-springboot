@@ -1,15 +1,17 @@
 package com.projeto.sistemabiblioteca.seeders;
 
-import com.github.javafaker.Faker;
-import com.projeto.sistemabiblioteca.entities.Autor;
-import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
-import com.projeto.sistemabiblioteca.repositories.AutorRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
 import java.util.Locale;
 
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
+import com.github.javafaker.Faker;
+import com.projeto.sistemabiblioteca.entities.Autor;
+import com.projeto.sistemabiblioteca.repositories.AutorRepository;
+
 @Component
+@Profile("dev")
 public class AutorSeeder implements CommandLineRunner {
 
     private final AutorRepository autorRepository;

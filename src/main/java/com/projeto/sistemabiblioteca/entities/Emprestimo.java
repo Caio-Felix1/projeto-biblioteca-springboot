@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
+import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -288,7 +289,10 @@ public class Emprestimo {
 		}
 		
 		status = StatusEmprestimo.EXEMPLAR_PERDIDO;
-		multa.aplicarMultaPorPerda();
+		
+		if (multa.getStatusPagamento() != StatusPagamento.PERDOADO) {
+			multa.aplicarMultaPorPerda();
+		}
 		exemplar.registrarPerda();
 	}
 	

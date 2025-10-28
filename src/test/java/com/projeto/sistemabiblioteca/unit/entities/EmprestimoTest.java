@@ -410,6 +410,8 @@ public class EmprestimoTest {
 	void deveRegistrarPerdaDoExemplarComStatusValido() {
 		Emprestimo emprestimo1 = criarEmprestimoComStatusEmAndamento(); 
 		Emprestimo emprestimo2 = criarEmprestimoComStatusAtrasado(); 
+		Emprestimo emprestimo3 = criarEmprestimoComStatusAtrasado();
+		emprestimo3.getMulta().perdoarMulta();
 		
 		Assertions.assertDoesNotThrow(() -> emprestimo1.registrarPerdaDoExemplar(),
 				"Era esperado que funcionasse o método registrarPerdaDoExemplar no objeto com status EM_ANDAMENTO");
@@ -439,6 +441,21 @@ public class EmprestimoTest {
 				"Era esperado que o valor retornado fosse 50.0");
 		
 		Assertions.assertEquals(StatusExemplar.PERDIDO, emprestimo2.getExemplar().getStatus(),
+				"Era esperado que o valor retornado fosse PERDIDO");
+		
+		Assertions.assertDoesNotThrow(() -> emprestimo3.registrarPerdaDoExemplar(),
+				"Era esperado que funcionasse o método registrarPerdaDoExemplar no objeto com status ATRASADO");
+		
+		Assertions.assertEquals(StatusEmprestimo.EXEMPLAR_PERDIDO, emprestimo3.getStatus(),
+				"Era esperado que o valor retornado fosse EXEMPLAR_PERDIDO");
+		
+		Assertions.assertEquals(StatusPagamento.PERDOADO, emprestimo3.getMulta().getStatusPagamento(),
+				"Era esperado que o valor retornado fosse PERDOADO");
+		
+		Assertions.assertEquals(1.0, emprestimo3.getMulta().getValor(),
+				"Era esperado que o valor retornado fosse 1.0");
+		
+		Assertions.assertEquals(StatusExemplar.PERDIDO, emprestimo3.getExemplar().getStatus(),
 				"Era esperado que o valor retornado fosse PERDIDO");
 	}
 	

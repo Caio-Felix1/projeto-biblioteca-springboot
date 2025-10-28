@@ -40,7 +40,9 @@ public class MultaService {
 		return multaRepository.save(multa);
 	}
 	
-	public void deletar(Long id) {
-		multaRepository.deleteById(id);
+	public void perdoarMulta(Long id) {
+		Multa multa = buscarPorId(id);
+		multa.perdoarMulta();
+		multaRepository.save(multa);
 	}
 }

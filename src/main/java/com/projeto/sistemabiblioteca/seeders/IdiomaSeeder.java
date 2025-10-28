@@ -2,16 +2,17 @@ package com.projeto.sistemabiblioteca.seeders;
 
 import java.util.List;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.projeto.sistemabiblioteca.entities.Idioma;
-import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 
 import jakarta.annotation.PostConstruct;
 
 @Component
+@Profile("dev")
 public class IdiomaSeeder {
 
     private final IdiomaRepository idiomaRepository;

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.projeto.sistemabiblioteca.DTOs.TituloDTO;
+import com.projeto.sistemabiblioteca.DTOs.TituloCreateDTO;
 import com.projeto.sistemabiblioteca.DTOs.TituloUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Titulo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
@@ -58,8 +58,8 @@ public class TituloController {
 
 
     @PostMapping
-    public ResponseEntity<Titulo> criar(@Valid @RequestBody TituloDTO tituloDTO) {
-        Titulo novo = tituloService.cadastrarTitulo(tituloDTO);
+    public ResponseEntity<Titulo> criar(@Valid @RequestBody TituloCreateDTO tituloCreateDTO) {
+        Titulo novo = tituloService.cadastrarTitulo(tituloCreateDTO);
         return ResponseEntity.ok(novo);
     }
 

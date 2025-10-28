@@ -1,5 +1,12 @@
 package com.projeto.sistemabiblioteca.seeders;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.Multa;
@@ -9,13 +16,9 @@ import com.projeto.sistemabiblioteca.repositories.EmprestimoRepository;
 import com.projeto.sistemabiblioteca.repositories.ExemplarRepository;
 import com.projeto.sistemabiblioteca.repositories.MultaRepository;
 import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Component
+@Profile("dev")
 public class EmprestimoSeeder implements CommandLineRunner {
 
     private final EmprestimoRepository emprestimoRepository;

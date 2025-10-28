@@ -1,17 +1,20 @@
 package com.projeto.sistemabiblioteca.seeders;
 
+import java.util.List;
+import java.util.Locale;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
 import com.github.javafaker.Faker;
 import com.projeto.sistemabiblioteca.entities.Endereco;
 import com.projeto.sistemabiblioteca.entities.Estado;
 import com.projeto.sistemabiblioteca.repositories.EnderecoRepository;
 import com.projeto.sistemabiblioteca.repositories.EstadoRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Locale;
 
 @Component
+@Profile("dev")
 public class EnderecoSeeder implements CommandLineRunner {
 
     private final EnderecoRepository enderecoRepository;
