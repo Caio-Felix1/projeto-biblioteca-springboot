@@ -1,5 +1,11 @@
 package com.projeto.sistemabiblioteca.services;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -148,6 +154,25 @@ public class EdicaoService {
 			}
 		}
 		
+		if (imagemUrl != null) {
+			try {
+				String imagemUrlAntiga = edicao1.getImagemUrl();
+				if (imagemUrlAntiga != null) {
+					String nomeArquivo = Paths.get(new URI(imagemUrlAntiga).getPath()).getFileName().toString();
+					
+					Path caminho = Paths.get("imagens").resolve(nomeArquivo);
+					
+					Files.deleteIfExists(caminho);
+				}
+			}
+			catch (IOException | URISyntaxException e) {
+				throw new RuntimeException("Erro: não foi possível deletar a imagem antiga.");
+			}
+		}
+		else {
+			imagemUrl = edicao1.getImagemUrl();
+		}
+		
 		Edicao edicao2 = new Edicao(
 				edicaoDTO.tipoCapa(),
 				edicaoDTO.qtdPaginas(),
@@ -170,11 +195,7 @@ public class EdicaoService {
 		edicao1.setTamanho(edicao2.getTamanho());
 		edicao1.setClassificacao(edicao2.getClassificacao());
 		edicao1.setDtPublicacao(edicao2.getDtPublicacao());
-		
-		if (edicao2.getImagemUrl() != null) {
-			edicao1.setImagemUrl(edicao2.getImagemUrl());
-		}
-		
+		edicao1.setImagemUrl(edicao2.getImagemUrl());
 		edicao1.setTitulo(edicao2.getTitulo());
 		edicao1.setEditora(edicao2.getEditora());
 		edicao1.setIdioma(edicao2.getIdioma());
