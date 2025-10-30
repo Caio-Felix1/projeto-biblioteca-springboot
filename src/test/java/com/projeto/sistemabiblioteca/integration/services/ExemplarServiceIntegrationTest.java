@@ -42,6 +42,7 @@ public class ExemplarServiceIntegrationTest {
 				LocalDate.of(2025, 10, 10),
 				null,
 				null,
+				null,
 				null);
 		
 		Edicao edicao2 = new Edicao(
@@ -50,6 +51,7 @@ public class ExemplarServiceIntegrationTest {
 				TamanhoEdicao.GRANDE,
 				ClassificacaoIndicativa.C18,
 				LocalDate.of(2024, 9, 9),
+				null,
 				null,
 				null,
 				null);
@@ -80,6 +82,7 @@ public class ExemplarServiceIntegrationTest {
 				LocalDate.of(2025, 10, 10),
 				null,
 				null,
+				null,
 				null);
 		
 		Edicao edicao2 = new Edicao(
@@ -88,6 +91,7 @@ public class ExemplarServiceIntegrationTest {
 				TamanhoEdicao.GRANDE,
 				ClassificacaoIndicativa.C18,
 				LocalDate.of(2024, 9, 9),
+				null,
 				null,
 				null,
 				null);
@@ -123,6 +127,7 @@ public class ExemplarServiceIntegrationTest {
 				LocalDate.of(2025, 10, 10),
 				null,
 				null,
+				null,
 				null);
 		
 		edicaoRepository.save(edicao);
@@ -155,6 +160,7 @@ public class ExemplarServiceIntegrationTest {
 				LocalDate.of(2025, 10, 10),
 				null,
 				null,
+				null,
 				null);
 		
 		Edicao edicao2 = new Edicao(
@@ -163,6 +169,7 @@ public class ExemplarServiceIntegrationTest {
 				TamanhoEdicao.GRANDE,
 				ClassificacaoIndicativa.C18,
 				LocalDate.of(2024, 9, 9),
+				null,
 				null,
 				null,
 				null);

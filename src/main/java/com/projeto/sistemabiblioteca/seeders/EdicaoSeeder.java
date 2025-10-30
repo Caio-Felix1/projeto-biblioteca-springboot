@@ -69,6 +69,7 @@ public class EdicaoSeeder implements CommandLineRunner {
                         TamanhoEdicao.values()[random.nextInt(TamanhoEdicao.values().length)],
                         ClassificacaoIndicativa.values()[random.nextInt(ClassificacaoIndicativa.values().length)],
                         LocalDate.now().minusYears(random.nextInt(50)), // Data de publicação até 50 anos atrás
+                        null,
                         titulo,
                         editora,
                         idioma

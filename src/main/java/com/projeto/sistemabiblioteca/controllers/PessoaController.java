@@ -43,7 +43,15 @@ public class PessoaController {
 	}
 	
 	@GetMapping("/status/{status}")
-	public ResponseEntity<List<Pessoa>> buscarTodosPorStatus(@PathVariable StatusConta statusConta) {
+	public ResponseEntity<List<Pessoa>> buscarTodosPorStatus(@PathVariable String status) {
+		StatusConta statusConta;
+		try {
+			statusConta = StatusConta.valueOf(status.toUpperCase());
+		}
+		catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Erro: o status informado é inválido.");
+		}
+		
 		return ResponseEntity.ok(pessoaService.buscarTodosComStatusContaIgualA(statusConta));
 	}
 	

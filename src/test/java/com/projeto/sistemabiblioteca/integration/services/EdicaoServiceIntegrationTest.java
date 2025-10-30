@@ -58,6 +58,7 @@ public class EdicaoServiceIntegrationTest {
 				TamanhoEdicao.MEDIO,
 				ClassificacaoIndicativa.C14,
 				LocalDate.of(2025, 10, 10),
+				null,
 				titulo,
 				editora,
 				idioma);
@@ -190,13 +191,14 @@ public class EdicaoServiceIntegrationTest {
 				editora.getIdEditora(),
 				idioma.getIdIdioma());
 		
-		Edicao edicaoNova = edicaoService.cadastrarEdicao(edicaoDTO);
+		Edicao edicaoNova = edicaoService.cadastrarEdicao(edicaoDTO, "imagem teste url");
 		
 		Assertions.assertEquals(TipoCapa.DURA, edicaoNova.getTipoCapa());
 		Assertions.assertEquals(100, edicaoNova.getQtdPaginas());
 		Assertions.assertEquals(TamanhoEdicao.MEDIO, edicaoNova.getTamanho());
 		Assertions.assertEquals(ClassificacaoIndicativa.C14, edicaoNova.getClassificacao());
 		Assertions.assertEquals(LocalDate.of(2025, 10, 10), edicaoNova.getDtPublicacao());
+		Assertions.assertEquals("imagem teste url", edicaoNova.getImagemUrl());
 		Assertions.assertEquals("Anel", edicaoNova.getTitulo().getNome());
 		Assertions.assertEquals("Editora teste", edicaoNova.getEditora().getNome());
 		Assertions.assertEquals("Português", edicaoNova.getIdioma().getNome());
@@ -236,13 +238,14 @@ public class EdicaoServiceIntegrationTest {
 				editora2.getIdEditora(),
 				idioma2.getIdIdioma());
 		
-		Edicao edicaoAtualizada = edicaoService.atualizar(edicao.getIdEdicao(), edicaoDTO);
+		Edicao edicaoAtualizada = edicaoService.atualizar(edicao.getIdEdicao(), edicaoDTO, "imagem teste url");
 		
 		Assertions.assertEquals(TipoCapa.MOLE, edicaoAtualizada.getTipoCapa());
 		Assertions.assertEquals(2000, edicaoAtualizada.getQtdPaginas());
 		Assertions.assertEquals(TamanhoEdicao.GRANDE, edicaoAtualizada.getTamanho());
 		Assertions.assertEquals(ClassificacaoIndicativa.C18, edicaoAtualizada.getClassificacao());
 		Assertions.assertEquals(LocalDate.of(2024, 9, 9), edicaoAtualizada.getDtPublicacao());
+		Assertions.assertEquals("imagem teste url", edicaoAtualizada.getImagemUrl());
 		Assertions.assertEquals("Tronos", edicaoAtualizada.getTitulo().getNome());
 		Assertions.assertEquals("Editora alterado", edicaoAtualizada.getEditora().getNome());
 		Assertions.assertEquals("Inglês", edicaoAtualizada.getIdioma().getNome());

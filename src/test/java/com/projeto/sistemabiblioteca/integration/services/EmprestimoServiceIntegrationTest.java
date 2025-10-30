@@ -9,11 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.projeto.sistemabiblioteca.DTOs.EmprestimoDTO;
+import com.projeto.sistemabiblioteca.DTOs.EmprestimoCreateDTO;
+import com.projeto.sistemabiblioteca.DTOs.EmprestimoUpdateDTO;
+import com.projeto.sistemabiblioteca.entities.Edicao;
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.Multa;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
+import com.projeto.sistemabiblioteca.entities.enums.ClassificacaoIndicativa;
 import com.projeto.sistemabiblioteca.entities.enums.EstadoFisico;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
@@ -21,6 +24,9 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
+import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
+import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
+import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 import com.projeto.sistemabiblioteca.repositories.ExemplarRepository;
 import com.projeto.sistemabiblioteca.repositories.MultaRepository;
 import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
@@ -46,6 +52,9 @@ public class EmprestimoServiceIntegrationTest {
 	
 	@Autowired
 	private MultaRepository multaRepository;
+	
+	@Autowired
+	private EdicaoRepository edicaoRepository;
 	
 	private final LocalDate dtInicioEmprestimoPadrao = LocalDate.parse("2025-10-10");
 	private final LocalDate hojePadrao = LocalDate.parse("2025-10-12");
@@ -120,7 +129,7 @@ public class EmprestimoServiceIntegrationTest {
 	}
 	
 	@Test
-	void deveCadastrarEmprestimo() {
+	void deveCadastrarEmprestimos() {
 		Pessoa pessoa = new Pessoa(
                 "Maria Joana",
                 new Cpf("11111111111"),
@@ -137,19 +146,59 @@ public class EmprestimoServiceIntegrationTest {
 		
 		pessoaRepository.save(pessoa);
 		
-		Exemplar exemplar = new Exemplar(null, null);
+		Edicao edicao1 = new Edicao(
+				TipoCapa.DURA,
+				100,
+				TamanhoEdicao.MEDIO,
+				ClassificacaoIndicativa.C14,
+				LocalDate.of(2025, 10, 10),
+				null,
+				null,
+				null,
+				null);
 		
-		exemplarRepository.save(exemplar);
+		Edicao edicao2 = new Edicao(
+				TipoCapa.MOLE,
+				200,
+				TamanhoEdicao.MEDIO,
+				ClassificacaoIndicativa.C18,
+				LocalDate.of(2020, 9, 9),
+				null,
+				null,
+				null,
+				null);
 		
-		EmprestimoDTO emprestimoDTO = new EmprestimoDTO(pessoa.getIdPessoa(), exemplar.getIdExemplar());
+		edicaoRepository.save(edicao1);
+		edicaoRepository.save(edicao2);
 		
-		Emprestimo emprestimo = emprestimoService.cadastrarEmprestimo(emprestimoDTO);
+		Exemplar exemplar1 = new Exemplar(EstadoFisico.BOM, edicao1);
+		Exemplar exemplar2 = new Exemplar(EstadoFisico.OTIMO, edicao2);
+		Exemplar exemplar3 = new Exemplar(EstadoFisico.EXCELENTE, edicao2);
 		
-		Assertions.assertEquals(LocalDate.now(), emprestimo.getDtInicioEmprestimo());
-		Assertions.assertEquals(pessoa.getIdPessoa(), emprestimo.getPessoa().getIdPessoa());
-		Assertions.assertEquals(exemplar.getIdExemplar(), emprestimo.getExemplar().getIdExemplar());
-		Assertions.assertEquals(StatusExemplar.ALUGADO, emprestimo.getExemplar().getStatus());
-		Assertions.assertEquals(StatusPagamento.NAO_APLICAVEL, emprestimo.getMulta().getStatusPagamento());
+		exemplarRepository.save(exemplar1);
+		exemplarRepository.save(exemplar2);
+		exemplarRepository.save(exemplar3);
+		
+		EmprestimoCreateDTO emprestimoDTO = new EmprestimoCreateDTO(
+				pessoa.getIdPessoa(),
+				List.of(edicao1.getIdEdicao(), edicao2.getIdEdicao()));
+		
+		List<Emprestimo> emprestimos = emprestimoService.cadastrarEmprestimos(emprestimoDTO);
+		
+		LocalDate hoje = LocalDate.now();
+		
+		Assertions.assertEquals(2, emprestimos.size());
+		
+		for (Emprestimo emp : emprestimos) {
+			Assertions.assertEquals(hoje, emp.getDtInicioEmprestimo());
+			Assertions.assertEquals(pessoa.getIdPessoa(), emp.getPessoa().getIdPessoa());
+			
+			Exemplar exemplar = emp.getExemplar();
+			
+			Assertions.assertTrue(exemplar.getEstadoFisico() == EstadoFisico.BOM || exemplar.getEstadoFisico() == EstadoFisico.EXCELENTE);
+			Assertions.assertEquals(StatusExemplar.ALUGADO, exemplar.getStatus());
+			Assertions.assertEquals(StatusPagamento.NAO_APLICAVEL, emp.getMulta().getStatusPagamento());
+		}
 	}
 	
 	@Test
@@ -198,9 +247,9 @@ public class EmprestimoServiceIntegrationTest {
 		
 		emprestimoService.inserir(emprestimo);
 		
-		EmprestimoDTO emprestimoDTO = new EmprestimoDTO(pessoa2.getIdPessoa(), exemplar2.getIdExemplar());
+		EmprestimoUpdateDTO emprestimoUpdateDTO = new EmprestimoUpdateDTO(pessoa2.getIdPessoa(), exemplar2.getIdExemplar());
 		
-		Emprestimo emprestimoAtualizado = emprestimoService.atualizar(emprestimo.getIdEmprestimo(), emprestimoDTO);
+		Emprestimo emprestimoAtualizado = emprestimoService.atualizar(emprestimo.getIdEmprestimo(), emprestimoUpdateDTO);
 		
 		Assertions.assertEquals(StatusExemplar.DISPONIVEL, exemplar1.getStatus());
 		Assertions.assertEquals(pessoa2.getIdPessoa(), emprestimoAtualizado.getPessoa().getIdPessoa());

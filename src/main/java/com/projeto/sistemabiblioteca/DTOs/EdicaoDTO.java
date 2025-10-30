@@ -16,6 +16,7 @@ public record EdicaoDTO(
         
         @NotNull(message = "Quantidade de capas é obrigatória")
 		@Min(value = 1, message = "Quantidade de páginas deve ser no mínimo 1")
+		
         Integer qtdPaginas,
         
         @NotNull(message = "Tamanho da edição é obrigatório")

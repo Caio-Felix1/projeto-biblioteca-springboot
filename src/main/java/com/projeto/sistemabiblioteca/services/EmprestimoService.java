@@ -1,13 +1,15 @@
 package com.projeto.sistemabiblioteca.services;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.projeto.sistemabiblioteca.DTOs.EmprestimoDTO;
+import com.projeto.sistemabiblioteca.DTOs.EmprestimoCreateDTO;
+import com.projeto.sistemabiblioteca.DTOs.EmprestimoUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.Multa;
@@ -61,7 +63,7 @@ public class EmprestimoService {
 		return emprestimo.get();
 	}
 	
-	private boolean estaNoLimiteMaximoDeEmprestimos(Pessoa pessoa) {
+	private long quantidadeDeEmprestimosAtivosDoUsuario(Pessoa pessoa) {
 		long qtdEmprestimo = emprestimoRepository.countByPessoaAndStatusIn(
 				pessoa, 
 				Set.of(
@@ -70,7 +72,7 @@ public class EmprestimoService {
 						StatusEmprestimo.EM_ANDAMENTO,
 						StatusEmprestimo.ATRASADO));
 		
-		return qtdEmprestimo == 5;
+		return qtdEmprestimo;
 	}
 	
 	private boolean verificarSeUsuarioTemMultaPendente(Pessoa pessoa) {
@@ -78,8 +80,8 @@ public class EmprestimoService {
 	}
 	
 	@Transactional
-	public Emprestimo cadastrarEmprestimo(EmprestimoDTO emprestimoDTO) {
-		Pessoa pessoa = pessoaService.buscarPorId(emprestimoDTO.idPessoa());
+	public List<Emprestimo> cadastrarEmprestimos(EmprestimoCreateDTO emprestimoCreateDTO) {
+		Pessoa pessoa = pessoaService.buscarPorId(emprestimoCreateDTO.idPessoa());
 		
 		if (pessoa.getStatusConta() != StatusConta.ATIVA) {
 			throw new IllegalArgumentException("Erro: não é possível associar um empréstimo a um usuário com conta que não está ativa.");
@@ -87,30 +89,37 @@ public class EmprestimoService {
 		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
 			throw new IllegalArgumentException("Erro: não é possível associar um empréstimo a um usuário que não é cliente.");
 		}
-		if (estaNoLimiteMaximoDeEmprestimos(pessoa)) {
-			throw new IllegalArgumentException("Erro: não é possível cadastrar um novo empréstimo para esse usuário. Ele já atingiu o limite de empréstimos por usuário.");
+		
+		long qtdEmprestimos = quantidadeDeEmprestimosAtivosDoUsuario(pessoa);
+		int qtdPedidos = emprestimoCreateDTO.idsEdicao().size();
+		
+		if (qtdEmprestimos == 5) {
+			throw new IllegalArgumentException("Erro: não é possível cadastrar um novo empréstimo para esse usuário. Ele já atingiu o limite de 5 empréstimos ativos por usuário.");
+		}
+		if (qtdEmprestimos + qtdPedidos > 5) {
+			throw new IllegalArgumentException("Erro: não é possível cadastrar " + qtdPedidos + " empréstimos para esse usuário. Ele já possui " + qtdEmprestimos + " empréstimos ativos e o limite é 5.");
 		}
 		if (verificarSeUsuarioTemMultaPendente(pessoa)) {
 			throw new IllegalArgumentException("Erro: não é possível cadastrar um novo empréstimo para esse usuário. Ele possui multa pendente.");
 		}
 		
-		Exemplar exemplar = exemplarService.buscarPorId(emprestimoDTO.idExemplar());
-		
-		if (exemplar.getStatus() != StatusExemplar.DISPONIVEL) {
-			throw new IllegalArgumentException("Erro: não é possível associar um empréstimo a um exemplar que não está disponível.");
+		LocalDate hoje = LocalDate.now();
+		List<Emprestimo> emprestimos = new ArrayList<>();
+		for (Long idEdicao : emprestimoCreateDTO.idsEdicao()) {
+			Exemplar exemplar = exemplarService.buscarPrimeiroExemplarPorEdicaoEStatus(idEdicao, StatusExemplar.DISPONIVEL);
+			
+			exemplar.alugar();
+			
+			exemplarService.inserir(exemplar);
+			
+			Multa multa = Multa.criarMultaVazia();
+			
+			multaRepository.save(multa);
+			
+			Emprestimo emprestimo = new Emprestimo(hoje, pessoa, exemplar, multa);
+			emprestimos.add(inserir(emprestimo));
 		}
-		
-		exemplar.alugar();
-		
-		exemplarService.inserir(exemplar);
-		
-		Multa multa = Multa.criarMultaVazia();
-		
-		multaRepository.save(multa);
-		
-		Emprestimo emprestimo = new Emprestimo(LocalDate.now(), pessoa, exemplar, multa);
-		
-		return inserir(emprestimo);
+		return emprestimos;
 	}
 	
 	public Emprestimo inserir(Emprestimo emprestimo) {
@@ -118,15 +127,15 @@ public class EmprestimoService {
 	}
 	
 	@Transactional
-	public Emprestimo atualizar(Long id, EmprestimoDTO emprestimoDTO) {
+	public Emprestimo atualizar(Long id, EmprestimoUpdateDTO emprestimoUpdateDTO) {
 		Emprestimo emprestimo1 = buscarPorId(id);
 		
 		Pessoa pessoa;
-		if (emprestimo1.getPessoa().getIdPessoa().equals(emprestimoDTO.idPessoa())) {
+		if (emprestimo1.getPessoa().getIdPessoa().equals(emprestimoUpdateDTO.idPessoa())) {
 			pessoa = emprestimo1.getPessoa();
 		}
 		else {
-			pessoa = pessoaService.buscarPorId(emprestimoDTO.idPessoa());
+			pessoa = pessoaService.buscarPorId(emprestimoUpdateDTO.idPessoa());
 			
 			if (pessoa.getStatusConta() != StatusConta.ATIVA) {
 				throw new IllegalArgumentException("Erro: não é possível associar um empréstimo a um usuário com conta que não está ativa ao atualizar.");
@@ -134,8 +143,8 @@ public class EmprestimoService {
 			if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
 				throw new IllegalArgumentException("Erro: não é possível associar um empréstimo a um usuário que não é cliente ao atualizar.");
 			}
-			if (estaNoLimiteMaximoDeEmprestimos(pessoa)) {
-				throw new IllegalArgumentException("Erro: não é possível associar um empréstimo para esse usuário ao atualizar. Ele já atingiu o limite de empréstimos por usuário.");
+			if (quantidadeDeEmprestimosAtivosDoUsuario(pessoa) == 5) {
+				throw new IllegalArgumentException("Erro: não é possível associar um empréstimo para esse usuário ao atualizar. Ele já atingiu o limite de 5 empréstimos ativos por usuário.");
 			}
 			if (verificarSeUsuarioTemMultaPendente(pessoa)) {
 				throw new IllegalArgumentException("Erro: não é possível associar um empréstimo para esse usuário ao atualizar. Ele possui multa pendente.");
@@ -143,11 +152,11 @@ public class EmprestimoService {
 		}
 		
 		Exemplar exemplar;
-		if (emprestimo1.getExemplar().getIdExemplar().equals(emprestimoDTO.idExemplar())) {
+		if (emprestimo1.getExemplar().getIdExemplar().equals(emprestimoUpdateDTO.idExemplar())) {
 			exemplar = emprestimo1.getExemplar();
 		}
 		else {
-			exemplar = exemplarService.buscarPorId(emprestimoDTO.idExemplar());
+			exemplar = exemplarService.buscarPorId(emprestimoUpdateDTO.idExemplar());
 			
 			if (exemplar.getStatus() != StatusExemplar.DISPONIVEL) {
 				throw new IllegalArgumentException("Erro: não é possível associar um empréstimo a um exemplar que não está disponível ao atualizar.");

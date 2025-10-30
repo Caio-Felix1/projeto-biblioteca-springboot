@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.Endereco;
 import com.projeto.sistemabiblioteca.entities.Estado;
 import com.projeto.sistemabiblioteca.entities.Pais;
@@ -44,7 +45,6 @@ public class TestConfig implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		/*
 		Pais pais1 = new Pais("Brasil");
 		Pais pais2 = new Pais("Estados Unidos");
 		
@@ -79,6 +79,6 @@ public class TestConfig implements CommandLineRunner {
 		pessoaService.inserir(p4);
 		pessoaService.inserir(p5);
 		pessoaService.inserir(p6);
-		*/
+		
 	}
 }

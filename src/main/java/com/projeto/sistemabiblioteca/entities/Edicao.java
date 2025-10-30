@@ -39,6 +39,8 @@ public class Edicao implements Ativavel {
 	
 	private LocalDate dtPublicacao;
 	
+	private String imagemUrl;
+	
 	@Enumerated(EnumType.STRING)
 	private StatusAtivo status;
 	
@@ -59,12 +61,13 @@ public class Edicao implements Ativavel {
 	}
 
 	public Edicao(TipoCapa tipoCapa, int qtdPaginas, TamanhoEdicao tamanho,  ClassificacaoIndicativa classificacao, 
-			LocalDate dtPublicacao, Titulo titulo, Editora editora, Idioma idioma) {
+			LocalDate dtPublicacao, String imagemUrl, Titulo titulo, Editora editora, Idioma idioma) {
 		this.tipoCapa = tipoCapa;
 		setQtdPaginas(qtdPaginas);
 		this.tamanho = tamanho;
 		this.classificacao = classificacao;
 		this.dtPublicacao = dtPublicacao;
+		this.imagemUrl = imagemUrl;
 		this.titulo = titulo;
 		this.editora = editora;
 		this.idioma = idioma;
@@ -116,6 +119,14 @@ public class Edicao implements Ativavel {
 
 	public void setDtPublicacao(LocalDate dtPublicacao) {
 		this.dtPublicacao = dtPublicacao;
+	}
+
+	public String getImagemUrl() {
+		return imagemUrl;
+	}
+
+	public void setImagemUrl(String imagemUrl) {
+		this.imagemUrl = imagemUrl;
 	}
 
 	public Titulo getTitulo() {

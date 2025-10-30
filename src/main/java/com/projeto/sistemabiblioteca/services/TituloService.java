@@ -103,18 +103,6 @@ public class TituloService {
 		titulo1.setDescricao(titulo2.getDescricao());
 	}
 	
-	public void adicionarCategoria(Long idTitulo, Long idCategoria) {
-		Titulo titulo = buscarPorId(idTitulo);
-		Categoria categoria = categoriaService.buscarPorId(idCategoria);
-		
-		if (categoria.getStatusAtivo() == StatusAtivo.INATIVO) {
-			throw new IllegalArgumentException("Erro: não é possível associar um título a uma categoria com status inativo ao atualizar.");
-		}
-		
-		titulo.adicionarCategoria(categoria);
-		tituloRepository.save(titulo);
-	}
-	
 	@Transactional
 	public void adicionarCategorias(Long idTitulo, Set<Long> idsCategorias) {
 		Titulo titulo = buscarPorId(idTitulo);
@@ -128,14 +116,7 @@ public class TituloService {
 		categorias.forEach(titulo::adicionarCategoria);
 		tituloRepository.save(titulo);
 	}
-	
-	public void removerCategoria(Long idTitulo, Long idCategoria) {
-		Titulo titulo = buscarPorId(idTitulo);
-		Categoria categoria = categoriaService.buscarPorId(idCategoria);
-		titulo.removerCategoria(categoria);
-		tituloRepository.save(titulo);
-	}
-	
+
 	@Transactional
 	public void removerCategorias(Long idTitulo, Set<Long> idsCategorias) {
 		Titulo titulo = buscarPorId(idTitulo);
@@ -143,19 +124,7 @@ public class TituloService {
 		categorias.forEach(titulo::removerCategoria);
 		tituloRepository.save(titulo);
 	}
-	
-	public void adicionarAutor(Long idTitulo, Long idAutor) {
-		Titulo titulo = buscarPorId(idTitulo);
-		Autor autor = autorService.buscarPorId(idAutor);
-		
-		if (autor.getStatusAtivo() == StatusAtivo.INATIVO) {
-			throw new IllegalArgumentException("Erro: não é possível associar um título a um autor com status inativo ao atualizar.");
-		}
-		
-		titulo.adicionarAutor(autor);
-		tituloRepository.save(titulo);
-	}
-	
+
 	@Transactional
 	public void adicionarAutores(Long idTitulo, Set<Long> idsAutores) {
 		Titulo titulo = buscarPorId(idTitulo);
@@ -169,14 +138,7 @@ public class TituloService {
 		autores.forEach(titulo::adicionarAutor);
 		tituloRepository.save(titulo);
 	}
-	
-	public void removerAutor(Long idTitulo, Long idAutor) {
-		Titulo titulo = buscarPorId(idTitulo);
-		Autor autor = autorService.buscarPorId(idAutor);
-		titulo.removerAutor(autor);
-		tituloRepository.save(titulo);
-	}
-	
+
 	@Transactional
 	public void removerAutores(Long idTitulo, Set<Long> idsAutores) {
 		Titulo titulo = buscarPorId(idTitulo);

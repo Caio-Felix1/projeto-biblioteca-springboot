@@ -65,7 +65,7 @@ public class EdicaoService {
 	}
 	
 	@Transactional
-	public Edicao cadastrarEdicao(EdicaoDTO edicaoDTO) {
+	public Edicao cadastrarEdicao(EdicaoDTO edicaoDTO, String imagemUrl) {
 		Titulo titulo = tituloService.buscarPorId(edicaoDTO.tituloId());
 		Editora editora = editoraService.buscarPorId(edicaoDTO.editoraId());
 		Idioma idioma = idiomaService.buscarPorId(edicaoDTO.idiomaId());
@@ -86,6 +86,7 @@ public class EdicaoService {
 				edicaoDTO.tamanho(),
 				edicaoDTO.classificacao(),
 				edicaoDTO.dtPublicacao(),
+				imagemUrl,
 				titulo,
 				editora,
 				idioma
@@ -108,7 +109,7 @@ public class EdicaoService {
 	}
 	
 	@Transactional
-	public Edicao atualizar(Long id, EdicaoDTO edicaoDTO) {
+	public Edicao atualizar(Long id, EdicaoDTO edicaoDTO, String imagemUrl) {
 		Edicao edicao1 = buscarPorId(id);
 		
 		Titulo titulo;
@@ -153,6 +154,7 @@ public class EdicaoService {
 				edicaoDTO.tamanho(),
 				edicaoDTO.classificacao(),
 				edicaoDTO.dtPublicacao(),
+				imagemUrl,
 				titulo,
 				editora,
 				idioma
@@ -168,6 +170,11 @@ public class EdicaoService {
 		edicao1.setTamanho(edicao2.getTamanho());
 		edicao1.setClassificacao(edicao2.getClassificacao());
 		edicao1.setDtPublicacao(edicao2.getDtPublicacao());
+		
+		if (edicao2.getImagemUrl() != null) {
+			edicao1.setImagemUrl(edicao2.getImagemUrl());
+		}
+		
 		edicao1.setTitulo(edicao2.getTitulo());
 		edicao1.setEditora(edicao2.getEditora());
 		edicao1.setIdioma(edicao2.getIdioma());

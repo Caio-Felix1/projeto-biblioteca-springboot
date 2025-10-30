@@ -5,6 +5,7 @@ import static com.projeto.sistemabiblioteca.entities.enums.StatusAtivo.INATIVO;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +15,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.projeto.sistemabiblioteca.DTOs.EdicaoDTO;
 import com.projeto.sistemabiblioteca.entities.Edicao;
+import com.projeto.sistemabiblioteca.entities.interfaces.ArmazenamentoService;
 import com.projeto.sistemabiblioteca.services.EdicaoService;
 
 import jakarta.validation.Valid;
@@ -27,9 +31,11 @@ import jakarta.validation.Valid;
 public class EdicaoController {
 	
     private final EdicaoService edicaoService;
+    private final ArmazenamentoService armazenamentoService;
 
-    public EdicaoController(EdicaoService edicaoService) {
+    public EdicaoController(EdicaoService edicaoService, ArmazenamentoService armazenamentoService) {
         this.edicaoService = edicaoService;
+        this.armazenamentoService = armazenamentoService;
     }
     
     @GetMapping
@@ -73,15 +79,33 @@ public class EdicaoController {
         return ResponseEntity.ok(e);
     }
     
-    @PostMapping
-    public ResponseEntity<Edicao> criar(@Valid @RequestBody EdicaoDTO edicaoDTO) {
-        Edicao nova = edicaoService.cadastrarEdicao(edicaoDTO);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Edicao> criar(
+    		@Valid @RequestPart("edicao") EdicaoDTO edicao, 
+    		@RequestPart(value = "imagem") MultipartFile imagem) {
+    	
+    	if (imagem == null || imagem.isEmpty()) {
+    		throw new IllegalArgumentException("Erro: imagem deve ser informada.");
+    	}
+    	
+    	String imagemUrl = armazenamentoService.salvar(imagem); 
+    	
+        Edicao nova = edicaoService.cadastrarEdicao(edicao, imagemUrl);
         return ResponseEntity.ok(nova);
     }
     
-    @PutMapping("/{id}")
-    public ResponseEntity<Edicao> atualizar(@PathVariable Long id, @Valid @RequestBody EdicaoDTO edicaoDTO) {
-        Edicao atualizada = edicaoService.atualizar(id, edicaoDTO);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Edicao> atualizar(
+    		@PathVariable Long id, 
+    		@Valid @RequestPart("edicao") EdicaoDTO edicao, 
+    		@RequestPart(value = "imagem", required = false) MultipartFile imagem) {
+    	
+    	String imagemUrl = null;
+    	if (imagem != null && !imagem.isEmpty()) {
+    		imagemUrl = armazenamentoService.salvar(imagem); 
+    	}
+    	
+        Edicao atualizada = edicaoService.atualizar(id, edicao, imagemUrl);
         return ResponseEntity.ok(atualizada);
     }
     

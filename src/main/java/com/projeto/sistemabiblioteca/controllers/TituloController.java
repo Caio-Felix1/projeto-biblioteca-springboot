@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.sistemabiblioteca.DTOs.TituloAutoresDTO;
+import com.projeto.sistemabiblioteca.DTOs.TituloCategoriasDTO;
 import com.projeto.sistemabiblioteca.DTOs.TituloCreateDTO;
 import com.projeto.sistemabiblioteca.DTOs.TituloUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Titulo;
@@ -75,55 +77,28 @@ public class TituloController {
         tituloService.inativar(id);
         return ResponseEntity.noContent().build();
     }
-
-    
-    @PostMapping("/{idTitulo}/categorias/{idCategoria}")
-    public ResponseEntity<Void> adicionarCategoria(@PathVariable Long idTitulo, @PathVariable Long idCategoria) {
-        tituloService.adicionarCategoria(idTitulo, idCategoria);
-        return ResponseEntity.noContent().build();
-    }
     
     @PostMapping("/{idTitulo}/categorias")
-    public ResponseEntity<Void> adicionarCategorias(@PathVariable Long idTitulo, @RequestBody Set<Long> idsCategorias) {
-        tituloService.adicionarCategorias(idTitulo, idsCategorias);
-        return ResponseEntity.noContent().build();
-    }
-
-
-    @DeleteMapping("/{idTitulo}/categorias/{idCategoria}")
-    public ResponseEntity<Void> removerCategoria(@PathVariable Long idTitulo, @PathVariable Long idCategoria) {
-        tituloService.removerCategoria(idTitulo, idCategoria);
+    public ResponseEntity<Void> adicionarCategorias(@PathVariable Long idTitulo, @Valid @RequestBody TituloCategoriasDTO tituloCategoriasDTO) {
+        tituloService.adicionarCategorias(idTitulo, tituloCategoriasDTO.idsCategorias());
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/{idTitulo}/categorias")
-    public ResponseEntity<Void> removerCategorias(@PathVariable Long idTitulo, @RequestBody Set<Long> idsCategorias) {
-        tituloService.removerCategorias(idTitulo, idsCategorias);
-        return ResponseEntity.noContent().build();
-    }
-
-
-    @PostMapping("/{idTitulo}/autores/{idAutor}")
-    public ResponseEntity<Void> adicionarAutor(@PathVariable Long idTitulo, @PathVariable Long idAutor) {
-        tituloService.adicionarAutor(idTitulo, idAutor);
+    public ResponseEntity<Void> removerCategorias(@PathVariable Long idTitulo, @Valid @RequestBody TituloCategoriasDTO tituloCategoriasDTO) {
+        tituloService.removerCategorias(idTitulo, tituloCategoriasDTO.idsCategorias());
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping("/{idTitulo}/autores")
-    public ResponseEntity<Void> adicionarAutores(@PathVariable Long idTitulo, @RequestBody Set<Long> idsAutores) {
-        tituloService.adicionarAutores(idTitulo, idsAutores);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{idTitulo}/autores/{idAutor}")
-    public ResponseEntity<Void> removerAutor(@PathVariable Long idTitulo, @PathVariable Long idAutor) {
-        tituloService.removerAutor(idTitulo, idAutor);
+    public ResponseEntity<Void> adicionarAutores(@PathVariable Long idTitulo, @Valid @RequestBody TituloAutoresDTO tituloAutoresDTO) {
+        tituloService.adicionarAutores(idTitulo, tituloAutoresDTO.idsAutores());
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping("/{idTitulo}/autores")
-    public ResponseEntity<Void> removerAutores(@PathVariable Long idTitulo, @RequestBody Set<Long> idsAutores) {
-        tituloService.removerAutores(idTitulo, idsAutores);
+    public ResponseEntity<Void> removerAutores(@PathVariable Long idTitulo, @Valid @RequestBody TituloAutoresDTO tituloAutoresDTO) {
+        tituloService.removerAutores(idTitulo, tituloAutoresDTO.idsAutores());
         return ResponseEntity.noContent().build();
     }
 }

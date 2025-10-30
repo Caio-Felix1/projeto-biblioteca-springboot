@@ -93,7 +93,7 @@ public class TituloServiceIntegrationTest {
 		
 		Long tituloId = tituloService.inserir(titulo).getIdTitulo();
 		
-		tituloService.adicionarCategoria(tituloId, categoriaId);
+		tituloService.adicionarCategorias(tituloId, Set.of(categoriaId));
 		
 		Titulo tituloAtualizado = tituloService.buscarPorId(tituloId);
 		
@@ -133,7 +133,7 @@ public class TituloServiceIntegrationTest {
 		
 		Long tituloId = tituloService.inserir(titulo).getIdTitulo();
 		
-		tituloService.removerCategoria(tituloId, categoriaId);
+		tituloService.removerCategorias(tituloId, Set.of(categoriaId));
 		
 		Titulo tituloAtualizado = tituloService.buscarPorId(tituloId);
 		
@@ -171,7 +171,7 @@ public class TituloServiceIntegrationTest {
 		
 		Long tituloId = tituloService.inserir(titulo).getIdTitulo();
 		
-		tituloService.adicionarAutor(tituloId, autorId);
+		tituloService.adicionarAutores(tituloId, Set.of(autorId));
 		
 		Titulo tituloAtualizado = tituloService.buscarPorId(tituloId);
 		
@@ -211,7 +211,7 @@ public class TituloServiceIntegrationTest {
 		
 		Long tituloId = tituloService.inserir(titulo).getIdTitulo();
 		
-		tituloService.removerAutor(tituloId, autorId);
+		tituloService.removerAutores(tituloId, Set.of(autorId));
 		
 		Titulo tituloAtualizado = tituloService.buscarPorId(tituloId);
 		

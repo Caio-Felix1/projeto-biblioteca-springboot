@@ -30,7 +30,6 @@ public class ExemplarController {
         this.exemplarService = exemplarService;
     }
 
-
     @GetMapping
     public ResponseEntity<List<Exemplar>> listarTodos() {
     	List<Exemplar> exemplares = exemplarService.buscarTodos();
@@ -38,8 +37,16 @@ public class ExemplarController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Exemplar>> listarPorStatus(@PathVariable StatusExemplar status) {
-    	List<Exemplar> exemplares = exemplarService.buscarTodosComStatusIgualA(status);
+    public ResponseEntity<List<Exemplar>> listarPorStatus(@PathVariable String status) {
+    	StatusExemplar statusExemplar;
+    	try {
+    		statusExemplar = StatusExemplar.valueOf(status.toUpperCase());
+    	}
+		catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Erro: o status informado é inválido.");
+		}
+    	
+    	List<Exemplar> exemplares = exemplarService.buscarTodosComStatusIgualA(statusExemplar);
         return ResponseEntity.ok(exemplares);
     }
     
@@ -50,8 +57,16 @@ public class ExemplarController {
     }
     
     @GetMapping("/buscar-primeiro-exemplar-por-edicao/{idEdicao}/status/{status}")
-    public ResponseEntity<Exemplar> listarPrimeiroDisponivelPorEdicao(@PathVariable Long idEdicao, @PathVariable StatusExemplar status) {
-        Exemplar exemplar = exemplarService.buscarPrimeiroExemplarPorEdicaoEStatus(idEdicao, status);
+    public ResponseEntity<Exemplar> listarPrimeiroDisponivelPorEdicao(@PathVariable Long idEdicao, @PathVariable String status) {
+    	StatusExemplar statusExemplar;
+    	try {
+    		statusExemplar = StatusExemplar.valueOf(status.toUpperCase());
+    	}
+		catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Erro: o status informado é inválido.");
+		}
+    	
+        Exemplar exemplar = exemplarService.buscarPrimeiroExemplarPorEdicaoEStatus(idEdicao, statusExemplar);
         return ResponseEntity.ok(exemplar);
     }
     
@@ -80,6 +95,13 @@ public class ExemplarController {
         Exemplar atualizado = exemplarService.atualizar(id, exemplarUpdateDTO);
         return ResponseEntity.ok(atualizado);
     }
+    
+    @PutMapping("/solicitar-exclusao-exemplar/{id}")
+    public ResponseEntity<Void> solicitarExclusaoDoExemplar(@PathVariable Long id) {
+    	exemplarService.solicitarExclusaoDoExemplar(id);
+    	return ResponseEntity.noContent().build();
+    }
+    
     
     @PutMapping("/em-analise-exclusao/rejeitar-exclusao-exemplar/{id}")
     public ResponseEntity<Void> rejeitarSolicitacaoDeExclusaoDeExemplar(@PathVariable Long id) {
