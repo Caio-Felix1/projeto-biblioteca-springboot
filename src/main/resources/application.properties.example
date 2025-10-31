@@ -25,5 +25,13 @@ spring.jpa.show-sql=true
 # Perfil para executar certos códigos
 spring.profiles.active=nomedoperfil
 
+spring.mail.host=sandbox.smtp.mailtrap.io
+spring.mail.port=2525
+spring.mail.username=8507a6d65c398e
+spring.mail.password=75fa69245edec6
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+
 # Para que os links das imagens salvas localmente funcionem no front-end
 spring.web.resources.static-locations=file:imagens/
