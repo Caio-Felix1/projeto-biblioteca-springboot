@@ -105,6 +105,7 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.POST, "/paises/**").permitAll()
 						.requestMatchers(HttpMethod.PUT, "/paises/**").permitAll()
 						.requestMatchers(HttpMethod.DELETE, "/paises/**").permitAll()
+
 						
 						.requestMatchers(HttpMethod.GET, "/emprestimos/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/emprestimos/**").permitAll()
@@ -117,6 +118,11 @@ public class SecurityConfigurations {
 						.requestMatchers(HttpMethod.DELETE, "/multas/**").permitAll()
 						
 						.requestMatchers("/imagens/**").permitAll()
+
+
+
+						.requestMatchers(HttpMethod.POST, "/email").permitAll()
+
                 )
                 .addFilterAfter(securityFilter, CorsFilter.class)
                 .build();

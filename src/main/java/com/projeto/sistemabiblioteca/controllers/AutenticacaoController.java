@@ -1,5 +1,7 @@
 package com.projeto.sistemabiblioteca.controllers;
 
+import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
+import com.projeto.sistemabiblioteca.services.EmailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,14 +34,17 @@ public class AutenticacaoController {
     private PasswordEncoder passwordEncoder;
 
     private TokenService tokenService;
+	private final EmailService emailService;
     
     public AutenticacaoController(AuthenticationManager authenticationManager, PessoaService pessoaService,
-			PasswordEncoder passwordEncoder, TokenService tokenService) {
+                                  PasswordEncoder passwordEncoder, TokenService tokenService, EmailService emailService) {
 		this.authenticationManager = authenticationManager;
 		this.pessoaService = pessoaService;
 		this.passwordEncoder = passwordEncoder;
 		this.tokenService = tokenService;
-	}
+
+        this.emailService = emailService;
+    }
 
 
 	@PostMapping("/login")
@@ -66,6 +71,14 @@ public class AutenticacaoController {
 		*/
     	
     	pessoaService.cadastrarUsuario(request);
+		EmailDTO email = new EmailDTO(
+				request.email(),
+				"Parabéns, seu registro foi realizado!",
+				"Olá! Seu registro na Biblioteca foi concluído com sucesso. " +
+						"Aguarde sua aprovação."
+		);
+
+		emailService.sendEmail(email);
     	
     	return ResponseEntity.ok("Registro efetuado com sucesso.");
 
