@@ -6,6 +6,7 @@ import com.projeto.sistemabiblioteca.entities.enums.ClassificacaoIndicativa;
 import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
 import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -14,9 +15,9 @@ public record EdicaoDTO(
 		@NotNull(message = "Tipo de capa é obrigatório")
         TipoCapa tipoCapa,
         
-        @NotNull(message = "Quantidade de capas é obrigatória")
-		@Min(value = 1, message = "Quantidade de páginas deve ser no mínimo 1")
-		
+        @NotNull(message = "Quantidade de páginas é obrigatória")
+		@Min(value = 1, message = "Deve ter no mínimo 1 página")
+		@Max(value = 5000, message = "Deve ter no máximo 5 mil páginas")
         Integer qtdPaginas,
         
         @NotNull(message = "Tamanho da edição é obrigatório")

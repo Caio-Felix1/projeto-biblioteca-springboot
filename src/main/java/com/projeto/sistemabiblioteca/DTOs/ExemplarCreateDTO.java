@@ -10,8 +10,8 @@ public record ExemplarCreateDTO(
 		EstadoFisico estadoFisico,
 		
 		@NotNull(message = "Quantidade do estoque é obrigatória")
-		@Min(value = 1, message = "O valor mínimo da quantidade de estoque é 1")
-		@Max(value = 100, message = "O valor máximo da quantidade de estoque é 100")
+		@Min(value = 1, message = "A quantidade mínima de estoque é 1")
+		@Max(value = 100, message = "A quantidade máxima permitida por requisição é 100")
 		Integer qtdEstoque,
                                 
 		@NotNull(message = "Edição é obrigatória") 

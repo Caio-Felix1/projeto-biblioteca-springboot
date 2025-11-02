@@ -31,6 +31,8 @@ import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.exceptions.AcessoNegadoException;
+import com.projeto.sistemabiblioteca.exceptions.CpfJaCadastradoException;
+import com.projeto.sistemabiblioteca.exceptions.EmailJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
 import com.projeto.sistemabiblioteca.services.EnderecoService;
 import com.projeto.sistemabiblioteca.services.EstadoService;
@@ -38,6 +40,8 @@ import com.projeto.sistemabiblioteca.services.PessoaService;
 import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
 import com.projeto.sistemabiblioteca.validation.Telefone;
+
+import jakarta.websocket.ClientEndpoint;
 
 @ExtendWith(MockitoExtension.class)
 public class PessoaServiceTest {
@@ -109,6 +113,28 @@ public class PessoaServiceTest {
 	}
 	
 	@Test
+	void deveLancarExcecaoAoUtilizarUmEmailJaExistente() {
+		String emailTeste = "teste@gmail.com";
+		
+		when(pessoaRepository.existsByEmailEndereco(any(String.class))).thenReturn(true);
+		
+		Assertions.assertThrows(EmailJaCadastradoException.class,
+				() -> pessoaService.verificarEmailDisponivel(emailTeste),
+				"Era esperado que fosse lançada uma exceção ao tentar utlizar um email já existente no banco de dados");
+	}
+	
+	@Test
+	void deveLancarExcecaoAoUtilizarUmCpfJaExistente() {
+		String cpfTeste = "11111111111";
+		
+		when(pessoaRepository.existsByCpfValor(any(String.class))).thenReturn(true);
+		
+		Assertions.assertThrows(CpfJaCadastradoException.class,
+				() -> pessoaService.verificarCpfDisponivel(cpfTeste),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar um CPF já existente no banco de dados");
+	}
+	
+	@Test
 	void deveCadastrarUsuario() {
 		RegistroDTO registroDTO = new RegistroDTO(
 				"Maria Joana", 
@@ -129,6 +155,8 @@ public class PessoaServiceTest {
 		
 		pessoaService.cadastrarUsuario(registroDTO);
 		
+		verify(pessoaRepository).existsByEmailEndereco(any(String.class));
+		verify(pessoaRepository).existsByCpfValor(any(String.class));
 		verify(passwordEncoder).encode("1234");
 		verify(enderecoService).inserir(any(Endereco.class));
 		verify(estadoService).buscarPorId(any(Long.class));
@@ -146,29 +174,7 @@ public class PessoaServiceTest {
 		PessoaDTO pessoaDTO = criarPessoaDTO(FuncaoUsuario.BIBLIOTECARIO);
 		
 		Estado estado = new Estado("São Paulo", new Pais("Brasil"));
-		/*
-		Endereco endereco = new Endereco(
-				"rua teste", 
-				"1234", 
-				"complemento teste", 
-				"bairro teste",
-				"00000000",
-				"cidade teste",
-				estado);
-		
-		Pessoa pessoaEsperada = new Pessoa(
-				"Maria Joana", 
-				new Cpf("11111111111"), 
-				Sexo.FEMININO, 
-				FuncaoUsuario.CLIENTE,
-				LocalDate.of(1990, 10, 10), 
-				LocalDate.of(2025, 10, 10),
-				new Telefone("1234567891"), 
-				new Email("maria@gmail.com"), 
-				"senhaHash",
-				StatusConta.EM_ANALISE_APROVACAO,
-				endereco);
-		*/
+
 		when(pessoaRepository.existsByEmailEndereco("joao@gmail.com")).thenReturn(false);
 		when(pessoaRepository.existsByCpfValor("22222222222")).thenReturn(false);
 		when(passwordEncoder.encode("1234")).thenReturn("senhaHash");
@@ -176,6 +182,8 @@ public class PessoaServiceTest {
 		
 		pessoaService.cadastrarUsuarioPorAdmin(pessoaDTO);
 		
+		verify(pessoaRepository).existsByEmailEndereco(any(String.class));
+		verify(pessoaRepository).existsByCpfValor(any(String.class));
 		verify(passwordEncoder).encode("1234");
 		verify(enderecoService).inserir(any(Endereco.class));
 		verify(estadoService).buscarPorId(any(Long.class));
@@ -187,6 +195,31 @@ public class PessoaServiceTest {
 		pessoa.getFuncao() == FuncaoUsuario.BIBLIOTECARIO &&
 		pessoa.getEndereco().getStatusAtivo() == StatusAtivo.ATIVO &&
 		pessoa.getEndereco().getEstado().getNome().equals(estado.getNome())));
+	}
+	
+	@Test
+	void deveLancarExcecaoAoCadastrarUsuarioComEstadoInativo() {
+		RegistroDTO registroDTO = new RegistroDTO(
+				"Maria Joana", 
+				"11111111111", 
+				Sexo.FEMININO, 
+				LocalDate.of(1990, 10, 10), 
+				"1234567891", 
+				"maria@gmail.com", 
+				"1234", 
+				criarEnderecoDTO());
+		
+		Estado estado = new Estado("São Paulo", new Pais("Brasil"));
+		estado.inativar();
+
+		when(pessoaRepository.existsByEmailEndereco("maria@gmail.com")).thenReturn(false);
+		when(pessoaRepository.existsByCpfValor("11111111111")).thenReturn(false);
+		when(passwordEncoder.encode("1234")).thenReturn("senhaHash");
+		when(estadoService.buscarPorId(any(Long.class))).thenReturn(estado);
+		
+		Assertions.assertThrows(IllegalArgumentException.class,
+				() -> pessoaService.cadastrarUsuario(registroDTO),
+				"Era esperado que fosse lançada uma exceção ao tentar cadastrar um usuário com endereço contendo estado inativo");
 	}
 	
 	@Test
@@ -208,6 +241,18 @@ public class PessoaServiceTest {
 	}
 	
 	@Test
+	void deveLancarExcecaoAoInativarUsuarioComStatusInativo() {
+		Pessoa pessoaTeste = criarPessoa(FuncaoUsuario.CLIENTE);
+		pessoaTeste.inativarConta();
+		
+		when(pessoaRepository.findById(any(Long.class))).thenReturn(Optional.of(pessoaTeste));
+		
+		Assertions.assertThrows(IllegalStateException.class,
+				() -> pessoaService.inativar(1L),
+				"Era esperado que fosse lançada uma exceção ao tentar inativar um usuário já inativo");
+	}
+	
+	@Test
 	void deveAtualizarQualquerUsuarioComUsuarioLogadoAdministrador() {
 		Pessoa cliente = criarPessoa(FuncaoUsuario.CLIENTE);
 		
@@ -221,6 +266,8 @@ public class PessoaServiceTest {
 	    Assertions.assertEquals("João Silva", atualizado.getNome());
 	    verify(enderecoService).atualizar(isNull(), any());
 	}
+	
+	// mais testes com adm
 	
 	@Test
 	void deveAtualizarASiMesmoComUsuarioLogadoBibliotecario() {
@@ -299,6 +346,34 @@ public class PessoaServiceTest {
 	}
 	
 	@Test
+	void deveLancarExcecaoQuandoBibliotecarioTentarAtualizarOutroBibliotecario() {
+		Pessoa bibliotecario1 = Mockito.spy(criarPessoa(FuncaoUsuario.BIBLIOTECARIO));
+		when(bibliotecario1.getIdPessoa()).thenReturn(1L);
+		Pessoa bibliotecario2 = Mockito.spy(criarPessoa(FuncaoUsuario.BIBLIOTECARIO));
+		when(bibliotecario2.getIdPessoa()).thenReturn(2L);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(bibliotecario1));
+		
+	    Assertions.assertThrows(AcessoNegadoException.class,
+	    		() -> pessoaService.atualizar(1L, criarPessoaDTO(FuncaoUsuario.CLIENTE), bibliotecario2),
+	    		"Era esperado que fosse lançada uma exceção quando um bibliotecário tenta atualizar outro bibliotecário");
+	}
+	
+	@Test
+	void deveLancarExcecaoQuandoBibliotecarioTentarAlterarAdministrador() {
+		Pessoa bibliotecario = Mockito.spy(criarPessoa(FuncaoUsuario.BIBLIOTECARIO));
+		when(bibliotecario.getIdPessoa()).thenReturn(1L);
+		Pessoa administrador = Mockito.spy(criarPessoa(FuncaoUsuario.ADMINISTRADOR));
+		when(administrador.getIdPessoa()).thenReturn(2L);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(administrador));
+		
+	    Assertions.assertThrows(AcessoNegadoException.class,
+	    		() -> pessoaService.atualizar(1L, criarPessoaDTO(FuncaoUsuario.CLIENTE), bibliotecario),
+	    		"Era esperado que fosse lançada uma exceção quando um bibliotecário tenta atualizar um administrador");
+	}
+	
+	@Test
 	void deveLancarExcecaoQuandoBibliotecarioTentarAtualizarSuaFuncaoParaCliente() {
 		Pessoa bibliotecario = Mockito.spy(criarPessoa(FuncaoUsuario.BIBLIOTECARIO));
 		when(bibliotecario.getIdPessoa()).thenReturn(1L);
@@ -331,5 +406,148 @@ public class PessoaServiceTest {
 	    Assertions.assertThrows(IllegalStateException.class,
 	    		() -> pessoaService.atualizar(1L, criarPessoaDTO(FuncaoUsuario.BIBLIOTECARIO), cliente),
 	    		"Era esperado que fosse lançada uma exceção quando um cliente tenta atualizar sua função");
+	}
+	
+	@Test
+	void deveAprovarContaDeCliente() {
+		Pessoa cliente = new Pessoa(
+				null, 
+				null, 
+				null, 
+				FuncaoUsuario.CLIENTE,
+				LocalDate.of(1990, 10, 10), 
+				LocalDate.of(2025, 10, 10),
+				null, 
+				null, 
+				null,
+				StatusConta.EM_ANALISE_APROVACAO,
+				null);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(cliente));
+		
+		pessoaService.aprovarConta(1L);
+		
+		verify(pessoaRepository).findById(any(Long.class));
+		
+		Assertions.assertEquals(StatusConta.ATIVA, cliente.getStatusConta());
+	}
+	
+	@Test
+	void deveLancarExcecaoAoAprovarContaDeUsuarioDiferenteDeCliente() {
+		Pessoa bibliotecario = criarPessoa(FuncaoUsuario.BIBLIOTECARIO);
+		Pessoa administrador = criarPessoa(FuncaoUsuario.ADMINISTRADOR);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(bibliotecario));
+		when(pessoaRepository.findById(2L)).thenReturn(Optional.of(administrador));
+		
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.aprovarConta(1L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método aprovarConta em um usuário com função de usuário BIBLIOTECARIO");
+	    
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.aprovarConta(2L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método aprovarConta em um usuário com função de usuário ADMINISTRADOR");
+	}
+	
+	@Test
+	void deveRejeitarContaDeCliente() {
+		Pessoa cliente = new Pessoa(
+				null, 
+				null, 
+				null, 
+				FuncaoUsuario.CLIENTE,
+				LocalDate.of(1990, 10, 10), 
+				LocalDate.of(2025, 10, 10),
+				null, 
+				null, 
+				null,
+				StatusConta.EM_ANALISE_APROVACAO,
+				criarEndereco());
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(cliente));
+		
+		pessoaService.rejeitarConta(1L);
+		
+		verify(pessoaRepository).findById(any(Long.class));
+		
+		Assertions.assertEquals(StatusConta.REJEITADA, cliente.getStatusConta());
+	}
+	
+	@Test
+	void deveLancarExcecaoAoRejeitarContaDeUsuarioDiferenteDeCliente() {
+		Pessoa bibliotecario = criarPessoa(FuncaoUsuario.BIBLIOTECARIO);
+		Pessoa administrador = criarPessoa(FuncaoUsuario.ADMINISTRADOR);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(bibliotecario));
+		when(pessoaRepository.findById(2L)).thenReturn(Optional.of(administrador));
+		
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.rejeitarConta(1L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método rejeitarConta em um usuário com função de usuário BIBLIOTECARIO");
+	    
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.rejeitarConta(2L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método rejeitarConta em um usuário com função de usuário ADMINISTRADOR");
+	}
+	
+	@Test
+	void deveSolicitarExclusaoDaContaDeCliente() {
+		Pessoa cliente = criarPessoa(FuncaoUsuario.CLIENTE);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(cliente));
+		
+		pessoaService.solicitarExclusaoConta(1L);
+		
+		verify(pessoaRepository).findById(any(Long.class));
+		
+		Assertions.assertEquals(StatusConta.EM_ANALISE_EXCLUSAO, cliente.getStatusConta());
+	}
+	
+	@Test
+	void deveLancarExcecaoAoSolicitarExclusaoDaContaDeUsuarioDiferenteDeCliente() {
+		Pessoa bibliotecario = criarPessoa(FuncaoUsuario.BIBLIOTECARIO);
+		Pessoa administrador = criarPessoa(FuncaoUsuario.ADMINISTRADOR);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(bibliotecario));
+		when(pessoaRepository.findById(2L)).thenReturn(Optional.of(administrador));
+		
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.solicitarExclusaoConta(1L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método solicitarExclusaoConta em um usuário com função de usuário BIBLIOTECARIO");
+	    
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.solicitarExclusaoConta(2L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método solicitarExclusaoConta em um usuário com função de usuário ADMINISTRADOR");
+	}
+	
+	@Test
+	void deveRejeitarSolicitacaoDeExclusaoDaContaDeCliente() {
+		Pessoa cliente = criarPessoa(FuncaoUsuario.CLIENTE);
+		cliente.solicitarExclusaoConta();
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(cliente));
+		
+		pessoaService.rejeitarSolicitacaoExclusao(1L);
+		
+		verify(pessoaRepository).findById(any(Long.class));
+		
+		Assertions.assertEquals(StatusConta.ATIVA, cliente.getStatusConta());
+	}
+	
+	@Test
+	void deveLancarExcecaoAoRejeitarSolicitacaoDeExclusaoDaContaDeUsuarioDiferenteDeCliente() {
+		Pessoa bibliotecario = criarPessoa(FuncaoUsuario.BIBLIOTECARIO);
+		Pessoa administrador = criarPessoa(FuncaoUsuario.ADMINISTRADOR);
+		
+		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(bibliotecario));
+		when(pessoaRepository.findById(2L)).thenReturn(Optional.of(administrador));
+		
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.rejeitarSolicitacaoExclusao(1L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método rejeitarSolicitacaoExclusao em um usuário com função de usuário BIBLIOTECARIO");
+	    
+	    Assertions.assertThrows(IllegalArgumentException.class,
+	    		() -> pessoaService.rejeitarSolicitacaoExclusao(2L),
+	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método rejeitarSolicitacaoExclusao em um usuário com função de usuário ADMINISTRADOR");
 	}
 }

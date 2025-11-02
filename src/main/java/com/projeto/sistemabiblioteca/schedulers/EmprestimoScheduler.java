@@ -1,8 +1,8 @@
 package com.projeto.sistemabiblioteca.schedulers;
 
-import static com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo.SEPARADO;
-import static com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo.EM_ANDAMENTO;
 import static com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo.ATRASADO;
+import static com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo.EM_ANDAMENTO;
+import static com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo.SEPARADO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Multa;
-import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
 import com.projeto.sistemabiblioteca.repositories.ExemplarRepository;
 import com.projeto.sistemabiblioteca.repositories.MultaRepository;
@@ -36,7 +35,7 @@ public class EmprestimoScheduler {
 		this.exemplarRepository = exemplarRepository;
 	}
 	
-	@Scheduled(cron = "0 0 0 * * *")
+	@Scheduled(cron = "0 0 0 * * ?")
 	@Transactional
 	public void verificarEmprestimos() {
 		LocalDate hoje = LocalDate.now();
@@ -62,7 +61,7 @@ public class EmprestimoScheduler {
 	}
 	
 	private void processarEmprestimoComStatusSeparado(Emprestimo emp, LocalDate hoje) {
-		if (emp.isPrazoDeRetiradaExpirado(LocalDate.now(), 2)) {
+		if (emp.isPrazoDeRetiradaExpirado(hoje, 2)) {
 			emp.cancelarReserva();
 			
 			exemplarRepository.save(emp.getExemplar());
@@ -70,8 +69,8 @@ public class EmprestimoScheduler {
 	}
 	
 	private void processarEmprestimoComStatusEmAndamento(Emprestimo emp, LocalDate hoje) {
-		if (emp.calcularDiasDeAtraso(LocalDate.now()) > 0) {
-			emp.registrarAtraso(LocalDate.now());
+		if (emp.calcularDiasDeAtraso(hoje) > 0) {
+			emp.registrarAtraso(hoje);
 			
 			multaRepository.save(emp.getMulta());
 		}
@@ -85,7 +84,7 @@ public class EmprestimoScheduler {
 	
 	private void processarEmprestimoComStatusAtrasado(Emprestimo emp, LocalDate hoje) {
 		if (emp.getMulta().getStatusPagamento() != StatusPagamento.PERDOADO) {
-			int diasAtraso = emp.calcularDiasDeAtraso(LocalDate.now());
+			int diasAtraso = emp.calcularDiasDeAtraso(hoje);
 				
 			Multa multa = emp.getMulta();
 			multa.aplicarMulta(diasAtraso);

@@ -12,6 +12,9 @@ import com.projeto.sistemabiblioteca.entities.Edicao;
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.Multa;
+import com.projeto.sistemabiblioteca.entities.Pessoa;
+import com.projeto.sistemabiblioteca.entities.enums.EstadoFisico;
+import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
@@ -799,5 +802,97 @@ public class EmprestimoTest {
 		
 		Assertions.assertThrows(IllegalArgumentException.class, () -> emprestimo.calcularDiasRestantes(null),
 				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método calcularDiasRestantes com data de hoje nula");
+	}
+	
+	@Test
+	void deveAlterarPessoaNoEmprestimoComStatusValido() {
+		Pessoa pessoa = new Pessoa("Pessoa 1", null, null, null, LocalDate.of(1990, 1, 1), hojePadrao, null, null, null, StatusConta.ATIVA, null);
+		
+		Emprestimo emprestimo1 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo2 = criarEmprestimoComStatusSeparado();
+		
+		Assertions.assertDoesNotThrow(() -> emprestimo1.setPessoa(pessoa),
+				"Era esperado que funcionasse o método setPessoa no objeto com status RESERVADO");
+		
+		Assertions.assertEquals("Pessoa 1", emprestimo1.getPessoa().getNome(),
+				"Era esperado que o valor retornado fosse 'Pessoa 1'");
+		
+		Assertions.assertDoesNotThrow(() -> emprestimo2.setPessoa(pessoa),
+				"Era esperado que funcionasse o método setPessoa no objeto com status SEPARADO");
+		
+		Assertions.assertEquals("Pessoa 1", emprestimo2.getPessoa().getNome(),
+				"Era esperado que o valor retornado fosse 'Pessoa 1'");
+	}
+	
+	@Test
+	void deveLancarExcecaoAoAlterarPessoaNoEmprestimoComStatusInvalido() {
+		Pessoa pessoa = new Pessoa("Pessoa 1", null, null, null, LocalDate.of(1990, 1, 1), hojePadrao, null, null, null, StatusConta.ATIVA, null);
+		
+		Emprestimo emprestimo1 = criarEmprestimoComStatusEmAndamento(); // em andamento
+		Emprestimo emprestimo2 = criarEmprestimoComStatusAtrasado(); // atrasado
+		Emprestimo emprestimo3 = criarEmprestimoComStatusDevolvido(); // devolvido
+		Emprestimo emprestimo4 = criarEmprestimoComStatusCancelado(); // cancelado
+		Emprestimo emprestimo5 = criarEmprestimoComStatusExemplarPerdido(); // exemplar_perdido
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo1.setPessoa(pessoa),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setPessoa em um objeto com status EM_ANDAMENTO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo2.setPessoa(pessoa),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setPessoa em um objeto com status ATRASADO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo3.setPessoa(pessoa),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setPessoa em um objeto com status DEVOLVIDO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo4.setPessoa(pessoa),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setPessoa em um objeto com status CANCELADO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo5.setPessoa(pessoa),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setPessoa em um objeto com status EXEMPLAR_PERDIDO");
+	}
+	
+	@Test
+	void deveAlterarExemplarNoEmprestimoComStatusValido() {
+		Exemplar exemplar = new Exemplar(EstadoFisico.EXCELENTE, null);
+		
+		Emprestimo emprestimo1 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo2 = criarEmprestimoComStatusSeparado();
+		
+		Assertions.assertDoesNotThrow(() -> emprestimo1.setExemplar(exemplar),
+				"Era esperado que funcionasse o método setExemplar no objeto com status RESERVADO");
+		
+		Assertions.assertEquals(EstadoFisico.EXCELENTE, emprestimo1.getExemplar().getEstadoFisico(),
+				"Era esperado que o valor retornado fosse EXCELENTE");
+		
+		Assertions.assertDoesNotThrow(() -> emprestimo2.setExemplar(exemplar),
+				"Era esperado que funcionasse o método setExemplar no objeto com status SEPARADO");
+		
+		Assertions.assertEquals(EstadoFisico.EXCELENTE, emprestimo2.getExemplar().getEstadoFisico(),
+				"Era esperado que o valor retornado fosse EXCELENTE");
+	}
+	
+	@Test
+	void deveLancarExcecaoAoAlterarExemplarNoEmprestimoComStatusInvalido() {
+		Exemplar exemplar = new Exemplar(EstadoFisico.EXCELENTE, null);
+		
+		Emprestimo emprestimo1 = criarEmprestimoComStatusEmAndamento(); // em andamento
+		Emprestimo emprestimo2 = criarEmprestimoComStatusAtrasado(); // atrasado
+		Emprestimo emprestimo3 = criarEmprestimoComStatusDevolvido(); // devolvido
+		Emprestimo emprestimo4 = criarEmprestimoComStatusCancelado(); // cancelado
+		Emprestimo emprestimo5 = criarEmprestimoComStatusExemplarPerdido(); // exemplar_perdido
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo1.setExemplar(exemplar),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setExemplar em um objeto com status EM_ANDAMENTO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo2.setExemplar(exemplar),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setExemplar em um objeto com status ATRASADO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo3.setExemplar(exemplar),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setExemplar em um objeto com status DEVOLVIDO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo4.setExemplar(exemplar),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setExemplar em um objeto com status CANCELADO");
+		
+		Assertions.assertThrows(IllegalStateException.class, () -> emprestimo5.setExemplar(exemplar),
+				"Era esperado que fosse lançada uma exceção ao tentar utilizar o método setExemplar em um objeto com status EXEMPLAR_PERDIDO");
 	}
 }

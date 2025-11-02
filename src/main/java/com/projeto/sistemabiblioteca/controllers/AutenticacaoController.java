@@ -53,7 +53,6 @@ public class AutenticacaoController {
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
-
     @PostMapping("/registro")
     public ResponseEntity<String> registrar(@Valid @RequestBody RegistroDTO request) {
     	/*
