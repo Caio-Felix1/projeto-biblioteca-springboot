@@ -50,7 +50,7 @@ public class ExemplarController {
         return ResponseEntity.ok(exemplares);
     }
     
-    @GetMapping("/buscar-por-edicao/{id}")
+    @GetMapping("/buscar-por-edicao/{idEdicao}")
     public ResponseEntity<List<Exemplar>> listarPorEdicao(@PathVariable Long idEdicao) {
     	List<Exemplar> exemplares = exemplarService.buscarTodosComEdicaoComIdIgualA(idEdicao);
         return ResponseEntity.ok(exemplares);
