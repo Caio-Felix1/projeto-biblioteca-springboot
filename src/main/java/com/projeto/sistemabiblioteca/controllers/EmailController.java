@@ -1,5 +1,5 @@
 package com.projeto.sistemabiblioteca.controllers;
-
+/*
 import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
 import com.projeto.sistemabiblioteca.services.EmailService;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,3 +30,4 @@ public class EmailController {
         System.out.println("Email enviado com sucesso");
     }
 }
+*/

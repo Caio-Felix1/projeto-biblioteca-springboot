@@ -1,7 +1,7 @@
 package com.projeto.sistemabiblioteca.controllers;
 
 import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
-import com.projeto.sistemabiblioteca.services.EmailService;
+//mport com.projeto.sistemabiblioteca.services.EmailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,16 +34,17 @@ public class AutenticacaoController {
     private PasswordEncoder passwordEncoder;
 
     private TokenService tokenService;
-	private final EmailService emailService;
+	//private final EmailService emailService;
     
+    // Depois inserir o EmailService no construtor
     public AutenticacaoController(AuthenticationManager authenticationManager, PessoaService pessoaService,
-                                  PasswordEncoder passwordEncoder, TokenService tokenService, EmailService emailService) {
+                                  PasswordEncoder passwordEncoder, TokenService tokenService) {
 		this.authenticationManager = authenticationManager;
 		this.pessoaService = pessoaService;
 		this.passwordEncoder = passwordEncoder;
 		this.tokenService = tokenService;
 
-        this.emailService = emailService;
+       // this.emailService = emailService;
     }
 
 
@@ -71,6 +72,7 @@ public class AutenticacaoController {
 		*/
     	
     	pessoaService.cadastrarUsuario(request);
+    	/*
 		EmailDTO email = new EmailDTO(
 				request.email(),
 				"Parabéns, seu registro foi realizado!",
@@ -79,7 +81,7 @@ public class AutenticacaoController {
 		);
 
 		emailService.sendEmail(email);
-    	
+    	*/
     	return ResponseEntity.ok("Registro efetuado com sucesso.");
 
     }

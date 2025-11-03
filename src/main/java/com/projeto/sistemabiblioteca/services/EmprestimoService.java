@@ -51,6 +51,10 @@ public class EmprestimoService {
 		return emprestimoRepository.findAllByStatusEquals(statusEmprestimo);
 	}
 	
+	public List<Emprestimo> buscarTodosPorIdPessoa(Long id) {
+		return emprestimoRepository.findAllByPessoaIdPessoa(id);
+	}
+	
 	public List<Emprestimo> buscarTodosEmprestimosParaVerificacaoDiaria(Set<StatusEmprestimo> statusSet) {
 		return emprestimoRepository.findAllByStatusIn(statusSet);
 	}
