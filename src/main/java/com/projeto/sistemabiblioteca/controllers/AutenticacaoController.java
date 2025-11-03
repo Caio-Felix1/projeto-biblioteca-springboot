@@ -1,7 +1,7 @@
 package com.projeto.sistemabiblioteca.controllers;
 
 import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
-//mport com.projeto.sistemabiblioteca.services.EmailService;
+import com.projeto.sistemabiblioteca.services.EmailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,17 +34,15 @@ public class AutenticacaoController {
     private PasswordEncoder passwordEncoder;
 
     private TokenService tokenService;
-	//private final EmailService emailService;
+	private final EmailService emailService;
     
-    // Depois inserir o EmailService no construtor
     public AutenticacaoController(AuthenticationManager authenticationManager, PessoaService pessoaService,
-                                  PasswordEncoder passwordEncoder, TokenService tokenService) {
+                                  PasswordEncoder passwordEncoder, TokenService tokenService, EmailService emailService) {
 		this.authenticationManager = authenticationManager;
 		this.pessoaService = pessoaService;
 		this.passwordEncoder = passwordEncoder;
 		this.tokenService = tokenService;
-
-       // this.emailService = emailService;
+		this.emailService = emailService;
     }
 
 
@@ -61,18 +59,8 @@ public class AutenticacaoController {
 
     @PostMapping("/registro")
     public ResponseEntity<String> registrar(@Valid @RequestBody RegistroDTO request) {
-    	/*
-        pessoaService.verificarEmailDisponivel(request.email());
-
-        Email email = new Email(request.email());
-
-        String encryptedPassword = passwordEncoder.encode(request.senha());
-
-        Pessoa pessoa = new Pessoa(email, encryptedPassword, request.funcao());
-		*/
-    	
     	pessoaService.cadastrarUsuario(request);
-    	/*
+    	
 		EmailDTO email = new EmailDTO(
 				request.email(),
 				"Parabéns, seu registro foi realizado!",
@@ -81,8 +69,7 @@ public class AutenticacaoController {
 		);
 
 		emailService.sendEmail(email);
-    	*/
+    	
     	return ResponseEntity.ok("Registro efetuado com sucesso.");
-
     }
 }

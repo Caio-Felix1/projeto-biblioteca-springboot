@@ -1,5 +1,5 @@
 package com.projeto.sistemabiblioteca.services;
-/*
+
 import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.SimpleMailMessage;
@@ -24,4 +24,4 @@ public class EmailService {
 
     }
 }
-*/
+
