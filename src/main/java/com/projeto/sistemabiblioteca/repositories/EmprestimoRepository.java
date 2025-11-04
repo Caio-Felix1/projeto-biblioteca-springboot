@@ -16,6 +16,10 @@ public interface EmprestimoRepository extends JpaRepository<Emprestimo, Long> {
 	
 	List<Emprestimo> findAllByPessoaIdPessoa(Long id);
 	
+	List<Emprestimo> findAllByPessoaEmailEndereco(String email);
+	
+	List<Emprestimo> findAllByPessoaCpfValor(String cpf);
+	
 	List<Emprestimo> findAllByStatusIn(Set<StatusEmprestimo> statusSet);
 	
 	long countByPessoaAndStatusIn(Pessoa pessoa, Set<StatusEmprestimo> statusSet);

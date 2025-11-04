@@ -7,6 +7,7 @@ public record EmprestimoResponseDTO(
 		Long idEmprestimo,
 		StatusEmprestimo status,
 		Long idPessoa,
+		String nomePessoa,
 		MultaDTO multa) {
 	
 	public static EmprestimoResponseDTO converterParaDTO(Emprestimo emp) {
@@ -19,6 +20,7 @@ public record EmprestimoResponseDTO(
 				emp.getIdEmprestimo(),
 				emp.getStatus(),
 				emp.getPessoa().getIdPessoa(),
+				emp.getPessoa().getNome(),
 				multaDTO);
 	}
 }

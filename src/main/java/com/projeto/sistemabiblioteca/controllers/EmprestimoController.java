@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.DataDevolucaoPrevistaDTO;
@@ -22,6 +23,8 @@ import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.services.EmprestimoService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
+import com.projeto.sistemabiblioteca.validation.Cpf;
+import com.projeto.sistemabiblioteca.validation.Email;
 
 import jakarta.validation.Valid;
 
@@ -77,6 +80,32 @@ public class EmprestimoController {
 		}
 		
     	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorIdPessoa(id);
+    	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
+    			.stream()
+    			.map(EmprestimoResponseDTO::converterParaDTO)
+    			.toList();
+    	
+        return ResponseEntity.ok(emprestimosResponseDTO);
+    }
+    
+    @GetMapping("/buscar-por-email")
+    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorEmailDoUsuario(@RequestParam String email) {
+    	Email emailFormatoValidado = new Email(email);
+    	
+    	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorEmailDoUsuario(emailFormatoValidado.getEndereco());
+    	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
+    			.stream()
+    			.map(EmprestimoResponseDTO::converterParaDTO)
+    			.toList();
+    	
+        return ResponseEntity.ok(emprestimosResponseDTO);
+    }
+    
+    @GetMapping("/buscar-por-cpf")
+    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorCpfDoUsuario(@RequestParam String cpf) {
+    	Cpf cpfFormatoValidado = new Cpf(cpf);
+    	
+    	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorCpfDoUsuario(cpfFormatoValidado.getValor());
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
     			.stream()
     			.map(EmprestimoResponseDTO::converterParaDTO)

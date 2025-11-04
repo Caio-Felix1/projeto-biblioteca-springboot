@@ -55,6 +55,14 @@ public class EmprestimoService {
 		return emprestimoRepository.findAllByPessoaIdPessoa(id);
 	}
 	
+	public List<Emprestimo> buscarTodosPorEmailDoUsuario(String email) {
+		return emprestimoRepository.findAllByPessoaEmailEndereco(email);
+	}
+	
+	public List<Emprestimo> buscarTodosPorCpfDoUsuario(String cpf) {
+		return emprestimoRepository.findAllByPessoaCpfValor(cpf);
+	}
+	
 	public List<Emprestimo> buscarTodosEmprestimosParaVerificacaoDiaria(Set<StatusEmprestimo> statusSet) {
 		return emprestimoRepository.findAllByStatusIn(statusSet);
 	}

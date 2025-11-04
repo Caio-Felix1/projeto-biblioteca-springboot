@@ -159,6 +159,140 @@ public class EmprestimoServiceIntegrationTest {
 	}
 	
 	@Test
+	void deveBuscarTodosEmprestimosFiltrandoPeloEmailDoUsuario() {
+		Pessoa pessoa1 = new Pessoa(
+                "Maria Joana",
+                new Cpf("11111111111"),
+                Sexo.FEMININO,
+                FuncaoUsuario.CLIENTE,
+                LocalDate.of(1990, 10, 10),
+                LocalDate.of(2025, 10, 10),
+                new Telefone("1234567891"),
+                new Email("maria@gmail.com"),
+                "senhaHash",
+                StatusConta.ATIVA,
+                null
+            );
+		
+		Pessoa pessoa2 = new Pessoa(
+                "João Silva",
+                new Cpf("22222222222"),
+                Sexo.MASCULINO,
+                FuncaoUsuario.CLIENTE,
+                LocalDate.of(1990, 10, 10),
+                LocalDate.of(2025, 10, 10),
+                new Telefone("1234567891"),
+                new Email("joao@gmail.com"),
+                "senhaHash",
+                StatusConta.ATIVA,
+                null
+            );
+		
+		pessoaRepository.save(pessoa1);
+		pessoaRepository.save(pessoa2);
+		
+		Emprestimo emprestimo1 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo2 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo3 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo4 = criarEmprestimoComStatusReservado();
+		
+		emprestimo1.setPessoa(pessoa1);
+		emprestimo2.setPessoa(pessoa1);
+		emprestimo3.setPessoa(pessoa2);
+		emprestimo4.setPessoa(pessoa2);
+		
+		exemplarRepository.save(emprestimo1.getExemplar());
+		exemplarRepository.save(emprestimo2.getExemplar());
+		exemplarRepository.save(emprestimo3.getExemplar());
+		exemplarRepository.save(emprestimo4.getExemplar());
+		
+		multaRepository.save(emprestimo1.getMulta());
+		multaRepository.save(emprestimo2.getMulta());
+		multaRepository.save(emprestimo3.getMulta());
+		multaRepository.save(emprestimo4.getMulta());
+		
+		emprestimoService.inserir(emprestimo1);
+		emprestimoService.inserir(emprestimo2);
+		emprestimoService.inserir(emprestimo3);
+		emprestimoService.inserir(emprestimo4);
+		
+		List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorEmailDoUsuario(pessoa1.getEmail().getEndereco());
+		
+		Assertions.assertEquals(2, emprestimos.size());
+		for (Emprestimo emp : emprestimos) {
+			Assertions.assertEquals(pessoa1.getEmail().getEndereco(), emp.getPessoa().getEmail().getEndereco());
+			Assertions.assertEquals("Maria Joana", emp.getPessoa().getNome());
+		}
+	}
+	
+	@Test
+	void deveBuscarTodosEmprestimosFiltrandoPeloCpfDoUsuario() {
+		Pessoa pessoa1 = new Pessoa(
+                "Maria Joana",
+                new Cpf("11111111111"),
+                Sexo.FEMININO,
+                FuncaoUsuario.CLIENTE,
+                LocalDate.of(1990, 10, 10),
+                LocalDate.of(2025, 10, 10),
+                new Telefone("1234567891"),
+                new Email("maria@gmail.com"),
+                "senhaHash",
+                StatusConta.ATIVA,
+                null
+            );
+		
+		Pessoa pessoa2 = new Pessoa(
+                "João Silva",
+                new Cpf("22222222222"),
+                Sexo.MASCULINO,
+                FuncaoUsuario.CLIENTE,
+                LocalDate.of(1990, 10, 10),
+                LocalDate.of(2025, 10, 10),
+                new Telefone("1234567891"),
+                new Email("joao@gmail.com"),
+                "senhaHash",
+                StatusConta.ATIVA,
+                null
+            );
+		
+		pessoaRepository.save(pessoa1);
+		pessoaRepository.save(pessoa2);
+		
+		Emprestimo emprestimo1 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo2 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo3 = criarEmprestimoComStatusReservado();
+		Emprestimo emprestimo4 = criarEmprestimoComStatusReservado();
+		
+		emprestimo1.setPessoa(pessoa1);
+		emprestimo2.setPessoa(pessoa1);
+		emprestimo3.setPessoa(pessoa2);
+		emprestimo4.setPessoa(pessoa2);
+		
+		exemplarRepository.save(emprestimo1.getExemplar());
+		exemplarRepository.save(emprestimo2.getExemplar());
+		exemplarRepository.save(emprestimo3.getExemplar());
+		exemplarRepository.save(emprestimo4.getExemplar());
+		
+		multaRepository.save(emprestimo1.getMulta());
+		multaRepository.save(emprestimo2.getMulta());
+		multaRepository.save(emprestimo3.getMulta());
+		multaRepository.save(emprestimo4.getMulta());
+		
+		emprestimoService.inserir(emprestimo1);
+		emprestimoService.inserir(emprestimo2);
+		emprestimoService.inserir(emprestimo3);
+		emprestimoService.inserir(emprestimo4);
+		
+		List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorCpfDoUsuario(pessoa2.getCpf().getValor());
+		
+		Assertions.assertEquals(2, emprestimos.size());
+		for (Emprestimo emp : emprestimos) {
+			Assertions.assertEquals(pessoa2.getCpf().getValor(), emp.getPessoa().getCpf().getValor());
+			Assertions.assertEquals("João Silva", emp.getPessoa().getNome());
+		}
+	}
+	
+	@Test
 	void deveBuscarTodosEmprestimosFiltrandoPorVariosStatus() {
 		Emprestimo emprestimo1 = criarEmprestimoComStatusReservado();
 		Emprestimo emprestimo2 = criarEmprestimoComStatusSeparado();
