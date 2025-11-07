@@ -45,7 +45,7 @@ public class ExemplarService {
 		return exemplarRepository.findAllByEdicaoAndStatusOrderByEstadoFisicoCustom(id, status)
 				.stream()
 				.findFirst()
-				.orElseThrow(() -> new ExemplarNaoDisponivelException("Erro: não tem exemplar disponível para essa edição."));
+				.orElseThrow(() -> new ExemplarNaoDisponivelException("Erro: não tem exemplar disponível para a edição com id " + id + "."));
 	}
 	
 	public Exemplar buscarPorId(Long id) {
