@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Pais;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.exceptions.PaisJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.PaisRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -36,7 +37,14 @@ public class PaisService {
 		return pais.get();
 	}
 	
+	public void verificarSePaisJaExiste(String nomePais) {
+		if (paisRepository.existsByNome(nomePais)) {
+			throw new PaisJaCadastradoException("Erro: país já foi cadastrado.");
+		}
+	}
+	
 	public Pais inserir(Pais pais) {
+		verificarSePaisJaExiste(pais.getNome());
 		return paisRepository.save(pais);
 	}
 	
@@ -51,6 +59,11 @@ public class PaisService {
 	
 	public Pais atualizar(Long id, Pais pais2) {
 		Pais pais1 = buscarPorId(id);
+		
+		if (!pais1.getNome().equals(pais2.getNome())) {
+			verificarSePaisJaExiste(pais2.getNome());
+		}
+		
 		atualizarDados(pais1, pais2);
 		return paisRepository.save(pais1);
 	}
