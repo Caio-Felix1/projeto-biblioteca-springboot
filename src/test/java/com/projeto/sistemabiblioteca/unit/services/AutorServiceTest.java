@@ -96,6 +96,6 @@ public class AutorServiceTest {
 		
 		Assertions.assertThrows(AutorJaCadastradoException.class,
 				() -> autorService.atualizar(1L, autor2),
-				"Era esperado que fosse lançada uma exceção ao tentar atualizar um autor com nome já existente no banco de dados");
+				"Era esperado que fosse lançada uma exceção ao tentar atualizar um autor com um nome já existente no banco de dados");
 	}
 }

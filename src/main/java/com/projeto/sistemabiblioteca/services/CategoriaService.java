@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.exceptions.CategoriaJaCadastradaException;
 import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -45,7 +46,14 @@ public class CategoriaService {
 		return categoria.get();
 	}
 	
+	public void verificarSeCategoriaJaExiste(String nomeCategoria) {
+		if (categoriaRepository.existsByNome(nomeCategoria)) {
+			throw new CategoriaJaCadastradaException("Erro: categoria já foi cadastrada.");
+		}
+	}
+	
 	public Categoria inserir(Categoria categoria) {
+		verificarSeCategoriaJaExiste(categoria.getNome());
 		return categoriaRepository.save(categoria);
 	}
 	
@@ -60,6 +68,11 @@ public class CategoriaService {
 	
 	public Categoria atualizar(Long id, Categoria categoria2) {
 		Categoria categoria1 = buscarPorId(id);
+		
+		if(!categoria1.getNome().equals(categoria2.getNome())) {
+			verificarSeCategoriaJaExiste(categoria2.getNome());
+		}
+		
 		atualizarDados(categoria1, categoria2);
 		return categoriaRepository.save(categoria1);
 	}
