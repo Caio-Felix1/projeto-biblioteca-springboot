@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.entities;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.entities.interfaces.Ativavel;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,6 +22,7 @@ public class Estado implements Ativavel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long idEstado;
 	
+	@Column(unique = true)
 	private String nome;
 	
 	@Enumerated(EnumType.STRING)

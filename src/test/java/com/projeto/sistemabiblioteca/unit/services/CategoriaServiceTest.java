@@ -72,7 +72,7 @@ public class CategoriaServiceTest {
 	}
 	
 	@Test
-	void deveAtualizarAutorComMesmoNome() {
+	void deveAtualizarCategoriaComMesmoNome() {
 		Categoria categoria1 = new Categoria("Categoria 1");
 		Categoria categoria2 = new Categoria("Categoria 1");
 		
@@ -87,7 +87,7 @@ public class CategoriaServiceTest {
 	}
 	
 	@Test
-	void deveLancarExcecaoAoTentarAtualizarAutorComUmNomeJaExistente() {
+	void deveLancarExcecaoAoTentarAtualizarCategoriaComUmNomeJaExistente() {
 		Categoria categoria1 = new Categoria("Categoria 1");
 		Categoria categoria2 = new Categoria("Categoria 2");
 		

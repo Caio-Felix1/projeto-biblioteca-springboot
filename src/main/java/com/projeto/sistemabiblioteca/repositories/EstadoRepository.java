@@ -10,4 +10,6 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 public interface EstadoRepository extends JpaRepository<Estado, Long> {
 	
 	List<Estado> findAllByStatusEquals(StatusAtivo status);
+	
+	boolean existsByNome(String nome);
 }

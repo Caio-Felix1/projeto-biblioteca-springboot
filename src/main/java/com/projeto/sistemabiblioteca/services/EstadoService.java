@@ -9,6 +9,7 @@ import com.projeto.sistemabiblioteca.DTOs.EstadoDTO;
 import com.projeto.sistemabiblioteca.entities.Estado;
 import com.projeto.sistemabiblioteca.entities.Pais;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.exceptions.EstadoJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.EstadoRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -41,12 +42,20 @@ public class EstadoService {
 		return estado.get();
 	}
 	
+	public void verificarSeEstadoJaExiste(String nomeEstado) {
+		if (estadoRepository.existsByNome(nomeEstado)) {
+			throw new EstadoJaCadastradoException("Erro: estado já foi cadastrado.");
+		}
+	}
+	
 	public Estado cadastrar(EstadoDTO estadoDTO) {
 		Pais pais = paisService.buscarPorId(estadoDTO.idPais());
 		
 		if (pais.getStatusAtivo() == StatusAtivo.INATIVO) {
 			throw new IllegalArgumentException("Erro: não é possível associar um novo estado a um país com status inativo.");
 		}
+		
+		verificarSeEstadoJaExiste(estadoDTO.nome());
 		
 		Estado estado = new Estado(estadoDTO.nome(), pais);
 		
@@ -79,6 +88,10 @@ public class EstadoService {
 			if (pais.getStatusAtivo() == StatusAtivo.INATIVO) {
 				throw new IllegalArgumentException("Erro: não é possível associar um estado a um país com status inativo ao atualizar.");
 			}
+		}
+		
+		if (!estado1.getNome().equals(estadoDTO.nome())) {
+			verificarSeEstadoJaExiste(estadoDTO.nome());
 		}
 		
 		Estado estado2 = new Estado(estadoDTO.nome(), pais);
