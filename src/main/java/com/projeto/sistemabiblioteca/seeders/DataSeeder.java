@@ -36,24 +36,28 @@ public class DataSeeder implements CommandLineRunner {
                 Telefone telefone = new Telefone(numero);
                 String email = "usuario" + faker.number().digits(3) + "@exemplo.com";
                 Email emailValido = new Email(email);
-                String senhaFixa = "SenhaFixa123";
-                String senhaCodificada = passwordEncoder.encode(senhaFixa); // agora funciona
-
-                Pessoa pessoa = new Pessoa(
-                        faker.name().fullName(),
-                        cpf,
-                        faker.bool().bool() ? Sexo.MASCULINO : Sexo.FEMININO,
-                        faker.bool().bool() ? FuncaoUsuario.CLIENTE : FuncaoUsuario.ADMINISTRADOR,
-                        faker.date().birthday().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
-                        LocalDate.now(),
-                        telefone,
-                        emailValido,
-                        senhaCodificada,
-                        StatusConta.ATIVA,
-                        null
-                );
-
-                pessoaRepository.save(pessoa);
+                
+                if (!pessoaRepository.existsByCpfValor(cpf.getValor()) && !pessoaRepository.existsByEmailEndereco(emailValido.getEndereco())) {
+                
+	                String senhaFixa = "SenhaFixa123";
+	                String senhaCodificada = passwordEncoder.encode(senhaFixa); // agora funciona
+	
+	                Pessoa pessoa = new Pessoa(
+	                        faker.name().fullName(),
+	                        cpf,
+	                        faker.bool().bool() ? Sexo.MASCULINO : Sexo.FEMININO,
+	                        faker.bool().bool() ? FuncaoUsuario.CLIENTE : FuncaoUsuario.ADMINISTRADOR,
+	                        faker.date().birthday().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
+	                        LocalDate.now(),
+	                        telefone,
+	                        emailValido,
+	                        senhaCodificada,
+	                        StatusConta.ATIVA,
+	                        null
+	                );
+	
+	                pessoaRepository.save(pessoa);
+                }
             }
             System.out.println("✅ 10 pessoas falsas criadas!");
         } else {

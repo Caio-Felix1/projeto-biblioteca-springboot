@@ -48,22 +48,25 @@ public class TituloSeeder implements CommandLineRunner {
                         faker.book().title(),
                         faker.lorem().paragraph()
                 );
-
-                // Adiciona de 1 a 3 categorias aleatórias
-                int qtdCategorias = 1 + random.nextInt(Math.min(3, categorias.size()));
-                for (int j = 0; j < qtdCategorias; j++) {
-                    Categoria categoria = categorias.get(random.nextInt(categorias.size()));
-                    titulo.adicionarCategoria(categoria);
+                
+                if (!tituloRepository.existsByNome(titulo.getNome())) {
+               
+	                // Adiciona de 1 a 3 categorias aleatórias
+	                int qtdCategorias = 1 + random.nextInt(Math.min(3, categorias.size()));
+	                for (int j = 0; j < qtdCategorias; j++) {
+	                    Categoria categoria = categorias.get(random.nextInt(categorias.size()));
+	                    titulo.adicionarCategoria(categoria);
+	                }
+	
+	                // Adiciona de 1 a 2 autores aleatórios
+	                int qtdAutores = 1 + random.nextInt(Math.min(2, autores.size()));
+	                for (int j = 0; j < qtdAutores; j++) {
+	                    Autor autor = autores.get(random.nextInt(autores.size()));
+	                    titulo.adicionarAutor(autor);
+	                }
+	
+	                tituloRepository.save(titulo);
                 }
-
-                // Adiciona de 1 a 2 autores aleatórios
-                int qtdAutores = 1 + random.nextInt(Math.min(2, autores.size()));
-                for (int j = 0; j < qtdAutores; j++) {
-                    Autor autor = autores.get(random.nextInt(autores.size()));
-                    titulo.adicionarAutor(autor);
-                }
-
-                tituloRepository.save(titulo);
             }
 
             System.out.println("✅ 10 títulos falsos criados com categorias e autores!");

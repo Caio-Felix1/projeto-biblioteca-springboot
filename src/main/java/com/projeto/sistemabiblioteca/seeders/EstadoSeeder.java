@@ -41,7 +41,9 @@ public class EstadoSeeder implements CommandLineRunner {
                 int quantidadeEstados = 2 + faker.number().numberBetween(0, 4);
                 for (int i = 0; i < quantidadeEstados; i++) {
                     Estado estado = new Estado(faker.address().state(), pais);
-                    estadoRepository.save(estado);
+                    if (!estadoRepository.existsByNome(estado.getNome())) {
+                    	estadoRepository.save(estado);
+                    }
                 }
             }
             System.out.println("✅ Estados criados para cada país!");

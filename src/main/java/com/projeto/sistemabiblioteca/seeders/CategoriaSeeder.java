@@ -28,7 +28,9 @@ public class CategoriaSeeder implements CommandLineRunner {
                 // Você pode usar faker para gerar palavras aleatórias ou nomes de livros
                 String nomeCategoria = faker.book().genre(); // retorna nomes de gêneros literários
                 Categoria categoria = new Categoria(nomeCategoria);
-                categoriaRepository.save(categoria);
+                if (!categoriaRepository.existsByNome(nomeCategoria)) {
+                	categoriaRepository.save(categoria);
+                }
             }
             System.out.println("✅ 10 categorias falsas criadas!");
         } else {

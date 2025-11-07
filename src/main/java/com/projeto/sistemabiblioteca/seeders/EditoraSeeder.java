@@ -28,7 +28,9 @@ public class EditoraSeeder implements CommandLineRunner {
                 // Gerar nomes de editoras fictícias
                 String nomeEditora = faker.book().publisher(); // retorna nomes de editoras
                 Editora editora = new Editora(nomeEditora);
-                editoraRepository.save(editora);
+                if (!editoraRepository.existsByNome(nomeEditora)) {
+                	 editoraRepository.save(editora);	
+                }
             }
             System.out.println("✅ 10 editoras falsas criadas!");
         } else {

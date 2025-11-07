@@ -26,7 +26,9 @@ public class PaisSeeder implements CommandLineRunner {
         if (paisRepository.count() == 0) {
             for (int i = 0; i < 10; i++) {
                 Pais pais = new Pais(faker.country().name());
-                paisRepository.save(pais);
+                if (!paisRepository.existsByNome(pais.getNome())) {
+                	paisRepository.save(pais);
+                }
             }
             System.out.println("✅ 10 países falsos criados!");
         } else {

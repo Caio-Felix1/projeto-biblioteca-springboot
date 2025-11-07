@@ -27,7 +27,9 @@ public class AutorSeeder implements CommandLineRunner {
             for (int i = 0; i < 10; i++) {
                 String nome = faker.book().author(); // gera nomes de autores falsos
                 Autor autor = new Autor(nome);
-                autorRepository.save(autor);
+                if (!autorRepository.existsByNome(nome)) {
+                	autorRepository.save(autor);
+                }
             }
             System.out.println("✅ 10 autores falsos criados!");
         } else {
