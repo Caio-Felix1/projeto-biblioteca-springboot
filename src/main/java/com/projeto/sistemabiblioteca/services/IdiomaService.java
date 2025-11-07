@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Idioma;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.exceptions.IdiomaJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -36,7 +37,14 @@ public class IdiomaService {
 		return idioma.get();
 	}
 	
+	public void verificarSeIdiomaJaExiste(String nomeIdioma) {
+		if (idiomaRepository.existsByNome(nomeIdioma)) {
+			throw new IdiomaJaCadastradoException("Erro: idioma já foi cadastrado.");
+		}
+	}
+	
 	public Idioma inserir(Idioma idioma) {
+		verificarSeIdiomaJaExiste(idioma.getNome());
 		return idiomaRepository.save(idioma);
 	}
 	
@@ -51,6 +59,11 @@ public class IdiomaService {
 	
 	public Idioma atualizar(Long id, Idioma idioma2) {
 		Idioma idioma1 = buscarPorId(id);
+		
+		if (!idioma1.getNome().equals(idioma2.getNome())) {
+			verificarSeIdiomaJaExiste(idioma2.getNome());
+		}
+		
 		atualizarDados(idioma1, idioma2);
 		return idiomaRepository.save(idioma1);
 	}
