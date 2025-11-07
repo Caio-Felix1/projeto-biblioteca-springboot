@@ -89,8 +89,15 @@ public class EmprestimoController {
     }
     
     @GetMapping("/buscar-por-email")
-    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorEmailDoUsuario(@RequestParam String email) {
+    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorEmailDoUsuario(@RequestParam String email, Authentication authentication) {
     	Email emailFormatoValidado = new Email(email);
+    	
+		String usernameAutenticado = authentication.getName();
+		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
+		
+		if (usuarioAutenticado.getFuncao() == FuncaoUsuario.CLIENTE && !usuarioAutenticado.getEmail().getEndereco().equals(emailFormatoValidado.getEndereco())) {
+			throw new IllegalArgumentException("Erro: um cliente não pode visualizar os empréstimos de outro cliente.");
+		}
     	
     	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorEmailDoUsuario(emailFormatoValidado.getEndereco());
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
@@ -102,8 +109,15 @@ public class EmprestimoController {
     }
     
     @GetMapping("/buscar-por-cpf")
-    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorCpfDoUsuario(@RequestParam String cpf) {
+    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorCpfDoUsuario(@RequestParam String cpf, Authentication authentication) {
     	Cpf cpfFormatoValidado = new Cpf(cpf);
+    	
+		String usernameAutenticado = authentication.getName();
+		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
+		
+		if (usuarioAutenticado.getFuncao() == FuncaoUsuario.CLIENTE && !usuarioAutenticado.getCpf().getValor().equals(cpfFormatoValidado.getValor())) {
+			throw new IllegalArgumentException("Erro: um cliente não pode visualizar os empréstimos de outro cliente.");
+		}
     	
     	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorCpfDoUsuario(cpfFormatoValidado.getValor());
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
