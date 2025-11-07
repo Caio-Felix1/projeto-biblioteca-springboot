@@ -41,8 +41,6 @@ import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
 import com.projeto.sistemabiblioteca.validation.Telefone;
 
-import jakarta.websocket.ClientEndpoint;
-
 @ExtendWith(MockitoExtension.class)
 public class PessoaServiceTest {
 	

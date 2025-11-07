@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.exceptions.AutorJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.AutorRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -45,7 +46,14 @@ public class AutorService {
 		return autor.get();
 	}
 	
+	public void verificarSeAutorJaExiste(String nomeAutor) {
+		if (autorRepository.existsByNome(nomeAutor)) {
+			throw new AutorJaCadastradoException("Erro: autor já foi cadastrado.");
+		}
+	}
+	
 	public Autor inserir(Autor autor) {
+		verificarSeAutorJaExiste(autor.getNome());
 		return autorRepository.save(autor);
 	}
 	
@@ -60,6 +68,11 @@ public class AutorService {
 	
 	public Autor atualizar(Long id, Autor autor2) {
 		Autor autor1 = buscarPorId(id);
+		
+		if (!autor1.getNome().equals(autor2.getNome())) {
+			verificarSeAutorJaExiste(autor2.getNome());
+		}
+		
 		atualizarDados(autor1, autor2);
 		return autorRepository.save(autor1);
 	}

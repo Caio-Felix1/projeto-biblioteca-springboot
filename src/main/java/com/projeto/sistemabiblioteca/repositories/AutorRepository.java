@@ -12,4 +12,6 @@ public interface AutorRepository extends JpaRepository<Autor, Long> {
 	List<Autor> findAllByNomeContainingIgnoreCase(String nome);
 	
 	List<Autor> findAllByStatusEquals(StatusAtivo status);
+	
+	boolean existsByNome(String nome);
 }
