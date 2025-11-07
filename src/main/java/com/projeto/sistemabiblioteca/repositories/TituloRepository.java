@@ -12,4 +12,6 @@ public interface TituloRepository extends JpaRepository<Titulo, Long> {
 	List<Titulo> findAllByNomeContainingIgnoreCase(String nome);
 	
 	List<Titulo> findAllByStatusEquals(StatusAtivo status);
+	
+	boolean existsByNome(String nome);
 }

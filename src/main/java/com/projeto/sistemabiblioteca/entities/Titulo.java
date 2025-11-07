@@ -26,6 +26,7 @@ public class Titulo implements Ativavel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long idTitulo;
 	
+	@Column(unique = true)
 	private String nome;
 	
 	@Column(length = 1000)

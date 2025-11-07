@@ -12,6 +12,7 @@ import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.entities.Titulo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.exceptions.TituloJaCadastradoException;
 import com.projeto.sistemabiblioteca.repositories.TituloRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -52,6 +53,12 @@ public class TituloService {
 		return titulo.get();
 	}
 	
+	public void verificarSeTituloJaExiste(String nomeTitulo) {
+		if (tituloRepository.existsByNome(nomeTitulo)) {
+			throw new TituloJaCadastradoException("Erro: título já foi cadastrado.");
+		}
+	}
+	
 	@Transactional
 	public Titulo cadastrarTitulo(TituloCreateDTO tituloCreateDTO) {
 		List<Autor> autores = autorService.buscarTodosPorId(tituloCreateDTO.idsAutores());
@@ -67,6 +74,8 @@ public class TituloService {
 		if (temCategoriaInativa) {
 			throw new IllegalArgumentException("Erro: não é possível associar um título a uma categoria com status inativo.");
 		}
+		
+		verificarSeTituloJaExiste(tituloCreateDTO.nome());
 		
 		Titulo titulo = new Titulo(tituloCreateDTO.nome(), tituloCreateDTO.descricao());
 		
@@ -91,6 +100,10 @@ public class TituloService {
 	
 	public Titulo atualizar(Long id, TituloUpdateDTO tituloUpdateDTO) {
 		Titulo titulo1 = buscarPorId(id);
+		
+		if (!titulo1.getNome().equals(tituloUpdateDTO.nome())) {
+			verificarSeTituloJaExiste(tituloUpdateDTO.nome());
+		}
 		
 		Titulo titulo2 = new Titulo(tituloUpdateDTO.nome(), tituloUpdateDTO.descricao());
 		
