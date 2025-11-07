@@ -87,7 +87,7 @@ public class AutorServiceTest {
 	}
 	
 	@Test
-	void deveLancarExcecaoAoTentarAtualizarAutorComNomeJaExistente() {
+	void deveLancarExcecaoAoTentarAtualizarAutorComUmNomeJaExistente() {
 		Autor autor1 = new Autor("Autor 1");
 		Autor autor2 = new Autor("Autor 2");
 		

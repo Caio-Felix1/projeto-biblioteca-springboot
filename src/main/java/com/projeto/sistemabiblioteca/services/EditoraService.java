@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Editora;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
+import com.projeto.sistemabiblioteca.exceptions.EditoraJaCadastradaException;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -40,7 +41,14 @@ public class EditoraService {
 		return editora.get();
 	}
 	
+	public void verificarSeEditoraJaExiste(String nomeEditora) {
+		if (editoraRepository.existsByNome(nomeEditora)) {
+			throw new EditoraJaCadastradaException("Erro: editora já foi cadastrada.");
+		}
+	}
+	
 	public Editora inserir(Editora editora) {
+		verificarSeEditoraJaExiste(editora.getNome());
 		return editoraRepository.save(editora);
 	}
 	
@@ -55,6 +63,11 @@ public class EditoraService {
 	
 	public Editora atualizar(Long id, Editora editora2) {
 		Editora editora1 = buscarPorId(id);
+		
+		if (!editora1.getNome().equals(editora2.getNome())) {
+			verificarSeEditoraJaExiste(editora2.getNome());
+		}
+		
 		atualizarDados(editora1, editora2);
 		return editoraRepository.save(editora1);
 	}

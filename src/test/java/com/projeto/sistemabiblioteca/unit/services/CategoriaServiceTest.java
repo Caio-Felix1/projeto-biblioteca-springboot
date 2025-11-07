@@ -87,7 +87,7 @@ public class CategoriaServiceTest {
 	}
 	
 	@Test
-	void deveLancarExcecaoAoTentarAtualizarAutorComNomeJaExistente() {
+	void deveLancarExcecaoAoTentarAtualizarAutorComUmNomeJaExistente() {
 		Categoria categoria1 = new Categoria("Categoria 1");
 		Categoria categoria2 = new Categoria("Categoria 2");
 		

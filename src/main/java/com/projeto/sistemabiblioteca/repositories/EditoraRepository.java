@@ -12,4 +12,6 @@ public interface EditoraRepository extends JpaRepository<Editora, Long> {
 	List<Editora> findAllByNomeContainingIgnoreCase(String nome);
 	
 	List<Editora> findAllByStatusEquals(StatusAtivo status);
+	
+	boolean existsByNome(String nome);
 }
