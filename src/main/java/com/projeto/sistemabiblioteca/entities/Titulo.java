@@ -6,6 +6,7 @@ import java.util.Set;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.entities.interfaces.Ativavel;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,6 +27,8 @@ public class Titulo implements Ativavel {
 	private Long idTitulo;
 	
 	private String nome;
+	
+	@Column(length = 1000)
 	private String descricao;
 	
 	@Enumerated(EnumType.STRING)

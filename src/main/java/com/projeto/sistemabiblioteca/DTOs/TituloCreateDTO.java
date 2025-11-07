@@ -12,7 +12,7 @@ public record TituloCreateDTO(
 		String nome,
 		
 		@NotBlank(message = "Descrição do título é obrigatória")
-		@Size(max = 500, message = "A descrição deve ter no máximo 500 caracteres")
+		@Size(max = 1000, message = "A descrição deve ter no máximo 1000 caracteres")
 		String descricao,
 		
 		@NotEmpty(message = "É necessário inserir pelo menos uma categoria")
