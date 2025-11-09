@@ -43,6 +43,11 @@ public class EstadoController {
     public ResponseEntity<List<Estado>> buscarInativos() {
         return ResponseEntity.ok(estadoService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
     }
+    
+    @GetMapping("/buscar-por-pais/{id}")
+    public ResponseEntity<List<Estado>> buscarTodosFiltrandoPorPais(Long id) {
+    	return ResponseEntity.ok(estadoService.buscarTodosFiltrandoPorPais(id));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Estado> buscarPorId(@PathVariable Long id) {

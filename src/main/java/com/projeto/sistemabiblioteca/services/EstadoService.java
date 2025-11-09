@@ -34,6 +34,10 @@ public class EstadoService {
 		return estadoRepository.findAllByStatusEquals(status);
 	}
 	
+	public List<Estado> buscarTodosFiltrandoPorPais(Long id) {
+		return estadoRepository.findAllByPaisIdPaisAndStatus(id, StatusAtivo.ATIVO);
+	}
+	
 	public Estado buscarPorId(Long id) {
 		Optional<Estado> estado = estadoRepository.findById(id);
 		if (estado.isEmpty()) {

@@ -21,7 +21,6 @@ import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
 import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
 import com.projeto.sistemabiblioteca.repositories.AutorRepository;
 import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
-import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
 import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 import com.projeto.sistemabiblioteca.repositories.TituloRepository;

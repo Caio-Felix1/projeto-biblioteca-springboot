@@ -11,5 +11,7 @@ public interface EstadoRepository extends JpaRepository<Estado, Long> {
 	
 	List<Estado> findAllByStatusEquals(StatusAtivo status);
 	
+	List<Estado> findAllByPaisIdPaisAndStatus(Long id, StatusAtivo status);
+	
 	boolean existsByNome(String nome);
 }
