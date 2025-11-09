@@ -348,6 +348,7 @@ public class EmprestimoServiceIntegrationTest {
 		pessoaRepository.save(pessoa);
 		
 		Edicao edicao1 = new Edicao(
+				"Edição 1",
 				TipoCapa.DURA,
 				100,
 				TamanhoEdicao.MEDIO,
@@ -359,6 +360,7 @@ public class EmprestimoServiceIntegrationTest {
 				null);
 		
 		Edicao edicao2 = new Edicao(
+				"Edição 2",
 				TipoCapa.MOLE,
 				200,
 				TamanhoEdicao.MEDIO,

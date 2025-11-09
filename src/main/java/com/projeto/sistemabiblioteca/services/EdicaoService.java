@@ -87,6 +87,7 @@ public class EdicaoService {
 		}
 
 		Edicao edicao = new Edicao(
+				edicaoDTO.descricaoEdicao(),
 				edicaoDTO.tipoCapa(),
 				edicaoDTO.qtdPaginas(),
 				edicaoDTO.tamanho(),
@@ -174,6 +175,7 @@ public class EdicaoService {
 		}
 		
 		Edicao edicao2 = new Edicao(
+				edicaoDTO.descricaoEdicao(),
 				edicaoDTO.tipoCapa(),
 				edicaoDTO.qtdPaginas(),
 				edicaoDTO.tamanho(),
@@ -190,6 +192,7 @@ public class EdicaoService {
 	}
 	
 	private void atualizarDados(Edicao edicao1, Edicao edicao2) {
+		edicao1.setDescricaoEdicao(edicao2.getDescricaoEdicao());
 		edicao1.setTipoCapa(edicao2.getTipoCapa());
 		edicao1.setQtdPaginas(edicao2.getQtdPaginas());
 		edicao1.setTamanho(edicao2.getTamanho());

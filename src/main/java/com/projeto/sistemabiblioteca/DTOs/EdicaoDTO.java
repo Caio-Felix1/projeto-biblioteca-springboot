@@ -10,8 +10,13 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 
 public record EdicaoDTO(
+		@NotNull(message = "Descrição da edição é obrigatória")
+		@Size(max = 60, message = "A descrição da edição deve ter no máximo 60 caracteres")
+		String descricaoEdicao,
+		
 		@NotNull(message = "Tipo de capa é obrigatório")
         TipoCapa tipoCapa,
         

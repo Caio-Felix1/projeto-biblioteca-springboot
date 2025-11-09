@@ -52,6 +52,7 @@ public class EdicaoServiceIntegrationTest {
 	
 	private Edicao criarEdicao(Titulo titulo, Editora editora, Idioma idioma) {
 		return new Edicao(
+				"Edição 1",
 				TipoCapa.DURA,
 				100,
 				TamanhoEdicao.MEDIO,
@@ -181,6 +182,7 @@ public class EdicaoServiceIntegrationTest {
 		idiomaRepository.save(idioma);
 		
 		EdicaoDTO edicaoDTO = new EdicaoDTO(
+				"Edição 1",
 				TipoCapa.DURA,
 				100,
 				TamanhoEdicao.MEDIO,
@@ -192,6 +194,7 @@ public class EdicaoServiceIntegrationTest {
 		
 		Edicao edicaoNova = edicaoService.cadastrarEdicao(edicaoDTO, "imagem teste url");
 		
+		Assertions.assertEquals("Edição 1", edicaoNova.getDescricaoEdicao());
 		Assertions.assertEquals(TipoCapa.DURA, edicaoNova.getTipoCapa());
 		Assertions.assertEquals(100, edicaoNova.getQtdPaginas());
 		Assertions.assertEquals(TamanhoEdicao.MEDIO, edicaoNova.getTamanho());
@@ -228,6 +231,7 @@ public class EdicaoServiceIntegrationTest {
 		edicaoService.inserir(edicao);
 		
 		EdicaoDTO edicaoDTO = new EdicaoDTO(
+				"Edição 2",
 				TipoCapa.MOLE,
 				2000,
 				TamanhoEdicao.GRANDE,
@@ -239,6 +243,7 @@ public class EdicaoServiceIntegrationTest {
 		
 		Edicao edicaoAtualizada = edicaoService.atualizar(edicao.getIdEdicao(), edicaoDTO, "imagem teste url");
 		
+		Assertions.assertEquals("Edição 2", edicaoAtualizada.getDescricaoEdicao());
 		Assertions.assertEquals(TipoCapa.MOLE, edicaoAtualizada.getTipoCapa());
 		Assertions.assertEquals(2000, edicaoAtualizada.getQtdPaginas());
 		Assertions.assertEquals(TamanhoEdicao.GRANDE, edicaoAtualizada.getTamanho());

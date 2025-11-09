@@ -25,6 +25,8 @@ public class Edicao implements Ativavel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long idEdicao;
+	
+	private String descricaoEdicao;
 
 	@Enumerated(EnumType.STRING)
 	private TipoCapa tipoCapa;
@@ -60,8 +62,9 @@ public class Edicao implements Ativavel {
 		
 	}
 
-	public Edicao(TipoCapa tipoCapa, int qtdPaginas, TamanhoEdicao tamanho,  ClassificacaoIndicativa classificacao, 
+	public Edicao(String descricaoEdicao, TipoCapa tipoCapa, int qtdPaginas, TamanhoEdicao tamanho,  ClassificacaoIndicativa classificacao, 
 			LocalDate dtPublicacao, String imagemUrl, Titulo titulo, Editora editora, Idioma idioma) {
+		this.descricaoEdicao = descricaoEdicao;
 		this.tipoCapa = tipoCapa;
 		setQtdPaginas(qtdPaginas);
 		this.tamanho = tamanho;
@@ -76,6 +79,14 @@ public class Edicao implements Ativavel {
 	
 	public Long getIdEdicao() {
 		return idEdicao;
+	}
+
+	public String getDescricaoEdicao() {
+		return descricaoEdicao;
+	}
+
+	public void setDescricaoEdicao(String descricaoEdicao) {
+		this.descricaoEdicao = descricaoEdicao;
 	}
 
 	public TipoCapa getTipoCapa() {

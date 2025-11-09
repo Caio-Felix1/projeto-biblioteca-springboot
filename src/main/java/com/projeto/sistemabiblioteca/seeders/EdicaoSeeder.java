@@ -64,6 +64,7 @@ public class EdicaoSeeder implements CommandLineRunner {
                 Idioma idioma = idiomas.get(random.nextInt(idiomas.size()));
 
                 Edicao edicao = new Edicao(
+                		"Edição temporária", // alterar depois
                         TipoCapa.values()[random.nextInt(TipoCapa.values().length)],
                         50 + random.nextInt(451), // 50 a 500 páginas
                         TamanhoEdicao.values()[random.nextInt(TamanhoEdicao.values().length)],

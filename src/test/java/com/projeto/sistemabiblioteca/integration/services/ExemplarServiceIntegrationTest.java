@@ -35,6 +35,7 @@ public class ExemplarServiceIntegrationTest {
 	@Test
 	void deveBuscarTodosFiltrandoPeloIdDaEdicao() {
 		Edicao edicao1 = new Edicao(
+				"Edição 1",
 				TipoCapa.DURA,
 				100,
 				TamanhoEdicao.MEDIO,
@@ -46,6 +47,7 @@ public class ExemplarServiceIntegrationTest {
 				null);
 		
 		Edicao edicao2 = new Edicao(
+				"Edição 2",
 				TipoCapa.MOLE,
 				2000,
 				TamanhoEdicao.GRANDE,
@@ -75,6 +77,7 @@ public class ExemplarServiceIntegrationTest {
 	@Test
 	void buscarPrimeiroExemplarDisponivelFiltrandoPeloIdDaEdicaoEStatusEOrdenandoPeloEstadoFisico() {
 		Edicao edicao1 = new Edicao(
+				"Edição 1",
 				TipoCapa.DURA,
 				100,
 				TamanhoEdicao.MEDIO,
@@ -86,6 +89,7 @@ public class ExemplarServiceIntegrationTest {
 				null);
 		
 		Edicao edicao2 = new Edicao(
+				"Edição 2",
 				TipoCapa.MOLE,
 				2000,
 				TamanhoEdicao.GRANDE,
@@ -120,6 +124,7 @@ public class ExemplarServiceIntegrationTest {
 	@Test
 	void deveCadastrarExemplares() {
 		Edicao edicao = new Edicao(
+				"Edição 1",
 				TipoCapa.DURA,
 				100,
 				TamanhoEdicao.MEDIO,
@@ -143,6 +148,7 @@ public class ExemplarServiceIntegrationTest {
 		
 		for (Exemplar exemplar : exemplares) {
 			Assertions.assertEquals(EstadoFisico.BOM, exemplar.getEstadoFisico());
+			Assertions.assertEquals("Edição 1", exemplar.getEdicao().getDescricaoEdicao());
 			Assertions.assertEquals(TipoCapa.DURA, exemplar.getEdicao().getTipoCapa());
 			Assertions.assertEquals(100, exemplar.getEdicao().getQtdPaginas());
 			Assertions.assertEquals(TamanhoEdicao.MEDIO, exemplar.getEdicao().getTamanho());
@@ -153,6 +159,7 @@ public class ExemplarServiceIntegrationTest {
 	@Test
 	void deveAtualizarExemplar() {
 		Edicao edicao1 = new Edicao(
+				"Edição 1",
 				TipoCapa.DURA,
 				100,
 				TamanhoEdicao.MEDIO,
@@ -164,6 +171,7 @@ public class ExemplarServiceIntegrationTest {
 				null);
 		
 		Edicao edicao2 = new Edicao(
+				"Edição 2",
 				TipoCapa.MOLE,
 				2000,
 				TamanhoEdicao.GRANDE,
@@ -188,6 +196,7 @@ public class ExemplarServiceIntegrationTest {
 		Exemplar exemplarAtualizado = exemplarService.atualizar(exemplar.getIdExemplar(), exemplarUpdateDTO);
 		
 		Assertions.assertEquals(EstadoFisico.RUIM, exemplarAtualizado.getEstadoFisico());
+		Assertions.assertEquals("Edição 2", exemplarAtualizado.getEdicao().getDescricaoEdicao());
 		Assertions.assertEquals(TipoCapa.MOLE, exemplarAtualizado.getEdicao().getTipoCapa());
 		Assertions.assertEquals(2000, exemplarAtualizado.getEdicao().getQtdPaginas());
 		Assertions.assertEquals(TamanhoEdicao.GRANDE, exemplarAtualizado.getEdicao().getTamanho());

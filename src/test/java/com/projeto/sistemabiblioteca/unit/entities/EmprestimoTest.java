@@ -317,7 +317,7 @@ public class EmprestimoTest {
 	
 	@Test
 	void deveRetirarExemplarComUmParametro() {
-		Edicao edicao = new Edicao(null, 100, null, null, null, null, null, null, null);
+		Edicao edicao = new Edicao(null, null, 100, null, null, null, null, null, null, null);
 		Emprestimo emprestimo = criarEmprestimoComStatusSeparado();
 		emprestimo.getExemplar().setEdicao(edicao);
 		
@@ -698,7 +698,7 @@ public class EmprestimoTest {
 			3001
 	})
 	void deveCalcularDataDeDevolucaoPrevista(int qtdPaginas) {
-		Edicao edicao = new Edicao(null, qtdPaginas, null, null, null, null, null, null, null);
+		Edicao edicao = new Edicao(null, null, qtdPaginas, null, null, null, null, null, null, null);
 		Emprestimo emprestimo = criarEmprestimoComStatusSeparado();
 		emprestimo.getExemplar().setEdicao(edicao);
 		LocalDate dtSeparacaoExemplar = emprestimo.getDtSeparacaoExemplar();
