@@ -8,12 +8,13 @@ import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 
 public record EdicaoDTO(
-		@NotNull(message = "Descrição da edição é obrigatória")
+		@NotBlank(message = "Descrição da edição é obrigatória")
 		@Size(max = 60, message = "A descrição da edição deve ter no máximo 60 caracteres")
 		String descricaoEdicao,
 		
