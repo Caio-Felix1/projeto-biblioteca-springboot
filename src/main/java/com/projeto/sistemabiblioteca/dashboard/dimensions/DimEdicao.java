@@ -20,7 +20,7 @@ import jakarta.persistence.Table;
 	@AttributeOverride(name = "surrogateKey", column = @Column(name = "sk_edicao")),
 	@AttributeOverride(name = "idNatural", column = @Column(name = "id_natural_edicao"))
 })
-public class DimEdicao {
+public class DimEdicao extends Dimensao {
 	
 	private String descricaoEdicao;
 	private TipoCapa tipoCapa;
@@ -35,6 +35,7 @@ public class DimEdicao {
 	}
 	
 	public DimEdicao(Edicao edicao) {
+		super(edicao.getIdEdicao());
 		descricaoEdicao = edicao.getDescricaoEdicao();
 		tipoCapa = edicao.getTipoCapa();
 		qtdPaginas = edicao.getQtdPaginas();

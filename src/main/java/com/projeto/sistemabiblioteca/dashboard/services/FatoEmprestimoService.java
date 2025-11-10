@@ -2,6 +2,8 @@ package com.projeto.sistemabiblioteca.dashboard.services;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.dashboard.facts.FatoEmprestimo;
 import com.projeto.sistemabiblioteca.dashboard.repositories.FatoEmprestimoRepository;
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
@@ -9,6 +11,7 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class FatoEmprestimoService {
 	
 	private FatoEmprestimoRepository fatoEmprestimoRepository;
@@ -18,18 +21,18 @@ public class FatoEmprestimoService {
 	}
 	
 	@Transactional
-	public void atualizar(Emprestimo emprestimoReal, Long skCliente, Long skExemplar, Long skEdicao,
+	public FatoEmprestimo atualizar(Emprestimo emprestimoReal, Long skCliente, Long skExemplar, Long skEdicao,
 			Long skIdioma, Long skEditora, Long skTitulo) {
-		Optional<FatoEmprestimo> fatoEmprestimoExistente = fatoEmprestimoRepository.findByIdNatural(emprestimoReal.getIdEmprestimo());
+		Optional<FatoEmprestimo> fatoEmprestimoExistente = fatoEmprestimoRepository.findByIdNaturalEmprestimo(emprestimoReal.getIdEmprestimo());
 		
 		if (fatoEmprestimoExistente.isPresent()) {
 			FatoEmprestimo fatoEmprestimo = fatoEmprestimoExistente.get();
 			atualizarDados(fatoEmprestimo, emprestimoReal, skCliente, skExemplar, skEdicao, skIdioma, skEditora, skTitulo);
-			fatoEmprestimoRepository.save(fatoEmprestimo);
+			return fatoEmprestimoRepository.save(fatoEmprestimo);
 		}
 		else {
 			FatoEmprestimo dimNovo = new FatoEmprestimo(emprestimoReal, skCliente, skExemplar, skEdicao, skIdioma, skEditora, skTitulo);
-			fatoEmprestimoRepository.save(dimNovo);
+			return fatoEmprestimoRepository.save(dimNovo);
 		}
 	}
 	

@@ -2,12 +2,15 @@ package com.projeto.sistemabiblioteca.dashboard.services;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.dashboard.dimensions.DimIdioma;
 import com.projeto.sistemabiblioteca.dashboard.repositories.DimIdiomaRepository;
 import com.projeto.sistemabiblioteca.entities.Idioma;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class DimIdiomaService {
 	
 	private DimIdiomaRepository dimIdiomaRepository;
@@ -17,17 +20,17 @@ public class DimIdiomaService {
 	}
 	
 	@Transactional
-	public void atualizar(Idioma idiomaReal) {
+	public DimIdioma atualizar(Idioma idiomaReal) {
 		Optional<DimIdioma> dimIdiomaExistente = dimIdiomaRepository.findByIdNatural(idiomaReal.getIdIdioma());
 		
 		if (dimIdiomaExistente.isPresent()) {
 			DimIdioma dimIdioma = dimIdiomaExistente.get();
 			atualizarDados(dimIdioma, idiomaReal);
-			dimIdiomaRepository.save(dimIdioma);
+			return dimIdiomaRepository.save(dimIdioma);
 		}
 		else {
 			DimIdioma dimNovo = new DimIdioma(idiomaReal);
-			dimIdiomaRepository.save(dimNovo);
+			return dimIdiomaRepository.save(dimNovo);
 		}
 	}
 	

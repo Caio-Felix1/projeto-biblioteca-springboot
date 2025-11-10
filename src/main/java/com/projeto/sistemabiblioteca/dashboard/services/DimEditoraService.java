@@ -2,12 +2,15 @@ package com.projeto.sistemabiblioteca.dashboard.services;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.dashboard.dimensions.DimEditora;
 import com.projeto.sistemabiblioteca.dashboard.repositories.DimEditoraRepository;
 import com.projeto.sistemabiblioteca.entities.Editora;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class DimEditoraService {
 	
 	private DimEditoraRepository dimEditoraRepository;
@@ -17,17 +20,17 @@ public class DimEditoraService {
 	}
 	
 	@Transactional
-	public void atualizar(Editora editoraReal) {
+	public DimEditora atualizar(Editora editoraReal) {
 		Optional<DimEditora> dimEditoraExistente = dimEditoraRepository.findByIdNatural(editoraReal.getIdEditora());
 		
 		if (dimEditoraExistente.isPresent()) {
 			DimEditora dimEditora = dimEditoraExistente.get();
 			atualizarDados(dimEditora, editoraReal);
-			dimEditoraRepository.save(dimEditora);
+			return dimEditoraRepository.save(dimEditora);
 		}
 		else {
 			DimEditora dimNovo = new DimEditora(editoraReal);
-			dimEditoraRepository.save(dimNovo);
+			return dimEditoraRepository.save(dimNovo);
 		}
 	}
 	

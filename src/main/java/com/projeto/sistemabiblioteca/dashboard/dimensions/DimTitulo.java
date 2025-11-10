@@ -42,12 +42,13 @@ public class DimTitulo extends Dimensao {
 		super();
 	}
 	
-	public DimTitulo(Titulo titulo) {
+	public DimTitulo(Titulo titulo, Set<DimCategoria> categorias, Set<DimAutor> autores) {
+		super(titulo.getIdTitulo());
 		nome = titulo.getNome();
 		status = titulo.getStatusAtivo();
 		
-		titulo.getAutores().forEach(autor -> this.adicionarAutor(new DimAutor(autor)));
-		titulo.getCategorias().forEach(categoria -> this.adicionarCategoria(new DimCategoria(categoria)));
+		categorias.forEach(c -> this.adicionarCategoria(c));
+		autores.forEach(a -> this.adicionarAutor(a));
 	}
 
 	public String getNome() {
@@ -74,19 +75,19 @@ public class DimTitulo extends Dimensao {
 		this.status = status;
 	}
 	
-	public void removerCategoria(DimCategoria dimCategoria) {
-		categorias.remove(dimCategoria);
-	}
-	
 	public void adicionarCategoria(DimCategoria dimCategoria) {
 		categorias.add(dimCategoria);
 	}
 	
-	public void removerAutor(DimAutor dimAutor) {
-		autores.remove(dimAutor);
+	public void removerTodasCategorias() {
+		categorias.clear();
 	}
 	
 	public void adicionarAutor(DimAutor dimAutor) {
 		autores.add(dimAutor);
+	}
+	
+	public void removerTodosAutores() {
+		autores.clear();
 	}
 }

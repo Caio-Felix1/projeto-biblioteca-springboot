@@ -25,6 +25,7 @@ public class DimEditora extends Dimensao {
 	}
 	
 	public DimEditora(Editora editora) {
+		super(editora.getIdEditora());
 		nome = editora.getNome();
 		status = editora.getStatusAtivo();
 	}

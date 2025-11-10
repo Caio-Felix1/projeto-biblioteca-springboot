@@ -8,5 +8,5 @@ import com.projeto.sistemabiblioteca.dashboard.facts.FatoEmprestimo;
 
 public interface FatoEmprestimoRepository extends JpaRepository<FatoEmprestimo, Long> {
 	
-	Optional<FatoEmprestimo> findByIdNatural(Long id);
+	Optional<FatoEmprestimo> findByIdNaturalEmprestimo(Long id);
 }

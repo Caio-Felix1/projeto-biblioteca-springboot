@@ -2,12 +2,15 @@ package com.projeto.sistemabiblioteca.dashboard.services;
 
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.projeto.sistemabiblioteca.dashboard.dimensions.DimCliente;
 import com.projeto.sistemabiblioteca.dashboard.repositories.DimClienteRepository;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class DimClienteService {
 	
 	private DimClienteRepository dimClienteRepository;
@@ -17,17 +20,17 @@ public class DimClienteService {
 	}
 	
 	@Transactional
-	public void atualizar(Pessoa clienteReal) {
+	public DimCliente atualizar(Pessoa clienteReal) {
 		Optional<DimCliente> dimClienteExistente = dimClienteRepository.findByIdNatural(clienteReal.getIdPessoa());
 		
 		if (dimClienteExistente.isPresent()) {
 			DimCliente dimCliente = dimClienteExistente.get();
 			atualizarDados(dimCliente, clienteReal);
-			dimClienteRepository.save(dimCliente);
+			return dimClienteRepository.save(dimCliente);
 		}
 		else {
 			DimCliente dimNovo = new DimCliente(clienteReal);
-			dimClienteRepository.save(dimNovo);
+			return dimClienteRepository.save(dimNovo);
 		}
 	}
 	

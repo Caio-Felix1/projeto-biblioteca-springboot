@@ -26,6 +26,7 @@ public class DimExemplar extends Dimensao {
 	}
 	
 	public DimExemplar(Exemplar exemplar) {
+		super(exemplar.getIdExemplar());
 		estadoFisico = exemplar.getEstadoFisico();
 		status = exemplar.getStatus();
 	}

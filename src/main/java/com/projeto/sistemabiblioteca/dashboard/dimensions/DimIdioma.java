@@ -25,6 +25,7 @@ public class DimIdioma extends Dimensao {
 	}
 	
 	public DimIdioma(Idioma idioma) {
+		super(idioma.getIdIdioma());
 		nome = idioma.getNome();
 		status = idioma.getStatusAtivo();
 	}

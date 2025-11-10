@@ -25,6 +25,7 @@ public class DimCategoria extends Dimensao {
 	}
 	
 	public DimCategoria(Categoria categoria) {
+		super(categoria.getIdCategoria());
 		nome = categoria.getNome();
 		status = categoria.getStatusAtivo();
 	}

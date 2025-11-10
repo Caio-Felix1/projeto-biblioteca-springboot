@@ -25,6 +25,7 @@ public class DimAutor extends Dimensao {
 	}
 	
 	public DimAutor(Autor autor) {
+		super(autor.getIdAutor());
 		nome = autor.getNome();
 		status = autor.getStatusAtivo();
 	}
