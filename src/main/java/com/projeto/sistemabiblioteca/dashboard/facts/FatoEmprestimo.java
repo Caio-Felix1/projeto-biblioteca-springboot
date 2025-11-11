@@ -7,6 +7,8 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,10 +31,14 @@ public class FatoEmprestimo {
 	private LocalDate dtDevolucaoPrevista;
 	private LocalDate dtDevolvidoExemplar;
 	
+	@Enumerated(EnumType.STRING)
 	private StatusEmprestimo status;
+	
 	private int diasAtraso;
 	
 	private double valorMulta;
+	
+	@Enumerated(EnumType.STRING)
 	private StatusPagamento statusPagamento;
 	
 	private Long skCliente;

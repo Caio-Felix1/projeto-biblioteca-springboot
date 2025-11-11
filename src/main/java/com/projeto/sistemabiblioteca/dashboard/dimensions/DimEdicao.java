@@ -12,6 +12,8 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,11 +25,21 @@ import jakarta.persistence.Table;
 public class DimEdicao extends Dimensao {
 	
 	private String descricaoEdicao;
+	
+	@Enumerated(EnumType.STRING)
 	private TipoCapa tipoCapa;
+	
 	private int qtdPaginas;
+	
+	@Enumerated(EnumType.STRING)
 	private TamanhoEdicao tamanho;
+	
+	@Enumerated(EnumType.STRING)
 	private ClassificacaoIndicativa classificacao;
+	
 	private LocalDate dtPublicacao;
+	
+	@Enumerated(EnumType.STRING)
 	private StatusAtivo status;
 	
 	protected DimEdicao() {

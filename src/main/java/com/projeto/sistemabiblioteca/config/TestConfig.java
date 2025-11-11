@@ -9,17 +9,38 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.projeto.sistemabiblioteca.entities.Autor;
+import com.projeto.sistemabiblioteca.entities.Categoria;
+import com.projeto.sistemabiblioteca.entities.Edicao;
+import com.projeto.sistemabiblioteca.entities.Editora;
+import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Endereco;
 import com.projeto.sistemabiblioteca.entities.Estado;
+import com.projeto.sistemabiblioteca.entities.Exemplar;
+import com.projeto.sistemabiblioteca.entities.Idioma;
+import com.projeto.sistemabiblioteca.entities.Multa;
 import com.projeto.sistemabiblioteca.entities.Pais;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
+import com.projeto.sistemabiblioteca.entities.Titulo;
+import com.projeto.sistemabiblioteca.entities.enums.ClassificacaoIndicativa;
+import com.projeto.sistemabiblioteca.entities.enums.EstadoFisico;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.Sexo;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
+import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
+import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
+import com.projeto.sistemabiblioteca.repositories.EmprestimoRepository;
+import com.projeto.sistemabiblioteca.repositories.MultaRepository;
+import com.projeto.sistemabiblioteca.services.AutorService;
+import com.projeto.sistemabiblioteca.services.CategoriaService;
+import com.projeto.sistemabiblioteca.services.EdicaoService;
+import com.projeto.sistemabiblioteca.services.EditoraService;
 import com.projeto.sistemabiblioteca.services.EnderecoService;
 import com.projeto.sistemabiblioteca.services.EstadoService;
+import com.projeto.sistemabiblioteca.services.ExemplarService;
+import com.projeto.sistemabiblioteca.services.IdiomaService;
 import com.projeto.sistemabiblioteca.services.PaisService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
+import com.projeto.sistemabiblioteca.services.TituloService;
 import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
 import com.projeto.sistemabiblioteca.validation.Telefone;
@@ -41,11 +62,38 @@ public class TestConfig implements CommandLineRunner {
 	private EnderecoService enderecoService;
 	
 	@Autowired
+	private AutorService autorService;
+	
+	@Autowired
+	private CategoriaService categoriaService;
+	
+	@Autowired
+	private TituloService tituloService;
+	
+	@Autowired
+	private EditoraService editoraService;
+	
+	@Autowired
+	private IdiomaService idiomaService;
+	
+	@Autowired
+	private EdicaoService edicaoService;
+	
+	@Autowired
+	private ExemplarService exemplarService;
+	
+	@Autowired
+	private MultaRepository multaRepository;
+	
+	@Autowired
+	private EmprestimoRepository emprestimoRepository;
+	
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
 	@Override
 	public void run(String... args) throws Exception {
-		/*
+		
 		Pais pais1 = new Pais("Brasil");
 		Pais pais2 = new Pais("Estados Unidos");
 		
@@ -80,6 +128,55 @@ public class TestConfig implements CommandLineRunner {
 		pessoaService.inserir(p4);
 		pessoaService.inserir(p5);
 		pessoaService.inserir(p6);
-		*/
+		
+		Autor autor = new Autor("Autor 1");
+		
+		autorService.inserir(autor);
+		
+		Categoria categoria = new Categoria("Categoria 1");
+		
+		categoriaService.inserir(categoria);
+		
+		Titulo titulo = new Titulo("Título 1", "Sinopse 1");
+		titulo.adicionarAutor(autor);
+		titulo.adicionarCategoria(categoria);
+		
+		tituloService.inserir(titulo);
+		
+		Editora editora = new Editora("Editora 1");
+		
+		editoraService.inserir(editora);
+		
+		Idioma idioma = new Idioma("Idioma 1");
+		
+		idiomaService.inserir(idioma);
+		
+		Edicao edicao = new Edicao(
+				"Edição de Colecionador",
+				TipoCapa.DURA,
+				350,
+				TamanhoEdicao.MEDIO,
+				ClassificacaoIndicativa.C14,
+				LocalDate.of(2020, 2, 2),
+				null,
+				titulo,
+				editora,
+				idioma);
+		
+		edicaoService.inserir(edicao);
+		
+		Exemplar exemplar = new Exemplar(EstadoFisico.EXCELENTE, edicao);
+		
+		exemplarService.inserir(exemplar);
+		
+		Multa multa = Multa.criarMultaVazia();
+		
+		multaRepository.save(multa);
+		
+		Emprestimo emprestimo = new Emprestimo(LocalDate.parse("2025-10-10"), p4, exemplar, multa);
+		emprestimo.separarExemplar(LocalDate.parse("2025-10-10"));
+		emprestimo.retirarExemplar(LocalDate.parse("2025-10-10"), LocalDate.parse("2025-10-15"));
+		
+		emprestimoRepository.save(emprestimo);
 	}
 }

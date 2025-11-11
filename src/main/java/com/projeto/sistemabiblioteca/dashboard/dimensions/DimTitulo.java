@@ -10,6 +10,8 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -24,6 +26,8 @@ import jakarta.persistence.Table;
 public class DimTitulo extends Dimensao {
 	
 	private String nome;
+	
+	@Enumerated(EnumType.STRING)
 	private StatusAtivo status;
 	
 	@ManyToMany

@@ -8,6 +8,8 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,7 +20,10 @@ import jakarta.persistence.Table;
 })
 public class DimExemplar extends Dimensao {
 	
+	@Enumerated(EnumType.STRING)
 	private EstadoFisico estadoFisico;
+	
+	@Enumerated(EnumType.STRING)
 	private StatusExemplar status;
 	
 	protected DimExemplar() {
