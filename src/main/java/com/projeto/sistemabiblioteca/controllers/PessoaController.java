@@ -173,7 +173,7 @@ public class PessoaController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> inativarUsuario(@PathVariable Long id, @Valid @RequestBody MotivoInativacaoDoUsuarioDTO motivoInativacaoDoUsuarioDTO,Authentication authentication) {
+	public ResponseEntity<Void> inativarUsuario(@PathVariable Long id, @Valid @RequestBody MotivoInativacaoDoUsuarioDTO motivoInativacaoDoUsuarioDTO, Authentication authentication) {
 		if (authentication == null) {
 			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
 		}

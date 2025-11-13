@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Faker;
@@ -11,6 +12,7 @@ import com.projeto.sistemabiblioteca.entities.Categoria;
 import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
 
 @Component
+@Order(2)
 @Profile("dev")
 public class CategoriaSeeder implements CommandLineRunner {
 

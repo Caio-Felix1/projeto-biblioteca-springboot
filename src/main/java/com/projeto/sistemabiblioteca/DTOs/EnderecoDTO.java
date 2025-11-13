@@ -13,7 +13,7 @@ public record EnderecoDTO(
 		
 		@NotBlank(message = "Número do endereço é obrigatório")
 		@Size(max = 10, message = "O número do endereço deve ter no máximo 10 caracteres")
-		@Pattern(regexp = "^[0-9]+[A-Za-z]?(\\-[A-Za-z0-9]+)?$", message = "O número do endereço deve estar num formato válido")
+		@Pattern(regexp = "^(?:[0-9]+[A-Za-z]?(?:\\-[A-Za-z0-9]+)?|[Ss]\\/?[Nn])$", message = "O número do endereço deve estar num formato válido")
 		String numero,
 		
 		@Size(max = 50, message = "Complemento deve ter no máximo 50 caracteres")

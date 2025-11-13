@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Faker;
@@ -15,6 +16,7 @@ import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 import com.projeto.sistemabiblioteca.repositories.ExemplarRepository;
 
 @Component
+@Order(7)
 @Profile("dev")
 public class ExemplarSeeder implements CommandLineRunner {
 
@@ -38,7 +40,7 @@ public class ExemplarSeeder implements CommandLineRunner {
                 return;
             }
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 40; i++) {
                 Edicao edicao = edicoes.get(random.nextInt(edicoes.size()));
                 EstadoFisico estadoFisico = EstadoFisico.values()[random.nextInt(EstadoFisico.values().length)];
 
@@ -46,7 +48,7 @@ public class ExemplarSeeder implements CommandLineRunner {
                 exemplarRepository.save(exemplar);
             }
 
-            System.out.println("✅ 20 exemplares criados!");
+            System.out.println("✅ 40 exemplares criados!");
         } else {
             System.out.println("⚠️ Exemplares já existem, seed ignorado.");
         }

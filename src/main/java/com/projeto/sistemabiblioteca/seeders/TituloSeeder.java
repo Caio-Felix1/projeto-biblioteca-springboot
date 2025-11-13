@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Faker;
@@ -17,6 +18,7 @@ import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
 import com.projeto.sistemabiblioteca.repositories.TituloRepository;
 
 @Component
+@Order(3)
 @Profile("dev")
 public class TituloSeeder implements CommandLineRunner {
 

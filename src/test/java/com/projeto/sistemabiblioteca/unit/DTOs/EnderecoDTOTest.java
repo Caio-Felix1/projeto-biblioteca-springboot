@@ -133,7 +133,9 @@ public class EnderecoDTOTest {
 			"45A",
 			"789-1",
 			"56B-22",
-			"1000C"
+			"1000C",
+			"S/N",
+			"s/n"
 	})
 	void deveFuncionarAoInserirNumeroValido(String numeroValido) {
 		EnderecoDTO enderecoDTO = new EnderecoDTO(

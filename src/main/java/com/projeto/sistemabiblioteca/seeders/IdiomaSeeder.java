@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.seeders;
 import java.util.List;
 
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 import jakarta.annotation.PostConstruct;
 
 @Component
+@Order(5)
 @Profile("dev")
 public class IdiomaSeeder {
 

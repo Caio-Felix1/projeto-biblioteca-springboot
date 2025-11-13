@@ -5,12 +5,14 @@ import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.Multa;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
+import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 import com.projeto.sistemabiblioteca.repositories.EmprestimoRepository;
 import com.projeto.sistemabiblioteca.repositories.ExemplarRepository;
@@ -18,6 +20,7 @@ import com.projeto.sistemabiblioteca.repositories.MultaRepository;
 import com.projeto.sistemabiblioteca.repositories.PessoaRepository;
 
 @Component
+@Order(12)
 @Profile("dev")
 public class EmprestimoSeeder implements CommandLineRunner {
 
@@ -38,7 +41,7 @@ public class EmprestimoSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception { // Spring Boot chama isso
-        List<Pessoa> pessoas = pessoaRepository.findAll();
+        List<Pessoa> pessoas = pessoaRepository.findAllByFuncaoEquals(FuncaoUsuario.CLIENTE);
         List<Exemplar> exemplares = exemplarRepository.findAll();
 
         LocalDate hoje = LocalDate.now();

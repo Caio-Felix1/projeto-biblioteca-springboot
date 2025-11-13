@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import com.github.javafaker.Faker;
@@ -14,6 +15,7 @@ import com.projeto.sistemabiblioteca.repositories.EnderecoRepository;
 import com.projeto.sistemabiblioteca.repositories.EstadoRepository;
 
 @Component
+@Order(10)
 @Profile("dev")
 public class EnderecoSeeder implements CommandLineRunner {
 
@@ -45,7 +47,7 @@ public class EnderecoSeeder implements CommandLineRunner {
                             faker.address().buildingNumber(),
                             faker.bool().bool() ? faker.address().secondaryAddress() : "",
                             faker.address().cityName(),
-                            faker.address().zipCode(),
+                            faker.address().zipCode().replaceAll("-", ""),
                             faker.address().cityName(),
                             estado
                     );
