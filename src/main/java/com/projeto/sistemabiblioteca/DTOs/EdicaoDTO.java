@@ -11,11 +11,13 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record EdicaoDTO(
 		@NotBlank(message = "Descrição da edição é obrigatória")
 		@Size(max = 60, message = "A descrição da edição deve ter no máximo 60 caracteres")
+		@Pattern(regexp = "^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ0-9])[A-Za-zÀ-ÖØ-öø-ÿ0-9.,'\"\\-\\s\u00AA\u00BA]+$", message = "A descrição da edição deve estar num formato válido")
 		String descricaoEdicao,
 		
 		@NotNull(message = "Tipo de capa é obrigatório")

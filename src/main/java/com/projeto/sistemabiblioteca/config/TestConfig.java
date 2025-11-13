@@ -93,7 +93,7 @@ public class TestConfig implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		
+		/*
 		Pais pais1 = new Pais("Brasil");
 		Pais pais2 = new Pais("Estados Unidos");
 		
@@ -178,5 +178,6 @@ public class TestConfig implements CommandLineRunner {
 		emprestimo.retirarExemplar(LocalDate.parse("2025-10-10"), LocalDate.parse("2025-10-15"));
 		
 		emprestimoRepository.save(emprestimo);
+		*/
 	}
 }

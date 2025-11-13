@@ -12,9 +12,15 @@ public class EmailTest {
 	@ParameterizedTest
 	@ValueSource(strings = {
 			"usuario1@empresa.com",
-			"a@b.com", "teste123@dominio.com.br", 
+			"a@b.com", 
+			"teste123@dominio.com.br", 
 			"mail9@site.com", 
-			"abc123@exemplo.com.br"
+			"abc123@exemplo.com.br",
+			"user@sub.site.com",
+			"teste123@empresa.com.br",
+			"john.doe@meusite.com",
+			"ANA_SILVA@biblioteca.com.br",
+			"dev+tag@provedor.com"
 	})
 	void deveInstanciarEmailComEnderecoValido(String emailStringTeste) {
 		Email email = Assertions.assertDoesNotThrow(
@@ -27,11 +33,16 @@ public class EmailTest {
 	
 	@ParameterizedTest
 	@ValueSource(strings = {
-			"User@site.com", 
-			"user.name@site.com", 
-			"user@site.org", 
-			"user@site123.com", 
-			"user@sub.site.com"
+			"usuario@gmail.org", 
+			"teste@empresa.net", 
+			"john@dominio.com.us", 
+			"ana@biblioteca.br", 
+			"dev@provedor.cjfsakjfiqjasfjka", 
+			"user@site.edu", 
+			"contato@governo.gov.br", 
+			"teste@empresa.io", 
+			"pessoa@dominio.co.uk", 
+			"aluno@universidade.edu.br"
 	})
 	void deveLancarExcecaoAoInstanciarEmailComEnderecoInvalido(String emailStringTeste) {
 		Assertions.assertThrows(EmailInvalidoException.class, 

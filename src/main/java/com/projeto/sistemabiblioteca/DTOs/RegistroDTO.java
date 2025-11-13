@@ -12,8 +12,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegistroDTO(
-		@NotBlank(message = "Nome é obrigatório")
-		@Size(max = 100, message = "O nome deve ter no máximo 100 caracteres")
+		@NotBlank(message = "Nome do usuário é obrigatório")
+		@Size(max = 100, message = "O nome do usuário deve ter no máximo 100 caracteres")
+		@Pattern(regexp = "^(?=.*[A-Za-zÀ-ÖØ-öø-ÿ])[A-Za-zÀ-ÖØ-öø-ÿ.'\\-\\s]+$", message = "O nome do usuário deve estar num formato válido")
 		String nome,
 		
 		@NotBlank(message = "CPF é obrigatório")
@@ -33,7 +34,7 @@ public record RegistroDTO(
 		
 		@NotBlank(message = "Email é obrigatório")
 		@Size(max = 100, message = "O email deve ter no máximo 100 caracteres")
-		@Pattern(regexp = "^[a-z0-9]+@[a-z]+\\.com(\\.br)?$", message = "Email deve estar num formato válido")
+		@Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.com(\\.br)?$", message = "Email deve estar num formato válido")
 		String email,
 		
 		@NotBlank(message = "Senha é obrigatória")

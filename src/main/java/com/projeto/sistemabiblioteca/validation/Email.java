@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 public final class Email {
 
 	private static final Pattern EMAIL_REGEX =
-			Pattern.compile("^[a-z0-9]+@[a-z]+\\.com(\\.br)?$");
+			Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.com(\\.br)?$");
 
 	@Column(name = "email", nullable = false, unique = true)
 	private String endereco;
