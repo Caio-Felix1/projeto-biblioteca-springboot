@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.sistemabiblioteca.DTOs.MotivoSolicitacaoExclusaoDTO;
 import com.projeto.sistemabiblioteca.DTOs.PessoaDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
@@ -104,7 +105,7 @@ public class PessoaController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<Pessoa> atualizarUsuario(@PathVariable Long id, @RequestBody PessoaDTO pessoaDTO, Authentication authentication) {
+	public ResponseEntity<Pessoa> atualizarUsuario(@PathVariable Long id, @Valid @RequestBody PessoaDTO pessoaDTO, Authentication authentication) {
 		if (authentication == null) {
 			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
 		}
@@ -134,8 +135,8 @@ public class PessoaController {
 	}
 	
 	@PutMapping("/solicitar-exclusao-conta/{id}")
-	public ResponseEntity<Void> solicitarExclusaoDeUsuario(@PathVariable Long id) {
-		pessoaService.solicitarExclusaoConta(id);
+	public ResponseEntity<Void> solicitarExclusaoDeUsuario(@PathVariable Long id, @Valid @RequestBody MotivoSolicitacaoExclusaoDTO motivoSolicitacaoExclusaoDTO) {
+		pessoaService.solicitarExclusaoConta(id, motivoSolicitacaoExclusaoDTO.motivo());
 		return ResponseEntity.noContent().build();
 	}
 	

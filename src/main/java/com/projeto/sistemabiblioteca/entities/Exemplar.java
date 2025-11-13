@@ -27,6 +27,8 @@ public class Exemplar {
 	@Enumerated(EnumType.STRING)
 	private EstadoFisico estadoFisico;
 	
+	private String motivoSolicitacaoExclusao;
+	
 	@ManyToOne
 	@JoinColumn(name = "id_edicao")
 	private Edicao edicao;
@@ -57,6 +59,14 @@ public class Exemplar {
 		this.estadoFisico = estadoFisico;
 	}
 	
+	public String getMotivoSolicitacaoExclusao() {
+		return motivoSolicitacaoExclusao;
+	}
+
+	public void setMotivoSolicitacaoExclusao(String motivoSolicitacaoExclusao) {
+		this.motivoSolicitacaoExclusao = motivoSolicitacaoExclusao;
+	}
+
 	public Edicao getEdicao() {
 		return edicao;
 	}

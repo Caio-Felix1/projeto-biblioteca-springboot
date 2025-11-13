@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.ExemplarCreateDTO;
 import com.projeto.sistemabiblioteca.DTOs.ExemplarUpdateDTO;
+import com.projeto.sistemabiblioteca.DTOs.MotivoSolicitacaoExclusaoDTO;
 import com.projeto.sistemabiblioteca.entities.Exemplar;
 import com.projeto.sistemabiblioteca.entities.enums.StatusExemplar;
 import com.projeto.sistemabiblioteca.services.ExemplarService;
@@ -97,8 +98,8 @@ public class ExemplarController {
     }
     
     @PutMapping("/solicitar-exclusao-exemplar/{id}")
-    public ResponseEntity<Void> solicitarExclusaoDoExemplar(@PathVariable Long id) {
-    	exemplarService.solicitarExclusaoDoExemplar(id);
+    public ResponseEntity<Void> solicitarExclusaoDoExemplar(@PathVariable Long id, @Valid @RequestBody MotivoSolicitacaoExclusaoDTO motivoSoliticaoExclusaoDTO) {
+    	exemplarService.solicitarExclusaoDoExemplar(id, motivoSoliticaoExclusaoDTO.motivo());
     	return ResponseEntity.noContent().build();
     }
     

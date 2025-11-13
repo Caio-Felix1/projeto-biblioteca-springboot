@@ -115,10 +115,11 @@ public class ExemplarService {
 		exemplar1.setEdicao(exemplar2.getEdicao());
 	}
 	
-	public void solicitarExclusaoDoExemplar(Long id) {
+	public void solicitarExclusaoDoExemplar(Long id, String motivo) {
 		Exemplar exemplar = buscarPorId(id);
 		
 		exemplar.solicitarExclusao();
+		exemplar.setMotivoSolicitacaoExclusao(motivo);
 		exemplarRepository.save(exemplar);
 	}
 	
@@ -126,6 +127,7 @@ public class ExemplarService {
 		Exemplar exemplar = buscarPorId(id);
 		
 		exemplar.rejeitarExclusao();
+		exemplar.setMotivoSolicitacaoExclusao(null);
 		exemplarRepository.save(exemplar);
 	}
 }

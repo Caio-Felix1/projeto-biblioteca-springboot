@@ -61,6 +61,8 @@ public class Pessoa implements UserDetails {
 	@Enumerated(EnumType.STRING)
 	private StatusConta statusConta;
 	
+	private String motivoSolicitacaoExclusao;
+	
 	@ManyToOne
 	@JoinColumn(name = "id_endereco")
 	private Endereco endereco;
@@ -169,6 +171,14 @@ public class Pessoa implements UserDetails {
 
 	public Endereco getEndereco() {
 		return endereco;
+	}
+	
+	public String getMotivoSolicitacaoExclusao() {
+		return motivoSolicitacaoExclusao;
+	}
+
+	public void setMotivoSolicitacaoExclusao(String motivoSolicitacaoExclusao) {
+		this.motivoSolicitacaoExclusao = motivoSolicitacaoExclusao;
 	}
 
 	public void setEndereco(Endereco endereco) {

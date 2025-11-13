@@ -286,12 +286,13 @@ public class PessoaService {
 		pessoaRepository.save(pessoa);
 	}
 	
-	public void solicitarExclusaoConta(Long id) {
+	public void solicitarExclusaoConta(Long id, String motivo) {
 		Pessoa pessoa = buscarPorId(id);
 		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
 			throw new IllegalArgumentException("Erro: a solicitação de exclusão de conta só pode ser realizada em contas de clientes.");
 		}
 		pessoa.solicitarExclusaoConta();
+		pessoa.setMotivoSolicitacaoExclusao(motivo);
 		pessoaRepository.save(pessoa);
 	}
 	
@@ -301,6 +302,7 @@ public class PessoaService {
 			throw new IllegalArgumentException("Erro: a rejeição de exclusão de conta só pode ser realizada em contas de clientes.");
 		}
 		pessoa.rejeitarSolicitacaoExclusao();
+		pessoa.setMotivoSolicitacaoExclusao(null);
 		pessoaRepository.save(pessoa);
 	}
 }

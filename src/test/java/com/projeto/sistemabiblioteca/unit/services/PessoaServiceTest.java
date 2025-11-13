@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -494,11 +495,12 @@ public class PessoaServiceTest {
 		
 		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(cliente));
 		
-		pessoaService.solicitarExclusaoConta(1L);
+		pessoaService.solicitarExclusaoConta(1L, "Cliente pediu a exclusão de sua conta.");
 		
 		verify(pessoaRepository).findById(any(Long.class));
 		
 		Assertions.assertEquals(StatusConta.EM_ANALISE_EXCLUSAO, cliente.getStatusConta());
+		Assertions.assertEquals("Cliente pediu a exclusão de sua conta.", cliente.getMotivoSolicitacaoExclusao());
 	}
 	
 	@Test
@@ -510,26 +512,30 @@ public class PessoaServiceTest {
 		when(pessoaRepository.findById(2L)).thenReturn(Optional.of(administrador));
 		
 	    Assertions.assertThrows(IllegalArgumentException.class,
-	    		() -> pessoaService.solicitarExclusaoConta(1L),
+	    		() -> pessoaService.solicitarExclusaoConta(1L, "Usuário pediu a exclusão de sua conta."),
 	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método solicitarExclusaoConta em um usuário com função de usuário BIBLIOTECARIO");
 	    
 	    Assertions.assertThrows(IllegalArgumentException.class,
-	    		() -> pessoaService.solicitarExclusaoConta(2L),
+	    		() -> pessoaService.solicitarExclusaoConta(2L, "Usuário pediu a exclusão de sua conta."),
 	    		"Era esperado que fosse lançada uma exceção ao tentar utilizar o método solicitarExclusaoConta em um usuário com função de usuário ADMINISTRADOR");
 	}
 	
 	@Test
 	void deveRejeitarSolicitacaoDeExclusaoDaContaDeCliente() {
 		Pessoa cliente = criarPessoa(FuncaoUsuario.CLIENTE);
-		cliente.solicitarExclusaoConta();
 		
 		when(pessoaRepository.findById(1L)).thenReturn(Optional.of(cliente));
 		
+		pessoaService.solicitarExclusaoConta(1L, "Cliente pediu a exclusão de sua conta.");
+		
+		Assertions.assertEquals("Cliente pediu a exclusão de sua conta.", cliente.getMotivoSolicitacaoExclusao());
+		
 		pessoaService.rejeitarSolicitacaoExclusao(1L);
 		
-		verify(pessoaRepository).findById(any(Long.class));
+		verify(pessoaRepository, times(2)).findById(any(Long.class));
 		
 		Assertions.assertEquals(StatusConta.ATIVA, cliente.getStatusConta());
+		Assertions.assertEquals(null, cliente.getMotivoSolicitacaoExclusao());
 	}
 	
 	@Test
