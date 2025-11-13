@@ -266,13 +266,13 @@ public class PessoaService {
 		pessoa1.setSenhaHash(pessoa2.getSenhaHash());
 	}
 	
-	public void aprovarConta(Long id) {
+	public Pessoa aprovarConta(Long id) {
 		Pessoa pessoa = buscarPorId(id);
 		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
 			throw new IllegalArgumentException("Erro: apenas clientes podem ser aprovados.");
 		}
 		pessoa.aprovarConta();
-		pessoaRepository.save(pessoa);
+		return pessoaRepository.save(pessoa);
 	}
 	
 	@Transactional

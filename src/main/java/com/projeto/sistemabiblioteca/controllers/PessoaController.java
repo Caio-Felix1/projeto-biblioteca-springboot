@@ -129,7 +129,20 @@ public class PessoaController {
 	
 	@PutMapping("/em-analise-aprovacao/aprovar-conta/{id}") 
 	public ResponseEntity<Void> aprovarUsuario(@PathVariable Long id) {
-		pessoaService.aprovarConta(id);
+		Pessoa usuarioAprovado = pessoaService.aprovarConta(id);
+		
+		EmailDTO emailDTO = new EmailDTO(
+				usuarioAprovado.getEmail().getEndereco(), 
+				"Cadastro aprovado – Bem-vindo(a) à Biblioteca", 
+				"Olá " + usuarioAprovado.getNome() + ",\n\n"
+				+ "Seu cadastro na Biblioteca foi aprovado com sucesso.\n"
+				+ "Agora você já pode acessar sua conta, consultar o acervo, reservar livros e aproveitar todos os recursos disponíveis.\n\n"
+				+ "Estamos felizes em tê-lo(a) conosco!\n\n"
+				+ "Atenciosamente,\n"
+				+ "Equipe da Biblioteca");
+		
+		emailService.sendEmail(emailDTO);
+		
 		return ResponseEntity.noContent().build();
 	}
 	
