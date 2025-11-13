@@ -71,7 +71,7 @@ public class MotivoSolicitacaoExclusaoDTOTest {
 		
 		Assertions.assertFalse(violacoes.isEmpty());
 		Assertions.assertTrue(violacoes.stream().anyMatch(v -> v.getPropertyPath().toString().equals("motivo")));
-		Assertions.assertTrue(violacoes.stream().anyMatch(v -> v.getMessage().equals("O motivo de solicitação de exclusão deve ter entre 10 e 100 caracteres")));
+		Assertions.assertTrue(violacoes.stream().anyMatch(v -> v.getMessage().equals("O motivo de solicitação de exclusão deve ter entre 10 e 500 caracteres")));
 	}
 	
 	@ParameterizedTest
@@ -87,7 +87,7 @@ public class MotivoSolicitacaoExclusaoDTOTest {
 		
 		Assertions.assertFalse(violacoes.isEmpty());
 		Assertions.assertTrue(violacoes.stream().anyMatch(v -> v.getPropertyPath().toString().equals("motivo")));
-		Assertions.assertTrue(violacoes.stream().anyMatch(v -> v.getMessage().equals("O motivo de solicitação de exclusão deve ter entre 10 e 100 caracteres")));
+		Assertions.assertTrue(violacoes.stream().anyMatch(v -> v.getMessage().equals("O motivo de solicitação de exclusão deve ter entre 10 e 500 caracteres")));
 	}
 	
 	@ParameterizedTest

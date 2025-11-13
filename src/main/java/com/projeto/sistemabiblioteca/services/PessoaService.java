@@ -189,14 +189,14 @@ public class PessoaService {
 	}
 	
 	@Transactional
-	public void inativar(Long id) {
+	public Pessoa inativar(Long id) {
 		Pessoa pessoa = buscarPorId(id);
 		if (pessoa.getStatusConta() == StatusConta.INATIVA) {
 			throw new IllegalStateException("Erro: usuário já está inativo.");
 		}
 		enderecoService.inativar(pessoa.getEndereco().getIdEndereco());
 		pessoa.inativarConta();
-		pessoaRepository.save(pessoa);
+		return pessoaRepository.save(pessoa);
 	}
 	
 	private boolean podeAtualizar(Pessoa usuarioAlvo, Pessoa usuarioLogado) {
@@ -276,14 +276,14 @@ public class PessoaService {
 	}
 	
 	@Transactional
-	public void rejeitarConta(Long id) {
+	public Pessoa rejeitarConta(Long id) {
 		Pessoa pessoa = buscarPorId(id);
 		if (pessoa.getFuncao() != FuncaoUsuario.CLIENTE) {
 			throw new IllegalArgumentException("Erro: apenas clientes podem ser rejeitados.");
 		}
 		enderecoService.inativar(pessoa.getEndereco().getIdEndereco());
 		pessoa.rejeitarConta();
-		pessoaRepository.save(pessoa);
+		return pessoaRepository.save(pessoa);
 	}
 	
 	public void solicitarExclusaoConta(Long id, String motivo) {

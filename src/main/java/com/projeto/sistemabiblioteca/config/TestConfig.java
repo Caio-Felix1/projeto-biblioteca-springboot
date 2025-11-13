@@ -108,7 +108,7 @@ public class TestConfig implements CommandLineRunner {
 		Endereco endereco = new Endereco("rua teste", "1234", "complemento teste", "bairro teste", "00000000", "cidade teste", estado1);
 		enderecoService.inserir(endereco);
 		
-		String senhaHash = passwordEncoder.encode("1234");
+		String senhaHash = passwordEncoder.encode("12345678");
 		
 		// testar aprovacao e rejeição de cadastro
 		Pessoa p1 = new Pessoa("teste1", new Cpf("00000000000"), Sexo.MASCULINO, FuncaoUsuario.CLIENTE, LocalDate.parse("2000-10-10"), LocalDate.now(), new Telefone("1234567891"), new Email("teste1@gmail.com"), senhaHash, StatusConta.EM_ANALISE_APROVACAO, null);

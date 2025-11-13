@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,13 +14,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
+import com.projeto.sistemabiblioteca.DTOs.MotivoInativacaoDoUsuarioDTO;
+import com.projeto.sistemabiblioteca.DTOs.MotivoRejeicaoDeCadastroDTO;
 import com.projeto.sistemabiblioteca.DTOs.MotivoSolicitacaoExclusaoDTO;
 import com.projeto.sistemabiblioteca.DTOs.PessoaDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.exceptions.AcessoNegadoException;
-import com.projeto.sistemabiblioteca.services.EstadoService;
+import com.projeto.sistemabiblioteca.services.EmailService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
 import com.projeto.sistemabiblioteca.validation.Cpf;
 import com.projeto.sistemabiblioteca.validation.Email;
@@ -34,8 +36,11 @@ public class PessoaController {
 	
 	private final PessoaService pessoaService;
 	
-	public PessoaController(PessoaService pessoaService, PasswordEncoder passwordEncoder, EstadoService estadoService) {
+	private final EmailService emailService;
+	
+	public PessoaController(PessoaService pessoaService, EmailService emailService) {
 		this.pessoaService = pessoaService;
+		this.emailService = emailService;
 	}
 	
 	@GetMapping
@@ -129,8 +134,16 @@ public class PessoaController {
 	}
 	
 	@PutMapping("/em-analise-aprovacao/rejeitar-conta/{id}") 
-	public ResponseEntity<Void> rejeitarUsuario(@PathVariable Long id) {
-		pessoaService.rejeitarConta(id);
+	public ResponseEntity<Void> rejeitarUsuario(@PathVariable Long id, @Valid @RequestBody MotivoRejeicaoDeCadastroDTO motivoRejeicaoDeCadastroDTO) {
+		Pessoa usuarioRejeitado = pessoaService.rejeitarConta(id);
+		
+		EmailDTO emailDTO = new EmailDTO(
+				usuarioRejeitado.getEmail().getEndereco(), 
+				"Conta não aprovada após análise de cadastro", 
+				motivoRejeicaoDeCadastroDTO.motivo());
+		
+		emailService.sendEmail(emailDTO);
+		
 		return ResponseEntity.noContent().build();
 	}
 	
@@ -147,7 +160,11 @@ public class PessoaController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> inativarUsuario(@PathVariable Long id, Authentication authentication) {
+	public ResponseEntity<Void> inativarUsuario(@PathVariable Long id, @Valid @RequestBody MotivoInativacaoDoUsuarioDTO motivoInativacaoDoUsuarioDTO,Authentication authentication) {
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
 		String usernameAutenticado = authentication.getName();
 		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
 		
@@ -155,7 +172,15 @@ public class PessoaController {
 			throw new IllegalArgumentException("Erro: administrador não pode inativar sua própria conta.");
 		}
 		
-		pessoaService.inativar(id);
+		Pessoa usuarioInativado = pessoaService.inativar(id);
+		
+		EmailDTO emailDTO = new EmailDTO(
+				usuarioInativado.getEmail().getEndereco(), 
+				"Conta inativada – acesso suspenso", 
+				motivoInativacaoDoUsuarioDTO.motivo());
+		
+		emailService.sendEmail(emailDTO);
+		
 		return ResponseEntity.noContent().build();
 	}
 }
