@@ -5,6 +5,7 @@ import static com.projeto.sistemabiblioteca.entities.enums.StatusAtivo.INATIVO;
 
 import java.util.List;
 
+import com.projeto.sistemabiblioteca.DTOs.Response.EdicaoResponseDTO;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -114,4 +115,20 @@ public class EdicaoController {
     	edicaoService.inativar(id);
     	return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/filtrar")
+   // public String buscar(@RequestParam("q") String termo) {
+    public List<EdicaoResponseDTO> buscar(@RequestParam("q") String termo) {
+
+        System.out.println("[CONTROLLER] termo = " + termo);
+
+        List<EdicaoResponseDTO> resposta = edicaoService.buscarPorTituloOuAutor(termo);
+
+        System.out.println("[CONTROLLER] retornando " + resposta.size() + " edições");
+
+        return resposta;
+
+
+    }
+
 }
