@@ -1,5 +1,6 @@
 package com.projeto.sistemabiblioteca.controllers;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -14,13 +15,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.DataDevolucaoPrevistaDTO;
+import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoCreateDTO;
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoResponseDTO;
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoUpdateDTO;
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
+import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
+import com.projeto.sistemabiblioteca.services.EmailService;
 import com.projeto.sistemabiblioteca.services.EmprestimoService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
 import com.projeto.sistemabiblioteca.validation.Cpf;
@@ -34,10 +38,12 @@ public class EmprestimoController {
 	
 	private final EmprestimoService emprestimoService;
 	private final PessoaService pessoaService;
+	private final EmailService emailService;
 	
-	public EmprestimoController(EmprestimoService emprestimoService, PessoaService pessoaService) {
+	public EmprestimoController(EmprestimoService emprestimoService, PessoaService pessoaService, EmailService emailService) {
 		this.emprestimoService = emprestimoService;
 		this.pessoaService = pessoaService;
+		this.emailService = emailService;
 	}
 	
     @GetMapping
@@ -148,7 +154,23 @@ public class EmprestimoController {
     
     @PutMapping("/registrar-separacao/{id}")
     public ResponseEntity<Void> registrarSeparacaoDoExemplar(@PathVariable Long id) {
-    	emprestimoService.registrarSeparacaoDoExemplar(id);
+    	Emprestimo emp = emprestimoService.registrarSeparacaoDoExemplar(id);
+    	
+    	if (Arrays.asList(StatusConta.ATIVA, StatusConta.EM_ANALISE_EXCLUSAO).contains(emp.getPessoa().getStatusConta())) {
+    		EmailDTO emailDTO = new EmailDTO(
+    				emp.getPessoa().getEmail().getEndereco(),
+    				"Aviso: Livro disponível para retirada",
+    				"Olá, " + emp.getPessoa().getNome() + ",\n\n"
+    				+ "Informamos que o livro \"" + emp.getExemplar().getEdicao().getTitulo().getNome() + "\" foi separado "
+    				+ "e já está disponível para retirada.\n\n"
+    				+ "O prazo para retirada é de 2 dias a partir de hoje. "
+    				+ "Caso não seja retirado dentro desse prazo, o empréstimo será automaticamente cancelado.\n\n"
+    				+ "Atenciosamente,\n"
+    				+ "Equipe da Biblioteca");
+    		
+    		emailService.sendEmail(emailDTO);
+    	}
+    	
         return ResponseEntity.noContent().build();
     }
     
@@ -184,7 +206,24 @@ public class EmprestimoController {
     
     @PutMapping("/registrar-perda/{id}")
     public ResponseEntity<Void> registrarPerdaDoExemplar(@PathVariable Long id) {
-    	emprestimoService.registrarPerdaDoExemplar(id);
+    	Emprestimo emp = emprestimoService.registrarPerdaDoExemplar(id);
+    	
+    	if (Arrays.asList(StatusConta.ATIVA, StatusConta.EM_ANALISE_EXCLUSAO).contains(emp.getPessoa().getStatusConta())) {
+    		EmailDTO emailDTO = new EmailDTO(
+    				emp.getPessoa().getEmail().getEndereco(),
+    				"Aviso: Perda de livro registrada",
+    				"Olá, " + emp.getPessoa().getNome() + ",\n\n"
+    				+ "Foi registrada a perda do livro \"" + emp.getExemplar().getEdicao().getTitulo().getNome() + "\" "
+    				+ "referente ao seu empréstimo.\n\n"
+    				+ "Nesse caso, é aplicada uma multa fixa. O valor já está lançado no sistema e precisa ser pago "
+    				+ "para que sua conta fique em dia com a biblioteca.\n\n"
+    				+ "Se tiver dúvidas sobre o valor ou sobre como realizar o pagamento, entre em contato com a equipe da biblioteca.\n\n"
+    				+ "Atenciosamente,\n"
+    				+ "Equipe da Biblioteca");
+    		
+    		emailService.sendEmail(emailDTO);
+    	}
+    	
         return ResponseEntity.noContent().build();
     }
 }

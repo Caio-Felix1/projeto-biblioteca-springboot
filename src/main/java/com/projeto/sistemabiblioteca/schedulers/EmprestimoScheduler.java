@@ -74,19 +74,20 @@ public class EmprestimoScheduler {
 			
 			exemplarRepository.save(emp.getExemplar());
 			
-			
-			EmailDTO emailDTO = new EmailDTO(
-					emp.getPessoa().getEmail().getEndereco(),
-					"Aviso: Empréstimo cancelado por não retirada",
-					"Olá, " + emp.getPessoa().getNome() + ",\n\n"
-						    + "Informamos que o empréstimo do livro \"" + emp.getExemplar().getEdicao().getTitulo().getNome() + "\" foi cancelado, "
-						    + "pois não houve retirada dentro do prazo estabelecido.\n\n"
-						    + "Caso ainda tenha interesse no livro, será necessário realizar uma nova reserva ou "
-						    + "solicitar um novo empréstimo.\n\n"
-						    + "Atenciosamente,\n"
-						    + "Equipe da Biblioteca");
-			
-			emailService.sendEmail(emailDTO);
+			if (Arrays.asList(StatusConta.ATIVA, StatusConta.EM_ANALISE_EXCLUSAO).contains(emp.getPessoa().getStatusConta())) {
+				EmailDTO emailDTO = new EmailDTO(
+						emp.getPessoa().getEmail().getEndereco(),
+						"Aviso: Empréstimo cancelado por não retirada",
+						"Olá, " + emp.getPessoa().getNome() + ",\n\n"
+							    + "Informamos que o empréstimo do livro \"" + emp.getExemplar().getEdicao().getTitulo().getNome() + "\" foi cancelado, "
+							    + "pois não houve retirada dentro do prazo estabelecido.\n\n"
+							    + "Caso ainda tenha interesse no livro, será necessário realizar uma nova reserva ou "
+							    + "solicitar um novo empréstimo.\n\n"
+							    + "Atenciosamente,\n"
+							    + "Equipe da Biblioteca");
+				
+				emailService.sendEmail(emailDTO);
+			}
 		}
 	}
 	
@@ -98,18 +99,20 @@ public class EmprestimoScheduler {
 			
 			multaRepository.save(emp.getMulta());
 			
-			EmailDTO emailDTO = new EmailDTO(
-					emp.getPessoa().getEmail().getEndereco(),
-					"Aviso: Empréstimo em atraso (1 dia)",
-					"Olá, " + emp.getPessoa().getNome() + ",\n\n"
-						    + "Identificamos que o prazo de devolução do livro \"" + emp.getExemplar().getEdicao().getTitulo().getNome() + "\" "
-						    + "venceu em " + emp.getDtDevolucaoPrevista() + " e atualmente está em atraso de "
-						    + "1 dia.\n\n"
-						    + "Pedimos que realize a devolução o quanto antes para evitar multas adicionais.\n\n"
-						    + "Atenciosamente,\n"
-						    + "Equipe da Biblioteca");
-			
-			emailService.sendEmail(emailDTO);
+			if (Arrays.asList(StatusConta.ATIVA, StatusConta.EM_ANALISE_EXCLUSAO).contains(emp.getPessoa().getStatusConta())) {
+				EmailDTO emailDTO = new EmailDTO(
+						emp.getPessoa().getEmail().getEndereco(),
+						"Aviso: Empréstimo em atraso (1 dia)",
+						"Olá, " + emp.getPessoa().getNome() + ",\n\n"
+							    + "Identificamos que o prazo de devolução do livro \"" + emp.getExemplar().getEdicao().getTitulo().getNome() + "\" "
+							    + "venceu em " + emp.getDtDevolucaoPrevista() + " e atualmente está em atraso de "
+							    + "1 dia.\n\n"
+							    + "Pedimos que realize a devolução o quanto antes para evitar multas adicionais.\n\n"
+							    + "Atenciosamente,\n"
+							    + "Equipe da Biblioteca");
+				
+				emailService.sendEmail(emailDTO);
+			}
 		}
 		else if (emp.getStatus() == StatusEmprestimo.EM_ANDAMENTO && Arrays.asList(StatusConta.ATIVA, StatusConta.EM_ANALISE_EXCLUSAO).contains(emp.getPessoa().getStatusConta())){
 		

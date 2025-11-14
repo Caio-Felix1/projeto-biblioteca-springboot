@@ -190,12 +190,12 @@ public class EmprestimoService {
 		emprestimo1.setExemplar(emprestimo2.getExemplar());
 	}
 	
-	public void registrarSeparacaoDoExemplar(Long id) {
+	public Emprestimo registrarSeparacaoDoExemplar(Long id) {
 		Emprestimo emprestimo = buscarPorId(id);
 		
 		emprestimo.separarExemplar(LocalDate.now());
 		
-		emprestimoRepository.save(emprestimo);
+		return emprestimoRepository.save(emprestimo);
 	}
 	
 	public void registrarRetiradaDoExemplar(Long id, LocalDate dtDevolucaoPrevista) {
@@ -247,12 +247,12 @@ public class EmprestimoService {
 	}
 	
 	@Transactional
-	public void registrarPerdaDoExemplar(Long id) {
+	public Emprestimo registrarPerdaDoExemplar(Long id) {
 		Emprestimo emprestimo = buscarPorId(id);
 		
 		emprestimo.registrarPerdaDoExemplar();
 		
 		exemplarService.inserir(emprestimo.getExemplar());
-		emprestimoRepository.save(emprestimo);
+		return emprestimoRepository.save(emprestimo);
 	}
 }
