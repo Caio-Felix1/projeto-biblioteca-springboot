@@ -17,10 +17,12 @@ import com.projeto.sistemabiblioteca.entities.Editora;
 import com.projeto.sistemabiblioteca.entities.Idioma;
 import com.projeto.sistemabiblioteca.entities.Titulo;
 import com.projeto.sistemabiblioteca.entities.enums.ClassificacaoIndicativa;
+import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
 import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
 import com.projeto.sistemabiblioteca.repositories.AutorRepository;
 import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
+import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
 import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 import com.projeto.sistemabiblioteca.repositories.TituloRepository;
@@ -90,15 +92,23 @@ public class EdicaoServiceIntegrationTest {
 		Edicao edicao1 = criarEdicao(titulo1, null, null);
 		Edicao edicao2 = criarEdicao(titulo2, null, null);
 		Edicao edicao3 = criarEdicao(titulo3, null, null);
+		Edicao edicao4 = criarEdicao(titulo1, null, null);
+		Edicao edicao5 = criarEdicao(titulo2, null, null);
+		
+		edicao4.inativar();
+		edicao5.inativar();
 		
 		edicaoService.inserir(edicao1);
 		edicaoService.inserir(edicao2);
 		edicaoService.inserir(edicao3);
+		edicaoService.inserir(edicao4);
+		edicaoService.inserir(edicao5);
 		
 		List<Edicao> edicoes = edicaoService.buscarTodosComAutorComNomeContendo("tolkien");
 		
 		Assertions.assertEquals(2, edicoes.size());
 		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getTitulo().getNome().contains("Anel")));
+		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
 		for (Edicao e : edicoes) {
 			Set<Autor> autores = e.getTitulo().getAutores();
 			Assertions.assertTrue(autores.stream().allMatch(a -> a.getNome().contains("Tolkien")));
@@ -118,15 +128,23 @@ public class EdicaoServiceIntegrationTest {
 		Edicao edicao1 = criarEdicao(titulo1, null, null);
 		Edicao edicao2 = criarEdicao(titulo2, null, null);
 		Edicao edicao3 = criarEdicao(titulo3, null, null);
+		Edicao edicao4 = criarEdicao(titulo3, null, null);
+		Edicao edicao5 = criarEdicao(titulo3, null, null);
+		
+		edicao4.inativar();
+		edicao5.inativar();
 		
 		edicaoService.inserir(edicao1);
 		edicaoService.inserir(edicao2);
 		edicaoService.inserir(edicao3);
+		edicaoService.inserir(edicao4);
+		edicaoService.inserir(edicao5);
 		
 		List<Edicao> edicoes = edicaoService.buscarTodosComTituloComNomeContendo("tronos");
 		
 		Assertions.assertEquals(1, edicoes.size());
 		Assertions.assertTrue(edicoes.get(0).getTitulo().getNome().equals("Tronos"));
+		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
 	}
 	
 	@Test
@@ -153,18 +171,55 @@ public class EdicaoServiceIntegrationTest {
 		Edicao edicao1 = criarEdicao(titulo1, null, null);
 		Edicao edicao2 = criarEdicao(titulo2, null, null);
 		Edicao edicao3 = criarEdicao(titulo3, null, null);
+		Edicao edicao4 = criarEdicao(titulo1, null, null);
+		Edicao edicao5 = criarEdicao(titulo2, null, null);
+		
+		edicao4.inativar();
+		edicao5.inativar();
 		
 		edicaoService.inserir(edicao1);
 		edicaoService.inserir(edicao2);
 		edicaoService.inserir(edicao3);
+		edicaoService.inserir(edicao4);
+		edicaoService.inserir(edicao5);
 		
 		List<Edicao> edicoes = edicaoService.buscarTodosComCategoriaComIdIgualA(categoria1.getIdCategoria());
 		
 		Assertions.assertEquals(2, edicoes.size());
+		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
 		for (Edicao e : edicoes) {
 			Set<Categoria> categorias = e.getTitulo().getCategorias();
 			Assertions.assertTrue(categorias.stream().allMatch(c -> c.getNome().equals("Aventura")));
 		}
+	}
+	
+	@Test
+	void deveBuscarTodosFiltrandoPeloIdDaEditora() {
+		Editora editora1 = new Editora("Editora 1");
+		Editora editora2 = new Editora("Editora 2");
+		
+		editoraRepository.save(editora1);
+		editoraRepository.save(editora2);
+		
+		Edicao edicao1 = criarEdicao(null, editora1, null);
+		Edicao edicao2 = criarEdicao(null, editora1, null);
+		Edicao edicao3 = criarEdicao(null, editora2, null);
+		Edicao edicao4 = criarEdicao(null, editora1, null);
+		Edicao edicao5 = criarEdicao(null, editora2, null);
+		
+		edicao4.inativar();
+		edicao5.inativar();
+		
+		edicaoService.inserir(edicao1);
+		edicaoService.inserir(edicao2);
+		edicaoService.inserir(edicao3);
+		edicaoService.inserir(edicao4);
+		edicaoService.inserir(edicao5);
+		
+		List<Edicao> edicoes = edicaoService.buscarTodosComEditoraComIdIgualA(editora1.getIdEditora());
+		Assertions.assertEquals(2, edicoes.size());
+		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
+		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getEditora().getNome().equals("Editora 1")));
 	}
 	
 	@Test

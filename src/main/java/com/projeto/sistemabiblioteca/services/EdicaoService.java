@@ -52,15 +52,19 @@ public class EdicaoService {
 	}
 	
 	public List<Edicao> buscarTodosComAutorComNomeContendo(String nome) {
-		return edicaoRepository.findAllByTituloAutoresNomeContainingIgnoreCase(nome);
+		return edicaoRepository.findAllByTituloAutoresNomeContainingIgnoreCaseAndStatus(nome, StatusAtivo.ATIVO);
 	}
 	
 	public List<Edicao> buscarTodosComTituloComNomeContendo(String nome) {
-		return edicaoRepository.findAllByTituloNomeContainingIgnoreCase(nome);
+		return edicaoRepository.findAllByTituloNomeContainingIgnoreCaseAndStatus(nome, StatusAtivo.ATIVO);
 	}
 	
 	public List<Edicao> buscarTodosComCategoriaComIdIgualA(Long id) {
-		return edicaoRepository.findAllByTituloCategoriasIdCategoria(id);
+		return edicaoRepository.findAllByTituloCategoriasIdCategoriaAndStatus(id, StatusAtivo.ATIVO);
+	}
+	
+	public List<Edicao> buscarTodosComEditoraComIdIgualA(Long id) {
+		return edicaoRepository.findAllByEditoraIdEditoraAndStatus(id, StatusAtivo.ATIVO);
 	}
 	
 	public Edicao buscarPorId(Long id) {

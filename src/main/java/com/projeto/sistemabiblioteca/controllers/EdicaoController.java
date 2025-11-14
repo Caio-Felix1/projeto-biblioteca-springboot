@@ -74,6 +74,12 @@ public class EdicaoController {
         return ResponseEntity.ok(edicoes);
     }
     
+    @GetMapping("/buscar-por-editora/{id}")
+    public ResponseEntity<List<Edicao>> listarTodosPelaEditora(@PathVariable Long id) {
+        List<Edicao> edicoes = edicaoService.buscarTodosComEditoraComIdIgualA(id);
+        return ResponseEntity.ok(edicoes);
+    }
+    
     @GetMapping("/{id}")
     public ResponseEntity<Edicao> buscar(@PathVariable Long id) {
         Edicao e = edicaoService.buscarPorId(id);

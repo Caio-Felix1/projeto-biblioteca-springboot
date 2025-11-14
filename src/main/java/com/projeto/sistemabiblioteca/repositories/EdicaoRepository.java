@@ -14,11 +14,13 @@ public interface EdicaoRepository extends JpaRepository<Edicao, Long> {
 
 	List<Edicao> findAllByStatusEquals(StatusAtivo status);
 
-	List<Edicao> findAllByTituloNomeContainingIgnoreCase(String nome);
+	List<Edicao> findAllByTituloNomeContainingIgnoreCaseAndStatus(String nome, StatusAtivo status);
 
-	List<Edicao> findAllByTituloAutoresNomeContainingIgnoreCase(String nome);
+	List<Edicao> findAllByTituloAutoresNomeContainingIgnoreCaseAndStatus(String nome, StatusAtivo status);
 
-	List<Edicao> findAllByTituloCategoriasIdCategoria(Long id);
+	List<Edicao> findAllByTituloCategoriasIdCategoriaAndStatus(Long id, StatusAtivo status);
+	
+	List<Edicao> findAllByEditoraIdEditoraAndStatus(Long id, StatusAtivo status);
 
 	@Query("""
     SELECT new com.projeto.sistemabiblioteca.DTOs.Response.EdicaoResponseDTO(
