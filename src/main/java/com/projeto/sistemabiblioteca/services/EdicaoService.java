@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import com.projeto.sistemabiblioteca.DTOs.Response.EdicaoResponseDTO;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.DTOs.EdicaoDTO;
@@ -202,5 +203,9 @@ public class EdicaoService {
 		edicao1.setTitulo(edicao2.getTitulo());
 		edicao1.setEditora(edicao2.getEditora());
 		edicao1.setIdioma(edicao2.getIdioma());
+	}
+
+	public List<EdicaoResponseDTO> buscarPorTituloOuAutor(String termo) {
+		return edicaoRepository.buscarPorTituloOuAutor(termo);
 	}
 }

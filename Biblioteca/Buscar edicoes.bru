@@ -1,0 +1,20 @@
+meta {
+  name: Buscar edicoes
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8081/titulos/filtrar?q=machado
+  body: none
+  auth: inherit
+}
+
+params:query {
+  q: machado
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
