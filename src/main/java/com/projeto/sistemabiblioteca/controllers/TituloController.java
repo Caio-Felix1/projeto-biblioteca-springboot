@@ -66,8 +66,8 @@ public class TituloController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Titulo> atualizar(@PathVariable Long id, @Valid @RequestBody TituloUpdateDTO tituloUpdateDTO) {
-        Titulo atualizado = tituloService.atualizar(id, tituloUpdateDTO);
+    public ResponseEntity<Titulo> atualizar(@PathVariable Long id, @Valid @RequestBody TituloCreateDTO tituloCreateDTO) {
+        Titulo atualizado = tituloService.atualizarTituloCompleto(id, tituloCreateDTO);
         return ResponseEntity.ok(atualizado);
     }
 

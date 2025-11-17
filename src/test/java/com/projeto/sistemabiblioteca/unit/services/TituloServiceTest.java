@@ -68,6 +68,7 @@ public class TituloServiceTest {
 		verify(tituloRepository).existsByNome(any(String.class));
 		verify(tituloRepository).save(argThat(t ->
 		t.getNome().equals("Título 1") &&
+		t.getDescricao().equals("Descrição 1") &&
 		t.getStatusAtivo() == StatusAtivo.ATIVO &&
 		t.getAutores().size() == 2 &&
 		t.getCategorias().size() == 2));
@@ -190,6 +191,41 @@ public class TituloServiceTest {
 		Assertions.assertThrows(TituloJaCadastradoException.class,
 				() -> tituloService.atualizar(1L, tituloUpdateDTO),
 				"Era esperado que fosse lançada uma exceção ao tentar atualizar um título com um nome já existente no banco de dados");
+	}
+	
+	@Test
+	void deveAtualizarTituloCompleto() {
+		Titulo titulo = new Titulo("Título 1", "Descrição 1");
+		List.of(new Autor("Autor 1"), new Autor("Autor 2")).forEach(titulo::adicionarAutor);
+		List.of(new Categoria("Categoria 1"), new Categoria("Categoria 2")).forEach(titulo::adicionarCategoria);
+		
+		TituloCreateDTO tituloCreateDTO = new TituloCreateDTO(
+				"Título 2",
+				"Descrição 2",
+				Set.of(3L),
+				Set.of(3L));
+		
+		when(tituloRepository.findById(any(Long.class))).thenReturn(Optional.of(titulo));
+		when(tituloRepository.existsByNome(any(String.class))).thenReturn(false);
+		when(autorService.buscarTodosPorId(any())).thenReturn(List.of(new Autor("Autor 3")));
+		when(categoriaService.buscarTodosPorId(any())).thenReturn(List.of(new Categoria("Categoria 3")));
+		when(tituloRepository.save(any(Titulo.class))).thenAnswer(inv -> inv.getArgument(0));
+		
+		Titulo tituloAtualizado = tituloService.atualizarTituloCompleto(1L, tituloCreateDTO);
+		
+		verify(tituloRepository).findById(any(Long.class));
+		verify(tituloRepository).existsByNome(any(String.class));
+		verify(autorService).buscarTodosPorId(any());
+		verify(categoriaService).buscarTodosPorId(any());		
+		verify(tituloRepository).save(argThat(t ->
+		t.getNome().equals("Título 2") &&
+		t.getDescricao().equals("Descrição 2") &&
+		t.getStatusAtivo() == StatusAtivo.ATIVO &&
+		t.getAutores().size() == 1 &&
+		t.getCategorias().size() == 1));
+		
+		Assertions.assertTrue(tituloAtualizado.getAutores().stream().allMatch(a -> a.getNome().equals("Autor 3")));
+		Assertions.assertTrue(tituloAtualizado.getCategorias().stream().allMatch(c -> c.getNome().equals("Categoria 3")));
 	}
 	
 	@Test

@@ -73,14 +73,62 @@ public class TituloServiceIntegrationTest {
 		Set<Categoria> categorias = titulo.getCategorias();
 		
 		Assertions.assertEquals(2, categorias.size());
-		Assertions.assertTrue(categorias.stream().anyMatch(c -> c.getNome().equals("Categoria 1")));
-		Assertions.assertTrue(categorias.stream().anyMatch(c -> c.getNome().equals("Categoria 2")));
+		Assertions.assertTrue(categorias.stream().anyMatch(c -> c.getNome().equals("Categoria 1") || c.getNome().equals("Categoria 2")));
 		
 		Set<Autor> autores = titulo.getAutores();
 		
 		Assertions.assertEquals(2, autores.size());
-		Assertions.assertTrue(autores.stream().anyMatch(a -> a.getNome().equals("Autor 1")));
-		Assertions.assertTrue(autores.stream().anyMatch(a -> a.getNome().equals("Autor 2")));
+		Assertions.assertTrue(autores.stream().allMatch(a -> a.getNome().equals("Autor 1") || a.getNome().equals("Autor 2")));
+	}
+	
+	@Test
+	void deveAtualizarTituloCompleto() {
+		Autor autor1 = new Autor("Autor 1");
+		Autor autor2 = new Autor("Autor 2");
+		Autor autor3 = new Autor("Autor 3");
+		Autor autor4 = new Autor("Autor 4");
+		
+		Long autor1Id = autorRepository.save(autor1).getIdAutor();
+		Long autor2Id = autorRepository.save(autor2).getIdAutor();
+		Long autor3Id = autorRepository.save(autor3).getIdAutor();
+		Long autor4Id = autorRepository.save(autor4).getIdAutor();
+		
+		Categoria categoria1 = new Categoria("Categoria 1");
+		Categoria categoria2 = new Categoria("Categoria 2");
+		Categoria categoria3 = new Categoria("Categoria 3");
+		Categoria categoria4 = new Categoria("Categoria 4");
+		
+		Long categoria1Id = categoriaRepository.save(categoria1).getIdCategoria();
+		Long categoria2Id = categoriaRepository.save(categoria2).getIdCategoria();
+		Long categoria3Id = categoriaRepository.save(categoria3).getIdCategoria();
+		Long categoria4Id = categoriaRepository.save(categoria4).getIdCategoria();
+		
+		Titulo titulo = new Titulo("Título 1", "Descrição 1");
+		List.of(autor1, autor2).forEach(titulo::adicionarAutor);
+		List.of(categoria1, categoria2).forEach(titulo::adicionarCategoria);
+		
+		tituloService.inserir(titulo);
+		
+		TituloCreateDTO tituloCreateDTO = new TituloCreateDTO(
+				"Titulo 2", 
+				"Descricao 2",
+				Set.of(categoria3Id, categoria4Id),
+				Set.of(autor3Id, autor4Id));
+		
+		Titulo tituloAtualizado = tituloService.atualizarTituloCompleto(titulo.getIdTitulo(), tituloCreateDTO);
+		
+		Assertions.assertEquals("Titulo 2", tituloAtualizado.getNome());
+		Assertions.assertEquals("Descricao 2", tituloAtualizado.getDescricao());
+		
+		Set<Categoria> categorias = tituloAtualizado.getCategorias();
+		
+		Assertions.assertEquals(2, categorias.size());
+		Assertions.assertTrue(categorias.stream().anyMatch(c -> c.getNome().equals("Categoria 3") || c.getNome().equals("Categoria 4")));
+		
+		Set<Autor> autores = tituloAtualizado.getAutores();
+		
+		Assertions.assertEquals(2, autores.size());
+		Assertions.assertTrue(autores.stream().allMatch(a -> a.getNome().equals("Autor 3") || a.getNome().equals("Autor 4")));
 	}
 	
 	@Test

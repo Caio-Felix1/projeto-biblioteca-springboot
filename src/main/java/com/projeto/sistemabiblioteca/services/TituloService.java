@@ -117,6 +117,43 @@ public class TituloService {
 	}
 	
 	@Transactional
+	public Titulo atualizarTituloCompleto(Long id, TituloCreateDTO tituloCreateDTO) {
+		Titulo titulo1 = buscarPorId(id);
+		
+		if (!titulo1.getNome().equals(tituloCreateDTO.nome())) {
+			verificarSeTituloJaExiste(tituloCreateDTO.nome());
+		}
+		
+		Titulo titulo2 = new Titulo(tituloCreateDTO.nome(), tituloCreateDTO.descricao());
+		
+		atualizarDados(titulo1, titulo2);
+		
+		titulo1.getAutores().forEach(titulo1::removerAutor);
+		
+		List<Autor> autores = autorService.buscarTodosPorId(tituloCreateDTO.idsAutores());
+		boolean temInativo = autores.stream().anyMatch(a -> a.getStatusAtivo() == StatusAtivo.INATIVO);
+		
+		if (temInativo) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a um autor com status inativo ao atualizar.");
+		}
+		
+		autores.forEach(titulo1::adicionarAutor);
+		
+		titulo1.getCategorias().forEach(titulo1::removerCategoria);
+		
+		List<Categoria> categorias = categoriaService.buscarTodosPorId(tituloCreateDTO.idsCategorias());
+		temInativo = categorias.stream().anyMatch(c -> c.getStatusAtivo() == StatusAtivo.INATIVO);
+		
+		if (temInativo) {
+			throw new IllegalArgumentException("Erro: não é possível associar um título a uma categoria com status inativo ao atualizar.");
+		}
+		
+		categorias.forEach(titulo1::adicionarCategoria);
+		
+		return tituloRepository.save(titulo1);
+	}
+	
+	@Transactional
 	public void adicionarCategorias(Long idTitulo, Set<Long> idsCategorias) {
 		Titulo titulo = buscarPorId(idTitulo);
 		List<Categoria> categorias = categoriaService.buscarTodosPorId(idsCategorias);
