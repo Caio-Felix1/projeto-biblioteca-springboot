@@ -22,6 +22,7 @@ public class AutorizacaoService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     	try {
         	Pessoa pessoa = pessoaService.buscarPorEmail(username);
+        	
         	return pessoa;
         }
         catch (EntityNotFoundException e) {

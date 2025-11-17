@@ -265,4 +265,9 @@ public class Pessoa implements UserDetails {
 	public String getUsername() {
 		return email.getEndereco();
 	}
+	
+	@Override
+	public boolean isEnabled() {
+		return this.getStatusConta() == StatusConta.ATIVA || this.getStatusConta() == StatusConta.EM_ANALISE_EXCLUSAO;
+	}
 }
