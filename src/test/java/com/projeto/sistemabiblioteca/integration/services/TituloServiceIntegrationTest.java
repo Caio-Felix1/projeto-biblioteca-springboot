@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.projeto.sistemabiblioteca.DTOs.TituloCreateDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
@@ -39,10 +41,10 @@ public class TituloServiceIntegrationTest {
 		tituloService.inserir(titulo1);
 		tituloService.inserir(titulo2);
 		
-		List<Titulo> titulos = tituloService.buscarTodosComNomeContendo("Titulo 2");
+		Page<Titulo> titulos = tituloService.buscarTodosComNomeContendo("Titulo 2", PageRequest.of(0, 5));
 		
-		Assertions.assertEquals(1, titulos.size());
-		Assertions.assertEquals("Titulo 2", titulos.get(0).getNome());
+		Assertions.assertEquals(1, titulos.getNumberOfElements());
+		Assertions.assertEquals("Titulo 2", titulos.getContent().get(0).getNome());
 	}
 	
 	@Test

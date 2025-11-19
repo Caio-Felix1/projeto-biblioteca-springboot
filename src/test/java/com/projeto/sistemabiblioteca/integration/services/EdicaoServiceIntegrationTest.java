@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.projeto.sistemabiblioteca.DTOs.EdicaoDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
@@ -22,7 +24,6 @@ import com.projeto.sistemabiblioteca.entities.enums.TamanhoEdicao;
 import com.projeto.sistemabiblioteca.entities.enums.TipoCapa;
 import com.projeto.sistemabiblioteca.repositories.AutorRepository;
 import com.projeto.sistemabiblioteca.repositories.CategoriaRepository;
-import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
 import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 import com.projeto.sistemabiblioteca.repositories.TituloRepository;
@@ -104,9 +105,9 @@ public class EdicaoServiceIntegrationTest {
 		edicaoService.inserir(edicao4);
 		edicaoService.inserir(edicao5);
 		
-		List<Edicao> edicoes = edicaoService.buscarTodosComAutorComNomeContendo("tolkien");
+		Page<Edicao> edicoes = edicaoService.buscarTodosComAutorComNomeContendo("tolkien", PageRequest.of(0, 10));
 		
-		Assertions.assertEquals(2, edicoes.size());
+		Assertions.assertEquals(2, edicoes.getNumberOfElements());
 		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getTitulo().getNome().contains("Anel")));
 		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
 		for (Edicao e : edicoes) {
@@ -140,10 +141,10 @@ public class EdicaoServiceIntegrationTest {
 		edicaoService.inserir(edicao4);
 		edicaoService.inserir(edicao5);
 		
-		List<Edicao> edicoes = edicaoService.buscarTodosComTituloComNomeContendo("tronos");
+		Page<Edicao> edicoes = edicaoService.buscarTodosComTituloComNomeContendo("tronos", PageRequest.of(0, 10));
 		
-		Assertions.assertEquals(1, edicoes.size());
-		Assertions.assertTrue(edicoes.get(0).getTitulo().getNome().equals("Tronos"));
+		Assertions.assertEquals(1, edicoes.getNumberOfElements());
+		Assertions.assertTrue(edicoes.getContent().get(0).getTitulo().getNome().equals("Tronos"));
 		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
 	}
 	
@@ -183,9 +184,9 @@ public class EdicaoServiceIntegrationTest {
 		edicaoService.inserir(edicao4);
 		edicaoService.inserir(edicao5);
 		
-		List<Edicao> edicoes = edicaoService.buscarTodosComCategoriaComIdIgualA(categoria1.getIdCategoria());
+		Page<Edicao> edicoes = edicaoService.buscarTodosComCategoriaComIdIgualA(categoria1.getIdCategoria(), PageRequest.of(0, 10));
 		
-		Assertions.assertEquals(2, edicoes.size());
+		Assertions.assertEquals(2, edicoes.getNumberOfElements());
 		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
 		for (Edicao e : edicoes) {
 			Set<Categoria> categorias = e.getTitulo().getCategorias();
@@ -216,8 +217,9 @@ public class EdicaoServiceIntegrationTest {
 		edicaoService.inserir(edicao4);
 		edicaoService.inserir(edicao5);
 		
-		List<Edicao> edicoes = edicaoService.buscarTodosComEditoraComIdIgualA(editora1.getIdEditora());
-		Assertions.assertEquals(2, edicoes.size());
+		Page<Edicao> edicoes = edicaoService.buscarTodosComEditoraComIdIgualA(editora1.getIdEditora(), PageRequest.of(0, 10));
+		
+		Assertions.assertEquals(2, edicoes.getNumberOfElements());
 		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getStatusAtivo() == StatusAtivo.ATIVO));
 		Assertions.assertTrue(edicoes.stream().allMatch(e -> e.getEditora().getNome().equals("Editora 1")));
 	}

@@ -75,7 +75,7 @@ public class DashboardUpdateScheduler {
 		@Scheduled(fixedDelay = 5000)
 		@Transactional
 		public void atualizarDashBoard() {
-			List<Emprestimo> emprestimosReais = emprestimoService.buscarTodos();
+			List<Emprestimo> emprestimosReais = emprestimoService.buscarTodosParaDashboard();
 			
 			for (Emprestimo empReal : emprestimosReais) {
 				DimCliente dimCliente = dimClienteService.atualizar(empReal.getPessoa());

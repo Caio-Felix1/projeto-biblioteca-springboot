@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoCreateDTO;
@@ -43,24 +45,28 @@ public class EmprestimoService {
 		this.exemplarService = exemplarService;
 	}
 	
-	public List<Emprestimo> buscarTodos() {
+	public List<Emprestimo> buscarTodosParaDashboard() {
 		return emprestimoRepository.findAll();
 	}
 	
-	public List<Emprestimo> buscarTodosComStatusIgualA(StatusEmprestimo statusEmprestimo) {
-		return emprestimoRepository.findAllByStatusEquals(statusEmprestimo);
+	public Page<Emprestimo> buscarTodos(Pageable pageable) {
+		return emprestimoRepository.findAll(pageable);
 	}
 	
-	public List<Emprestimo> buscarTodosPorIdPessoa(Long id) {
-		return emprestimoRepository.findAllByPessoaIdPessoa(id);
+	public Page<Emprestimo> buscarTodosComStatusIgualA(StatusEmprestimo statusEmprestimo, Pageable pageable) {
+		return emprestimoRepository.findAllByStatusEquals(statusEmprestimo, pageable);
 	}
 	
-	public List<Emprestimo> buscarTodosPorEmailDoUsuario(String email) {
-		return emprestimoRepository.findAllByPessoaEmailEndereco(email);
+	public Page<Emprestimo> buscarTodosPorIdPessoa(Long id, Pageable pageable) {
+		return emprestimoRepository.findAllByPessoaIdPessoa(id, pageable);
 	}
 	
-	public List<Emprestimo> buscarTodosPorCpfDoUsuario(String cpf) {
-		return emprestimoRepository.findAllByPessoaCpfValor(cpf);
+	public Page<Emprestimo> buscarTodosPorEmailDoUsuario(String email, Pageable pageable) {
+		return emprestimoRepository.findAllByPessoaEmailEndereco(email, pageable);
+	}
+	
+	public Page<Emprestimo> buscarTodosPorCpfDoUsuario(String cpf, Pageable pageable) {
+		return emprestimoRepository.findAllByPessoaCpfValor(cpf, pageable);
 	}
 	
 	public List<Emprestimo> buscarTodosEmprestimosParaVerificacaoDiaria(Set<StatusEmprestimo> statusSet) {

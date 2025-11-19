@@ -3,6 +3,10 @@ package com.projeto.sistemabiblioteca.controllers;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +23,7 @@ import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoCreateDTO;
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoResponseDTO;
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoUpdateDTO;
+import com.projeto.sistemabiblioteca.DTOs.PageResponseDTO;
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
@@ -47,18 +52,26 @@ public class EmprestimoController {
 	}
 	
     @GetMapping
-    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodos() {
-    	List<Emprestimo> emprestimos = emprestimoService.buscarTodos();
+    public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodos(@RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	
+    	Page<Emprestimo> emprestimos = emprestimoService.buscarTodos(pageable);
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
     			.stream()
     			.map(EmprestimoResponseDTO::converterParaDTO)
     			.toList();
     	
-        return ResponseEntity.ok(emprestimosResponseDTO);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(
+        		new PageImpl<>(
+        				emprestimosResponseDTO,
+        				emprestimos.getPageable(),
+        				emprestimos.getTotalElements())
+        		)
+        		);
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<EmprestimoResponseDTO>> listarPorStatus(@PathVariable String status) {
+    public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarPorStatus(@PathVariable String status, @RequestParam int pagina, @RequestParam int tamanho) {
     	StatusEmprestimo statusEmprestimo;
     	try {
     		statusEmprestimo = StatusEmprestimo.valueOf(status.toUpperCase());
@@ -67,17 +80,25 @@ public class EmprestimoController {
 			throw new IllegalArgumentException("Erro: o status informado é inválido.");
 		}
     	
-    	List<Emprestimo> emprestimos = emprestimoService.buscarTodosComStatusIgualA(statusEmprestimo);
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+
+    	Page<Emprestimo> emprestimos = emprestimoService.buscarTodosComStatusIgualA(statusEmprestimo, pageable);
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
     			.stream()
     			.map(EmprestimoResponseDTO::converterParaDTO)
     			.toList();
     	
-        return ResponseEntity.ok(emprestimosResponseDTO);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(
+        		new PageImpl<>(
+        				emprestimosResponseDTO,
+        				emprestimos.getPageable(),
+        				emprestimos.getTotalElements())
+        		)
+        		);
     }
     
     @GetMapping("/buscar-por-pessoa/{id}")
-    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorPessoa(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorPessoa(@PathVariable Long id, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
 		String usernameAutenticado = authentication.getName();
 		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
 		
@@ -85,17 +106,25 @@ public class EmprestimoController {
 			throw new IllegalArgumentException("Erro: um cliente não pode visualizar os empréstimos de outro cliente.");
 		}
 		
-    	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorIdPessoa(id);
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+		
+    	Page<Emprestimo> emprestimos = emprestimoService.buscarTodosPorIdPessoa(id, pageable);
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
     			.stream()
     			.map(EmprestimoResponseDTO::converterParaDTO)
     			.toList();
     	
-        return ResponseEntity.ok(emprestimosResponseDTO);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(
+        		new PageImpl<>(
+        				emprestimosResponseDTO,
+        				emprestimos.getPageable(),
+        				emprestimos.getTotalElements())
+        		)
+        		);
     }
     
     @GetMapping("/buscar-por-email")
-    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorEmailDoUsuario(@RequestParam String email, Authentication authentication) {
+    public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorEmailDoUsuario(@RequestParam String email, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
     	Email emailFormatoValidado = new Email(email);
     	
 		String usernameAutenticado = authentication.getName();
@@ -104,18 +133,26 @@ public class EmprestimoController {
 		if (usuarioAutenticado.getFuncao() == FuncaoUsuario.CLIENTE && !usuarioAutenticado.getEmail().getEndereco().equals(emailFormatoValidado.getEndereco())) {
 			throw new IllegalArgumentException("Erro: um cliente não pode visualizar os empréstimos de outro cliente.");
 		}
-    	
-    	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorEmailDoUsuario(emailFormatoValidado.getEndereco());
+		
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+
+    	Page<Emprestimo> emprestimos = emprestimoService.buscarTodosPorEmailDoUsuario(emailFormatoValidado.getEndereco(), pageable);
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
     			.stream()
     			.map(EmprestimoResponseDTO::converterParaDTO)
     			.toList();
     	
-        return ResponseEntity.ok(emprestimosResponseDTO);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(
+        		new PageImpl<>(
+        				emprestimosResponseDTO,
+        				emprestimos.getPageable(),
+        				emprestimos.getTotalElements())
+        		)
+        		);
     }
     
     @GetMapping("/buscar-por-cpf")
-    public ResponseEntity<List<EmprestimoResponseDTO>> listarTodosPorCpfDoUsuario(@RequestParam String cpf, Authentication authentication) {
+    public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorCpfDoUsuario(@RequestParam String cpf, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
     	Cpf cpfFormatoValidado = new Cpf(cpf);
     	
 		String usernameAutenticado = authentication.getName();
@@ -124,14 +161,22 @@ public class EmprestimoController {
 		if (usuarioAutenticado.getFuncao() == FuncaoUsuario.CLIENTE && !usuarioAutenticado.getCpf().getValor().equals(cpfFormatoValidado.getValor())) {
 			throw new IllegalArgumentException("Erro: um cliente não pode visualizar os empréstimos de outro cliente.");
 		}
+		
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
     	
-    	List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorCpfDoUsuario(cpfFormatoValidado.getValor());
+    	Page<Emprestimo> emprestimos = emprestimoService.buscarTodosPorCpfDoUsuario(cpfFormatoValidado.getValor(), pageable);
     	List<EmprestimoResponseDTO> emprestimosResponseDTO = emprestimos
     			.stream()
     			.map(EmprestimoResponseDTO::converterParaDTO)
     			.toList();
     	
-        return ResponseEntity.ok(emprestimosResponseDTO);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(
+        		new PageImpl<>(
+        				emprestimosResponseDTO,
+        				emprestimos.getPageable(),
+        				emprestimos.getTotalElements())
+        		)
+        		);
     }
     
     @GetMapping("/{id}")

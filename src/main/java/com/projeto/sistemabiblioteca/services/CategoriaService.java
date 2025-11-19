@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Categoria;
@@ -22,16 +24,16 @@ public class CategoriaService {
 		this.categoriaRepository = categoriaRepository;
 	}
 	
-	public List<Categoria> buscarTodos() {
-		return categoriaRepository.findAll();
+	public Page<Categoria> buscarTodos(Pageable pageable) {
+		return categoriaRepository.findAll(pageable);
 	}
 	
-	public List<Categoria> buscarTodosComNomeContendo(String nome) {
-		return categoriaRepository.findAllByNomeContainingIgnoreCase(nome);
+	public Page<Categoria> buscarTodosComNomeContendo(String nome, Pageable pageable) {
+		return categoriaRepository.findAllByNomeContainingIgnoreCase(nome, pageable);
 	}
 	
-	public List<Categoria> buscarTodosComStatusIgualA(StatusAtivo status) {
-		return categoriaRepository.findAllByStatusEquals(status);
+	public Page<Categoria> buscarTodosComStatusIgualA(StatusAtivo status, Pageable pageable) {
+		return categoriaRepository.findAllByStatusEquals(status, pageable);
 	}
 	
 	public List<Categoria> buscarTodosPorId(Set<Long> ids) {

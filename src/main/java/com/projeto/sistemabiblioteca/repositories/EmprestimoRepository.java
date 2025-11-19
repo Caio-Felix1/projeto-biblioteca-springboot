@@ -3,6 +3,8 @@ package com.projeto.sistemabiblioteca.repositories;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
@@ -12,13 +14,13 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusPagamento;
 
 public interface EmprestimoRepository extends JpaRepository<Emprestimo, Long> {
 	
-	List<Emprestimo> findAllByStatusEquals(StatusEmprestimo status);
+	Page<Emprestimo> findAllByStatusEquals(StatusEmprestimo status, Pageable pageable);
 	
-	List<Emprestimo> findAllByPessoaIdPessoa(Long id);
+	Page<Emprestimo> findAllByPessoaIdPessoa(Long id, Pageable pageable);
 	
-	List<Emprestimo> findAllByPessoaEmailEndereco(String email);
+	Page<Emprestimo> findAllByPessoaEmailEndereco(String email, Pageable pageable);
 	
-	List<Emprestimo> findAllByPessoaCpfValor(String cpf);
+	Page<Emprestimo> findAllByPessoaCpfValor(String cpf, Pageable pageable);
 	
 	List<Emprestimo> findAllByStatusIn(Set<StatusEmprestimo> statusSet);
 	

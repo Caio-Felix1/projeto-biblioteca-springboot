@@ -6,10 +6,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
-import com.projeto.sistemabiblioteca.DTOs.Response.EdicaoResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.DTOs.EdicaoDTO;
@@ -43,28 +43,28 @@ public class EdicaoService {
 		this.idiomaService = idiomaService;
 	}
 	
-	public List<Edicao> buscarTodos() {
-		return edicaoRepository.findAll();
+	public Page<Edicao> buscarTodos(Pageable pageable) {
+		return edicaoRepository.findAll(pageable);
 	}
 	
-	public List<Edicao> buscarTodosComStatusIgualA(StatusAtivo status) {
-		return edicaoRepository.findAllByStatusEquals(status);
+	public Page<Edicao> buscarTodosComStatusIgualA(StatusAtivo status, Pageable pageable) {
+		return edicaoRepository.findAllByStatusEquals(status, pageable);
 	}
 	
-	public List<Edicao> buscarTodosComAutorComNomeContendo(String nome) {
-		return edicaoRepository.findAllByTituloAutoresNomeContainingIgnoreCaseAndStatus(nome, StatusAtivo.ATIVO);
+	public Page<Edicao> buscarTodosComAutorComNomeContendo(String nome, Pageable pageable) {
+		return edicaoRepository.findAllByTituloAutoresNomeContainingIgnoreCaseAndStatus(nome, StatusAtivo.ATIVO, pageable);
 	}
 	
-	public List<Edicao> buscarTodosComTituloComNomeContendo(String nome) {
-		return edicaoRepository.findAllByTituloNomeContainingIgnoreCaseAndStatus(nome, StatusAtivo.ATIVO);
+	public Page<Edicao> buscarTodosComTituloComNomeContendo(String nome, Pageable pageable) {
+		return edicaoRepository.findAllByTituloNomeContainingIgnoreCaseAndStatus(nome, StatusAtivo.ATIVO, pageable);
 	}
 	
-	public List<Edicao> buscarTodosComCategoriaComIdIgualA(Long id) {
-		return edicaoRepository.findAllByTituloCategoriasIdCategoriaAndStatus(id, StatusAtivo.ATIVO);
+	public Page<Edicao> buscarTodosComCategoriaComIdIgualA(Long id, Pageable pageable) {
+		return edicaoRepository.findAllByTituloCategoriasIdCategoriaAndStatus(id, StatusAtivo.ATIVO, pageable);
 	}
 	
-	public List<Edicao> buscarTodosComEditoraComIdIgualA(Long id) {
-		return edicaoRepository.findAllByEditoraIdEditoraAndStatus(id, StatusAtivo.ATIVO);
+	public Page<Edicao> buscarTodosComEditoraComIdIgualA(Long id, Pageable pageable) {
+		return edicaoRepository.findAllByEditoraIdEditoraAndStatus(id, StatusAtivo.ATIVO, pageable);
 	}
 	
 	public Edicao buscarPorId(Long id) {
@@ -209,7 +209,7 @@ public class EdicaoService {
 		edicao1.setIdioma(edicao2.getIdioma());
 	}
 
-	public List<EdicaoResponseDTO> buscarPorTituloOuAutor(String termo) {
-		return edicaoRepository.buscarPorTituloOuAutor(termo);
+	public Page<Edicao> buscarPorTituloOuAutor(String termo, Pageable pageable) {
+		return edicaoRepository.buscarPorTituloOuAutor(termo, StatusAtivo.ATIVO, pageable);
 	}
 }

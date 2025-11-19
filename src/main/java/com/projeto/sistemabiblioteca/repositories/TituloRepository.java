@@ -1,7 +1,7 @@
 package com.projeto.sistemabiblioteca.repositories;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.projeto.sistemabiblioteca.entities.Titulo;
@@ -9,9 +9,9 @@ import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 
 public interface TituloRepository extends JpaRepository<Titulo, Long> {
 	
-	List<Titulo> findAllByNomeContainingIgnoreCase(String nome);
+	Page<Titulo> findAllByNomeContainingIgnoreCase(String nome, Pageable pageable);
 	
-	List<Titulo> findAllByStatusEquals(StatusAtivo status);
+	Page<Titulo> findAllByStatusEquals(StatusAtivo status, Pageable pageable);
 	
 	boolean existsByNome(String nome);
 }

@@ -3,9 +3,9 @@ package com.projeto.sistemabiblioteca.controllers;
 import static com.projeto.sistemabiblioteca.entities.enums.StatusAtivo.ATIVO;
 import static com.projeto.sistemabiblioteca.entities.enums.StatusAtivo.INATIVO;
 
-import java.util.List;
-
-import com.projeto.sistemabiblioteca.DTOs.Response.EdicaoResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projeto.sistemabiblioteca.DTOs.EdicaoDTO;
+import com.projeto.sistemabiblioteca.DTOs.PageResponseDTO;
 import com.projeto.sistemabiblioteca.entities.Edicao;
 import com.projeto.sistemabiblioteca.entities.interfaces.ArmazenamentoService;
 import com.projeto.sistemabiblioteca.services.EdicaoService;
@@ -40,50 +40,57 @@ public class EdicaoController {
     }
     
     @GetMapping
-    public ResponseEntity<List<Edicao>> listarTodos() {
-        return ResponseEntity.ok(edicaoService.buscarTodos());
+    public ResponseEntity<PageResponseDTO<Edicao>> listarTodos(@RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicaoService.buscarTodos(pageable)));
     }
     
     @GetMapping("/ativos")
-    public ResponseEntity<List<Edicao>> listarAtivos() {
-        List<Edicao> ativos = edicaoService.buscarTodosComStatusIgualA(ATIVO);
-        return ResponseEntity.ok(ativos);
+    public ResponseEntity<PageResponseDTO<Edicao>> listarAtivos(@RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	Page<Edicao> ativos = edicaoService.buscarTodosComStatusIgualA(ATIVO, pageable);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(ativos));
     }
     
     @GetMapping("/inativos")
-    public ResponseEntity<List<Edicao>> listarInativos() {
-        List<Edicao> inativos = edicaoService.buscarTodosComStatusIgualA(INATIVO);
-        return ResponseEntity.ok(inativos);
+    public ResponseEntity<PageResponseDTO<Edicao>> listarInativos(@RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	Page<Edicao> inativos = edicaoService.buscarTodosComStatusIgualA(INATIVO, pageable);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(inativos));
     }
     
     @GetMapping("/buscar-por-autor")
-    public ResponseEntity<List<Edicao>> listarTodosPeloAutor(@RequestParam String nomeAutor) {
-        List<Edicao> edicoes = edicaoService.buscarTodosComAutorComNomeContendo(nomeAutor);
-        return ResponseEntity.ok(edicoes);
+    public ResponseEntity<PageResponseDTO<Edicao>> listarTodosPeloAutor(@RequestParam String nomeAutor, @RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	Page<Edicao> edicoes = edicaoService.buscarTodosComAutorComNomeContendo(nomeAutor, pageable);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicoes));
     }
     
     @GetMapping("/buscar-por-titulo")
-    public ResponseEntity<List<Edicao>> listarTodosPeloTitulo(@RequestParam String nomeTitulo) {
-        List<Edicao> edicoes = edicaoService.buscarTodosComTituloComNomeContendo(nomeTitulo);
-        return ResponseEntity.ok(edicoes);
+    public ResponseEntity<PageResponseDTO<Edicao>> listarTodosPeloTitulo(@RequestParam String nomeTitulo, @RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	Page<Edicao> edicoes = edicaoService.buscarTodosComTituloComNomeContendo(nomeTitulo, pageable);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicoes));
     }
     
     @GetMapping("/buscar-por-categoria/{id}")
-    public ResponseEntity<List<Edicao>> listarTodosPelaCategoria(@PathVariable Long id) {
-        List<Edicao> edicoes = edicaoService.buscarTodosComCategoriaComIdIgualA(id);
-        return ResponseEntity.ok(edicoes);
+    public ResponseEntity<PageResponseDTO<Edicao>> listarTodosPelaCategoria(@PathVariable Long id, @RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	Page<Edicao> edicoes = edicaoService.buscarTodosComCategoriaComIdIgualA(id, pageable);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicoes));
     }
     
     @GetMapping("/buscar-por-editora/{id}")
-    public ResponseEntity<List<Edicao>> listarTodosPelaEditora(@PathVariable Long id) {
-        List<Edicao> edicoes = edicaoService.buscarTodosComEditoraComIdIgualA(id);
-        return ResponseEntity.ok(edicoes);
+    public ResponseEntity<PageResponseDTO<Edicao>> listarTodosPelaEditora(@PathVariable Long id, @RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	Page<Edicao> edicoes = edicaoService.buscarTodosComEditoraComIdIgualA(id, pageable);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicoes));
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Edicao> buscar(@PathVariable Long id) {
-        Edicao e = edicaoService.buscarPorId(id);
-        return ResponseEntity.ok(e);
+    public ResponseEntity<Edicao> buscarPorId(@PathVariable Long id) {
+        Edicao edicao = edicaoService.buscarPorId(id);
+        return ResponseEntity.ok(edicao);
     }
     
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -124,17 +131,9 @@ public class EdicaoController {
 
     @GetMapping("/filtrar")
    // public String buscar(@RequestParam("q") String termo) {
-    public List<EdicaoResponseDTO> buscar(@RequestParam("q") String termo) {
-
-        System.out.println("[CONTROLLER] termo = " + termo);
-
-        List<EdicaoResponseDTO> resposta = edicaoService.buscarPorTituloOuAutor(termo);
-
-        System.out.println("[CONTROLLER] retornando " + resposta.size() + " edições");
-
-        return resposta;
-
-
+    public ResponseEntity<PageResponseDTO<Edicao>> buscar(@RequestParam("q") String termo, @RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicaoService.buscarPorTituloOuAutor(termo, pageable)));
     }
 
 }

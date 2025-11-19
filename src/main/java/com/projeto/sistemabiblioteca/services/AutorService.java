@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Autor;
@@ -22,16 +24,16 @@ public class AutorService {
 		this.autorRepository = autorRepository;
 	}
 	
-	public List<Autor> buscarTodos() {
-		return autorRepository.findAll();
+	public Page<Autor> buscarTodos(Pageable pageable) {
+		return autorRepository.findAll(pageable);
 	}
 	
-	public List<Autor> buscarTodosComNomeContendo(String nome) {
-		return autorRepository.findAllByNomeContainingIgnoreCase(nome);
+	public Page<Autor> buscarTodosComNomeContendo(String nome, Pageable pageable) {
+		return autorRepository.findAllByNomeContainingIgnoreCase(nome, pageable);
 	}
 	
-	public List<Autor> buscarTodosComStatusIgualA(StatusAtivo status) {
-		return autorRepository.findAllByStatusEquals(status);
+	public Page<Autor> buscarTodosComStatusIgualA(StatusAtivo status, Pageable pageable) {
+		return autorRepository.findAllByStatusEquals(status, pageable);
 	}
 	
 	public List<Autor> buscarTodosPorId(Set<Long> ids) {

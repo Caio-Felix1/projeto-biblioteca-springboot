@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoCreateDTO;
 import com.projeto.sistemabiblioteca.DTOs.EmprestimoUpdateDTO;
@@ -149,9 +151,9 @@ public class EmprestimoServiceIntegrationTest {
 		emprestimoService.inserir(emprestimo3);
 		emprestimoService.inserir(emprestimo4);
 		
-		List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorIdPessoa(pessoa1.getIdPessoa());
+		Page<Emprestimo> emprestimos = emprestimoService.buscarTodosPorIdPessoa(pessoa1.getIdPessoa(), PageRequest.of(0, 5));
 		
-		Assertions.assertEquals(2, emprestimos.size());
+		Assertions.assertEquals(2, emprestimos.getNumberOfElements());
 		for (Emprestimo emp : emprestimos) {
 			Assertions.assertEquals(pessoa1.getIdPessoa(), emp.getPessoa().getIdPessoa());
 			Assertions.assertEquals("Maria Joana", emp.getPessoa().getNome());
@@ -216,9 +218,9 @@ public class EmprestimoServiceIntegrationTest {
 		emprestimoService.inserir(emprestimo3);
 		emprestimoService.inserir(emprestimo4);
 		
-		List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorEmailDoUsuario(pessoa1.getEmail().getEndereco());
+		Page<Emprestimo> emprestimos = emprestimoService.buscarTodosPorEmailDoUsuario(pessoa1.getEmail().getEndereco(), PageRequest.of(0, 5));
 		
-		Assertions.assertEquals(2, emprestimos.size());
+		Assertions.assertEquals(2, emprestimos.getNumberOfElements());
 		for (Emprestimo emp : emprestimos) {
 			Assertions.assertEquals(pessoa1.getEmail().getEndereco(), emp.getPessoa().getEmail().getEndereco());
 			Assertions.assertEquals("Maria Joana", emp.getPessoa().getNome());
@@ -283,9 +285,9 @@ public class EmprestimoServiceIntegrationTest {
 		emprestimoService.inserir(emprestimo3);
 		emprestimoService.inserir(emprestimo4);
 		
-		List<Emprestimo> emprestimos = emprestimoService.buscarTodosPorCpfDoUsuario(pessoa2.getCpf().getValor());
+		Page<Emprestimo> emprestimos = emprestimoService.buscarTodosPorCpfDoUsuario(pessoa2.getCpf().getValor(), PageRequest.of(0, 5));
 		
-		Assertions.assertEquals(2, emprestimos.size());
+		Assertions.assertEquals(2, emprestimos.getNumberOfElements());
 		for (Emprestimo emp : emprestimos) {
 			Assertions.assertEquals(pessoa2.getCpf().getValor(), emp.getPessoa().getCpf().getValor());
 			Assertions.assertEquals("João Silva", emp.getPessoa().getNome());

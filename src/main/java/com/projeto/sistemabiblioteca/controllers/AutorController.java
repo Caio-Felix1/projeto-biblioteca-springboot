@@ -2,6 +2,8 @@ package com.projeto.sistemabiblioteca.controllers;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.AutorDTO;
+import com.projeto.sistemabiblioteca.DTOs.PageResponseDTO;
 import com.projeto.sistemabiblioteca.entities.Autor;
 import com.projeto.sistemabiblioteca.entities.enums.StatusAtivo;
 import com.projeto.sistemabiblioteca.services.AutorService;
@@ -32,21 +35,25 @@ public class AutorController {
 
 
     @GetMapping
-    public ResponseEntity<List<Autor>> buscarTodos(@RequestParam(required = false) String nome) {
-        if (nome != null && !nome.isEmpty()) {
-            return ResponseEntity.ok(autorService.buscarTodosComNomeContendo(nome));
+    public ResponseEntity<PageResponseDTO<Autor>> buscarTodos(@RequestParam(required = false) String nome, @RequestParam int pagina, @RequestParam int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+    	
+    	if (nome != null && !nome.isEmpty()) {
+            return ResponseEntity.ok(PageResponseDTO.converterParaDTO(autorService.buscarTodosComNomeContendo(nome, pageable)));
         }
-        return ResponseEntity.ok(autorService.buscarTodos());
+        return ResponseEntity.ok(PageResponseDTO.converterParaDTO(autorService.buscarTodos(pageable)));
     }
     
     @GetMapping("/ativos")
-    public ResponseEntity<List<Autor>> buscarAtivos() {
-    	return ResponseEntity.ok(autorService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO));
+    public ResponseEntity<PageResponseDTO<Autor>> buscarAtivos(@RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(autorService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO, pageable)));
     }
     
     @GetMapping("/inativos")
-    public ResponseEntity<List<Autor>> buscarInativos() {
-    	return ResponseEntity.ok(autorService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
+    public ResponseEntity<PageResponseDTO<Autor>> buscarInativos(@RequestParam int pagina, @RequestParam int tamanho) {
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+    	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(autorService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO, pageable)));
     }
 
     @GetMapping("/{id}")

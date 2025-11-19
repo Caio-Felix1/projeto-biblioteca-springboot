@@ -1,8 +1,9 @@
 package com.projeto.sistemabiblioteca.services;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.entities.Editora;
@@ -21,16 +22,16 @@ public class EditoraService {
 		this.editoraRepository = editoraRepository;
 	}
 	
-	public List<Editora> buscarTodos() {
-		return editoraRepository.findAll();
+	public Page<Editora> buscarTodos(Pageable pageable) {
+		return editoraRepository.findAll(pageable);
 	}
 	
-	public List<Editora> buscarTodosComNomeContendo(String nome) {
-		return editoraRepository.findAllByNomeContainingIgnoreCase(nome);
+	public Page<Editora> buscarTodosComNomeContendo(String nome, Pageable pageable) {
+		return editoraRepository.findAllByNomeContainingIgnoreCase(nome, pageable);
 	}
 	
-	public List<Editora> buscarTodosComStatusIgualA(StatusAtivo status) {
-		return editoraRepository.findAllByStatusEquals(status);
+	public Page<Editora> buscarTodosComStatusIgualA(StatusAtivo status, Pageable pageable) {
+		return editoraRepository.findAllByStatusEquals(status, pageable);
 	}
 	
 	public Editora buscarPorId(Long id) {

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.projeto.sistemabiblioteca.DTOs.TituloCreateDTO;
@@ -33,16 +35,16 @@ public class TituloService {
 		this.autorService = autorService;
 	}
 	
-	public List<Titulo> buscarTodos() {
-		return tituloRepository.findAll();
+	public Page<Titulo> buscarTodos(Pageable pageable) {
+		return tituloRepository.findAll(pageable);
 	}
 	
-	public List<Titulo> buscarTodosComNomeContendo(String nome) {
-		return tituloRepository.findAllByNomeContainingIgnoreCase(nome);
+	public Page<Titulo> buscarTodosComNomeContendo(String nome, Pageable pageable) {
+		return tituloRepository.findAllByNomeContainingIgnoreCase(nome, pageable);
 	}
 	
-	public List<Titulo> buscarTodosComStatusIgualA(StatusAtivo status) {
-		return tituloRepository.findAllByStatusEquals(status);
+	public Page<Titulo> buscarTodosComStatusIgualA(StatusAtivo status, Pageable pageable) {
+		return tituloRepository.findAllByStatusEquals(status, pageable);
 	}
 	
 	public Titulo buscarPorId(Long id) {
