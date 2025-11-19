@@ -1,7 +1,7 @@
 package com.projeto.sistemabiblioteca.repositories;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.projeto.sistemabiblioteca.entities.Pessoa;
@@ -18,7 +18,7 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
      Pessoa findByCpfValor(String cpf);
      
-     List<Pessoa> findAllByFuncaoEquals(FuncaoUsuario funcao);
+     Page<Pessoa> findAllByFuncaoEquals(FuncaoUsuario funcao, Pageable pageable);
      
-     List<Pessoa> findAllByStatusContaEquals(StatusConta statusConta);
+     Page<Pessoa> findAllByStatusContaEquals(StatusConta statusConta, Pageable pageable);
 }

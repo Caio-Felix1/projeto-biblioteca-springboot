@@ -1,9 +1,10 @@
 package com.projeto.sistemabiblioteca.services;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,16 +46,16 @@ public class PessoaService {
 		this.enderecoService = enderecoService;
 	}
 	
-	public List<Pessoa> buscarTodos() {
-		return pessoaRepository.findAll();
+	public Page<Pessoa> buscarTodos(Pageable pageable) {
+		return pessoaRepository.findAll(pageable);
 	}
 	
-	public List<Pessoa> buscarTodosComFuncaoIgualA(FuncaoUsuario funcao) {
-		return pessoaRepository.findAllByFuncaoEquals(funcao);
+	public Page<Pessoa> buscarTodosComFuncaoIgualA(FuncaoUsuario funcao, Pageable pageable) {
+		return pessoaRepository.findAllByFuncaoEquals(funcao, pageable);
 	}
 	
-	public List<Pessoa> buscarTodosComStatusContaIgualA(StatusConta statusConta) {
-		return pessoaRepository.findAllByStatusContaEquals(statusConta);
+	public Page<Pessoa> buscarTodosComStatusContaIgualA(StatusConta statusConta, Pageable pageable) {
+		return pessoaRepository.findAllByStatusContaEquals(statusConta, pageable);
 	}
 	
 	public Pessoa buscarPorId(Long id) {

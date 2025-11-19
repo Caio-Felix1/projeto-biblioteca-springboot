@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.projeto.sistemabiblioteca.DTOs.EnderecoDTO;
@@ -87,10 +89,11 @@ public class PessoaServiceIntegrationTest {
         pessoaRepository.save(pessoa1);
         pessoaRepository.save(pessoa2);
         
-        List<Pessoa> pessoas = pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.BIBLIOTECARIO);
         
-        Assertions.assertEquals(1, pessoas.size());
-        Assertions.assertEquals("maria@gmail.com", pessoas.get(0).getEmail().getEndereco());
+        Page<Pessoa> pessoas = pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.BIBLIOTECARIO, PageRequest.of(0, 5));
+        
+        Assertions.assertEquals(1, pessoas.getNumberOfElements());
+        Assertions.assertEquals("maria@gmail.com", pessoas.getContent().get(0).getEmail().getEndereco());
 	}
 	
 	@Test
@@ -101,10 +104,10 @@ public class PessoaServiceIntegrationTest {
         pessoaRepository.save(pessoa1);
         pessoaRepository.save(pessoa2);
         
-        List<Pessoa> pessoas = pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_APROVACAO);
+        Page<Pessoa> pessoas = pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_APROVACAO, PageRequest.of(0, 5));
         
-        Assertions.assertEquals(1, pessoas.size());
-        Assertions.assertEquals("maria@gmail.com", pessoas.get(0).getEmail().getEndereco());
+        Assertions.assertEquals(1, pessoas.getNumberOfElements());
+        Assertions.assertEquals("maria@gmail.com", pessoas.getContent().get(0).getEmail().getEndereco());
 	}
 	
 	@Test
@@ -151,11 +154,11 @@ public class PessoaServiceIntegrationTest {
 		
         pessoaService.cadastrarUsuario(registroDTO);
         
-        List<Pessoa> pessoas = pessoaService.buscarTodos();
+        Page<Pessoa> pessoas = pessoaService.buscarTodos(PageRequest.of(0, 5));
         List<Endereco> enderecos = enderecoRepository.findAll();
         
-        Assertions.assertEquals(1, pessoas.size());
-        Assertions.assertEquals(StatusConta.EM_ANALISE_APROVACAO, pessoas.get(0).getStatusConta());
+        Assertions.assertEquals(1, pessoas.getNumberOfElements());
+        Assertions.assertEquals(StatusConta.EM_ANALISE_APROVACAO, pessoas.getContent().get(0).getStatusConta());
         Assertions.assertEquals(1, enderecos.size());
         Assertions.assertEquals("rua teste", enderecos.get(0).getNomeLogradouro());
         Assertions.assertEquals(StatusAtivo.ATIVO, enderecos.get(0).getStatusAtivo());
@@ -179,11 +182,11 @@ public class PessoaServiceIntegrationTest {
 		
         pessoaService.cadastrarUsuarioPorAdmin(pessoaDTO);
         
-        List<Pessoa> pessoas = pessoaService.buscarTodos();
+        Page<Pessoa> pessoas = pessoaService.buscarTodos(PageRequest.of(0, 5));
         List<Endereco> enderecos = enderecoRepository.findAll();
         
-        Assertions.assertEquals(1, pessoas.size());
-        Assertions.assertEquals(StatusConta.ATIVA, pessoas.get(0).getStatusConta());
+        Assertions.assertEquals(1, pessoas.getNumberOfElements());
+        Assertions.assertEquals(StatusConta.ATIVA, pessoas.getContent().get(0).getStatusConta());
         Assertions.assertEquals(1, enderecos.size());
         Assertions.assertEquals("rua teste", enderecos.get(0).getNomeLogradouro());
         Assertions.assertEquals(StatusAtivo.ATIVO, enderecos.get(0).getStatusAtivo());

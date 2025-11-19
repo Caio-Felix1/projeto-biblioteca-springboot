@@ -7,6 +7,8 @@ import java.util.Random;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import com.projeto.sistemabiblioteca.entities.Emprestimo;
@@ -93,7 +95,7 @@ public class EmprestimoSeeder implements CommandLineRunner {
     
     @Override
     public void run(String... args) throws Exception { // Spring Boot chama isso
-        List<Pessoa> pessoas = pessoaRepository.findAllByFuncaoEquals(FuncaoUsuario.CLIENTE);
+        Page<Pessoa> pessoas = pessoaRepository.findAllByFuncaoEquals(FuncaoUsuario.CLIENTE, PageRequest.of(0, 10));
         List<Exemplar> exemplares = exemplarRepository.findAll();
 
         //LocalDate hoje = LocalDate.now();

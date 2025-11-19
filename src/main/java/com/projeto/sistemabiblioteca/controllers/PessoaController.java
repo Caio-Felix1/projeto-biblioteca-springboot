@@ -1,7 +1,8 @@
 package com.projeto.sistemabiblioteca.controllers;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
 import com.projeto.sistemabiblioteca.DTOs.MotivoInativacaoDoUsuarioDTO;
 import com.projeto.sistemabiblioteca.DTOs.MotivoRejeicaoDeCadastroDTO;
 import com.projeto.sistemabiblioteca.DTOs.MotivoSolicitacaoExclusaoDTO;
+import com.projeto.sistemabiblioteca.DTOs.PageResponseDTO;
 import com.projeto.sistemabiblioteca.DTOs.PessoaDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
@@ -44,12 +46,13 @@ public class PessoaController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<Pessoa>> buscarTodos() {
-		return ResponseEntity.ok(pessoaService.buscarTodos());
+	public ResponseEntity<PageResponseDTO<Pessoa>> buscarTodos(@RequestParam int pagina, @RequestParam int tamanho) {
+		Pageable pageable = PageRequest.of(pagina, tamanho);
+		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodos(pageable)));
 	}
 	
 	@GetMapping("/status/{status}")
-	public ResponseEntity<List<Pessoa>> buscarTodosPorStatus(@PathVariable String status) {
+	public ResponseEntity<PageResponseDTO<Pessoa>> buscarTodosPorStatus(@PathVariable String status, @RequestParam int pagina, @RequestParam int tamanho) {
 		StatusConta statusConta;
 		try {
 			statusConta = StatusConta.valueOf(status.toUpperCase());
@@ -58,32 +61,39 @@ public class PessoaController {
 			throw new IllegalArgumentException("Erro: o status informado é inválido.");
 		}
 		
-		return ResponseEntity.ok(pessoaService.buscarTodosComStatusContaIgualA(statusConta));
+		Pageable pageable = PageRequest.of(pagina, tamanho);
+		
+		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComStatusContaIgualA(statusConta, pageable)));
 	}
 	
 	@GetMapping("/clientes")
-	public ResponseEntity<List<Pessoa>> buscarClientes() {
-		return ResponseEntity.ok(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.CLIENTE));
+	public ResponseEntity<PageResponseDTO<Pessoa>> buscarClientes(@RequestParam int pagina, @RequestParam int tamanho) {
+		Pageable pageable = PageRequest.of(pagina, tamanho);
+		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.CLIENTE, pageable)));
 	}
 	
 	@GetMapping("/funcionarios")
-	public ResponseEntity<List<Pessoa>> buscarFuncionarios() {
-		return ResponseEntity.ok(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.BIBLIOTECARIO));
+	public ResponseEntity<PageResponseDTO<Pessoa>> buscarFuncionarios(@RequestParam int pagina, @RequestParam int tamanho) {
+		Pageable pageable = PageRequest.of(pagina, tamanho);
+		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.BIBLIOTECARIO, pageable)));
 	}
 	
 	@GetMapping("/administradores")
-	public ResponseEntity<List<Pessoa>> buscarAdministradores() {
-		return ResponseEntity.ok(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.ADMINISTRADOR));
+	public ResponseEntity<PageResponseDTO<Pessoa>> buscarAdministradores(@RequestParam int pagina, @RequestParam int tamanho) {
+		Pageable pageable = PageRequest.of(pagina, tamanho);
+		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.ADMINISTRADOR, pageable)));
 	}
 	
 	@GetMapping("/em-analise-aprovacao")
-	public ResponseEntity<List<Pessoa>> buscarClientesEmAnaliseAprovacao() {
-		return ResponseEntity.ok(pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_APROVACAO));
+	public ResponseEntity<PageResponseDTO<Pessoa>> buscarClientesEmAnaliseAprovacao(@RequestParam int pagina, @RequestParam int tamanho) {
+		Pageable pageable = PageRequest.of(pagina, tamanho);
+		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_APROVACAO, pageable)));
 	}
 	
 	@GetMapping("/em-analise-exclusao")
-	public ResponseEntity<List<Pessoa>> buscarClientesEmAnaliseExclusao() {
-		return ResponseEntity.ok(pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_EXCLUSAO));
+	public ResponseEntity<PageResponseDTO<Pessoa>> buscarClientesEmAnaliseExclusao(@RequestParam int pagina, @RequestParam int tamanho) {
+		Pageable pageable = PageRequest.of(pagina, tamanho);
+		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_EXCLUSAO, pageable)));
 	}
 	
 	@GetMapping("/{id}")
