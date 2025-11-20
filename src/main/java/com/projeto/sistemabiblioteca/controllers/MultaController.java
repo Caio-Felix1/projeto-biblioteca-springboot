@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.controllers;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,12 +23,14 @@ public class MultaController {
     public MultaController(MultaService multaService) {
         this.multaService = multaService;
     }
-
+    
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping
     public ResponseEntity<List<Multa>> listarTodos() {
         return ResponseEntity.ok(multaService.buscarTodos());
     }
-
+	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Multa>> listarPorStatus(@PathVariable String status) {
     	StatusPagamento statusPagamento;
@@ -41,12 +44,14 @@ public class MultaController {
         return ResponseEntity.ok(multaService.buscarTodosComStatusPagamentoIgualA(statusPagamento));
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<Multa> buscarPorId(@PathVariable Long id) {
     	Multa multa = multaService.buscarPorId(id);
         return ResponseEntity.ok(multa);
     }
-
+	
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     @PutMapping("/perdoar-multa/{id}")
     public ResponseEntity<Multa> perdoarMulta(@PathVariable Long id) {
     	Multa multaPerdoada = multaService.perdoarMulta(id);

@@ -49,79 +49,25 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
 
-						.requestMatchers(HttpMethod.GET, "/autores/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/autores").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/autores/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/autores/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/edicoes/buscar-por-autor").permitAll()
+						.requestMatchers(HttpMethod.GET, "/edicoes/buscar-por-titulo").permitAll()
+						.requestMatchers(HttpMethod.GET, "/edicoes/buscar-por-categoria/*").permitAll()
+						.requestMatchers(HttpMethod.GET, "/edicoes/buscar-por-editora/*").permitAll()
+						.requestMatchers(HttpMethod.GET, "/edicoes/*").permitAll()
+						.requestMatchers(HttpMethod.GET, "/edicoes/filtrar").permitAll()
 
-						.requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/categorias").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/categorias/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/categorias/**").permitAll()
-
-						.requestMatchers(HttpMethod.GET, "/editoras/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/editoras").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/editoras/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/editoras/**").permitAll()
-
-						.requestMatchers(HttpMethod.GET, "/edicoes/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/edicoes").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/edicoes/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/edicoes/**").permitAll()
-
-						.requestMatchers(HttpMethod.GET, "/idiomas/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/idiomas").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/idiomas/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/idiomas/**").permitAll()
-
-						.requestMatchers(HttpMethod.GET, "/titulos/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/titulos/**").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/titulos/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/titulos/**").permitAll()
-
-						.requestMatchers(HttpMethod.GET, "/exemplares/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/exemplares").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/exemplares/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/exemplares/**").permitAll()
-
-						.requestMatchers(HttpMethod.POST, "livros/gerenciamento").permitAll()
+						.requestMatchers(HttpMethod.GET, "/idiomas/ativos").permitAll()
 						
-						.requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/usuarios/**").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/usuarios/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/usuarios/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/estados/ativos").permitAll()
+						.requestMatchers(HttpMethod.GET, "/estados/buscar-por-pais/*").permitAll()
 						
-						.requestMatchers(HttpMethod.GET, "/enderecos/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/enderecos/**").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/enderecos/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/enderecos/**").permitAll()
+						.requestMatchers(HttpMethod.GET, "/paises/ativos").permitAll()
 						
-						.requestMatchers(HttpMethod.GET, "/estados/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/estados/**").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/estados/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/estados/**").permitAll()
-						
-						.requestMatchers(HttpMethod.GET, "/paises/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/paises/**").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/paises/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/paises/**").permitAll()
-
-						
-						.requestMatchers(HttpMethod.GET, "/emprestimos/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/emprestimos/**").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/emprestimos/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/emprestimos/**").permitAll()
-						
-						.requestMatchers(HttpMethod.GET, "/multas/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/multas/**").permitAll()
-						.requestMatchers(HttpMethod.PUT, "/multas/**").permitAll()
-						.requestMatchers(HttpMethod.DELETE, "/multas/**").permitAll()
-						
-						.requestMatchers("/imagens/**").permitAll()
-
-
+						.requestMatchers(HttpMethod.GET, "/imagens/**").permitAll()
 
 						.requestMatchers(HttpMethod.POST, "/email").permitAll()
+						
+						.anyRequest().authenticated()
 
                 )
                 .addFilterAfter(securityFilter, CorsFilter.class)

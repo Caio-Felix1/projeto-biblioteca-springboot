@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +36,7 @@ public class TituloController {
         this.tituloService = tituloService;
     }
 
-
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping
     public ResponseEntity<PageResponseDTO<Titulo>> listarTodos(@RequestParam(required = false) String nome, @RequestParam int pagina, @RequestParam int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
@@ -45,68 +46,73 @@ public class TituloController {
         }
         return ResponseEntity.ok(PageResponseDTO.converterParaDTO(tituloService.buscarTodos(pageable)));
     }
-
+	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/ativos")
     public ResponseEntity<PageResponseDTO<Titulo>> listarAtivos(@RequestParam int pagina, @RequestParam int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
     	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(tituloService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO, pageable)));
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/inativos")
     public ResponseEntity<PageResponseDTO<Titulo>> listarInativos(@RequestParam int pagina, @RequestParam int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
     	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(tituloService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO, pageable)));
     }
-
+	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<Titulo> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(tituloService.buscarPorId(id));
     }
 
-
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<Titulo> criar(@Valid @RequestBody TituloCreateDTO tituloCreateDTO) {
         Titulo novo = tituloService.cadastrarTitulo(tituloCreateDTO);
         return ResponseEntity.ok(novo);
     }
 
-
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<Titulo> atualizar(@PathVariable Long id, @Valid @RequestBody TituloCreateDTO tituloCreateDTO) {
         Titulo atualizado = tituloService.atualizarTituloCompleto(id, tituloCreateDTO);
         return ResponseEntity.ok(atualizado);
     }
 
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
         tituloService.inativar(id);
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PostMapping("/{idTitulo}/categorias")
     public ResponseEntity<Void> adicionarCategorias(@PathVariable Long idTitulo, @Valid @RequestBody TituloCategoriasDTO tituloCategoriasDTO) {
         tituloService.adicionarCategorias(idTitulo, tituloCategoriasDTO.idsCategorias());
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @DeleteMapping("/{idTitulo}/categorias")
     public ResponseEntity<Void> removerCategorias(@PathVariable Long idTitulo, @Valid @RequestBody TituloCategoriasDTO tituloCategoriasDTO) {
         tituloService.removerCategorias(idTitulo, tituloCategoriasDTO.idsCategorias());
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PostMapping("/{idTitulo}/autores")
     public ResponseEntity<Void> adicionarAutores(@PathVariable Long idTitulo, @Valid @RequestBody TituloAutoresDTO tituloAutoresDTO) {
         tituloService.adicionarAutores(idTitulo, tituloAutoresDTO.idsAutores());
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @DeleteMapping("/{idTitulo}/autores")
     public ResponseEntity<Void> removerAutores(@PathVariable Long idTitulo, @Valid @RequestBody TituloAutoresDTO tituloAutoresDTO) {
         tituloService.removerAutores(idTitulo, tituloAutoresDTO.idsAutores());
         return ResponseEntity.noContent().build();
     }
-
-
-
 }

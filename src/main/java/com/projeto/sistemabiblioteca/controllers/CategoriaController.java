@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.controllers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,8 @@ public class CategoriaController {
     public CategoriaController(CategoriaService categoriaService) {
         this.categoriaService = categoriaService;
     }
-
+    
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping
     public ResponseEntity<PageResponseDTO<Categoria>> buscarTodos(@RequestParam(required = false) String nome, @RequestParam int pagina, @RequestParam int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
@@ -41,36 +43,42 @@ public class CategoriaController {
         return ResponseEntity.ok(PageResponseDTO.converterParaDTO(categoriaService.buscarTodos(pageable)));
     }
     
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/ativos")
     public ResponseEntity<PageResponseDTO<Categoria>> buscarAtivos(@RequestParam int pagina, @RequestParam int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
     	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(categoriaService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO, pageable)));
     }
     
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/inativos")
     public ResponseEntity<PageResponseDTO<Categoria>> buscarInativos(@RequestParam int pagina, @RequestParam int tamanho) {
         Pageable pageable = PageRequest.of(pagina, tamanho);
     	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(categoriaService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO, pageable)));
     }
-
+    
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<Categoria> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(categoriaService.buscarPorId(id));
     }
-
+    
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<Categoria> cadastrar(@Valid @RequestBody CategoriaDTO categoriaDTO) {
     	Categoria categoria = new Categoria(categoriaDTO.nome());
         Categoria novaCategoria = categoriaService.inserir(categoria);
         return ResponseEntity.ok(novaCategoria);
     }
-
+    
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<Categoria> atualizar(@PathVariable Long id, @Valid @RequestBody CategoriaDTO categoriaDTO) {
     	Categoria categoria = new Categoria(categoriaDTO.nome());
     	return ResponseEntity.ok(categoriaService.atualizar(id, categoria));
     }
-
+    
+    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
         categoriaService.inativar(id);

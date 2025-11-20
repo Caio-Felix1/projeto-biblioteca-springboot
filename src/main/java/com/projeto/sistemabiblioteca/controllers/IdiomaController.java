@@ -7,6 +7,7 @@ import com.projeto.sistemabiblioteca.services.IdiomaService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,29 +22,31 @@ public class IdiomaController {
         this.idiomaService = idiomaService;
     }
 
-    
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping
     public ResponseEntity<List<Idioma>> listarTodos() {
         return ResponseEntity.ok(idiomaService.buscarTodos());
     }
-
+	
     @GetMapping("/ativos")
     public ResponseEntity<List<Idioma>> listarAtivos() {
         return ResponseEntity.ok(idiomaService.buscarTodosComStatusIgualA(StatusAtivo.ATIVO));
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/inativos")
     public ResponseEntity<List<Idioma>> listarInativos() {
         return ResponseEntity.ok(idiomaService.buscarTodosComStatusIgualA(StatusAtivo.INATIVO));
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<Idioma> buscarPorId(@PathVariable Long id) {
     	Idioma idioma = idiomaService.buscarPorId(id);
         return ResponseEntity.ok(idioma);
     }
 
-
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<Idioma> criar(@RequestBody IdiomaDTO idiomaDTO) {
     	Idioma idioma = new Idioma(idiomaDTO.nome());
@@ -52,7 +55,7 @@ public class IdiomaController {
         return ResponseEntity.ok(salvo);
     }
 
-
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<Idioma> atualizar(@PathVariable Long id, @RequestBody IdiomaDTO idiomaDTO) {
     	Idioma idioma = new Idioma(idiomaDTO.nome());
@@ -60,7 +63,7 @@ public class IdiomaController {
         return ResponseEntity.ok(atualizado);
     }
 
-
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> inativar(@PathVariable Long id) {
     	idiomaService.inativar(id);

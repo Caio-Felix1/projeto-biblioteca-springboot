@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +52,7 @@ public class EmprestimoController {
 		this.emailService = emailService;
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodos(@RequestParam int pagina, @RequestParam int tamanho) {
     	Pageable pageable = PageRequest.of(pagina, tamanho);
@@ -69,7 +71,8 @@ public class EmprestimoController {
         		)
         		);
     }
-
+	
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/status/{status}")
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarPorStatus(@PathVariable String status, @RequestParam int pagina, @RequestParam int tamanho) {
     	StatusEmprestimo statusEmprestimo;
@@ -97,6 +100,7 @@ public class EmprestimoController {
         		);
     }
     
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-por-pessoa/{id}")
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorPessoa(@PathVariable Long id, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
 		String usernameAutenticado = authentication.getName();
@@ -123,6 +127,7 @@ public class EmprestimoController {
         		);
     }
     
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-por-email")
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorEmailDoUsuario(@RequestParam String email, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
     	Email emailFormatoValidado = new Email(email);
@@ -151,6 +156,7 @@ public class EmprestimoController {
         		);
     }
     
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-por-cpf")
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorCpfDoUsuario(@RequestParam String cpf, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
     	Cpf cpfFormatoValidado = new Cpf(cpf);
@@ -179,24 +185,32 @@ public class EmprestimoController {
         		);
     }
     
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<Emprestimo> buscarPorId(@PathVariable Long id) {
     	Emprestimo emprestimo = emprestimoService.buscarPorId(id);
         return ResponseEntity.ok(emprestimo);
     }
     
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO', 'ADMINISTRADOR')")
     @PostMapping
-    public ResponseEntity<List<Emprestimo>> cadastrarEmprestimos(@Valid @RequestBody EmprestimoCreateDTO emprestimoCreateDTO) {
+    public ResponseEntity<List<Emprestimo>> cadastrarEmprestimos(@Valid @RequestBody EmprestimoCreateDTO emprestimoCreateDTO, Authentication authentication) {
+		// fazer validacao
+		
     	List<Emprestimo> emprestimos = emprestimoService.cadastrarEmprestimos(emprestimoCreateDTO);
     	return ResponseEntity.ok(emprestimos);
     }
 
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/{id}")
-    public ResponseEntity<Emprestimo> atualizar(@PathVariable Long id, @Valid @RequestBody EmprestimoUpdateDTO emprestimoUpdateDTO) {
+    public ResponseEntity<Emprestimo> atualizar(@PathVariable Long id, @Valid @RequestBody EmprestimoUpdateDTO emprestimoUpdateDTO, Authentication authentication) {
+    	// fazer validacao
+    	
     	Emprestimo emprestimoAtualizado = emprestimoService.atualizar(id, emprestimoUpdateDTO);
         return ResponseEntity.ok(emprestimoAtualizado);
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/registrar-separacao/{id}")
     public ResponseEntity<Void> registrarSeparacaoDoExemplar(@PathVariable Long id) {
     	Emprestimo emp = emprestimoService.registrarSeparacaoDoExemplar(id);
@@ -219,36 +233,42 @@ public class EmprestimoController {
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/registrar-retirada-manual/{id}")
     public ResponseEntity<Void> registrarRetiradaDoExemplar(@PathVariable Long id, @Valid @RequestBody DataDevolucaoPrevistaDTO dtDevolucaoPrevistaDTO) {
     	emprestimoService.registrarRetiradaDoExemplar(id, dtDevolucaoPrevistaDTO.dtDevolucaoPrevista());
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/registrar-retirada/{id}")
     public ResponseEntity<Void> registrarRetiradaDoExemplar(@PathVariable Long id) {
     	emprestimoService.registrarRetiradaDoExemplar(id);
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/renovar-data-de-devolucao-prevista/{id}")
     public ResponseEntity<Void> renovarDataDeDevolucaoPrevista(@PathVariable Long id, @Valid @RequestBody DataDevolucaoPrevistaDTO dtDevolucaoPrevistaDTO) {
     	emprestimoService.renovarDataDeDevolucaoPrevista(id, dtDevolucaoPrevistaDTO.dtDevolucaoPrevista());
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/registrar-devolucao/{id}")
     public ResponseEntity<Void> registrarDevolucaoDoExemplar(@PathVariable Long id) {
     	emprestimoService.registrarDevolucaoDoExemplar(id);
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/pagar-multa/{id}")
     public ResponseEntity<Void> pagarMulta(@PathVariable Long id) {
     	emprestimoService.pagarMulta(id);
         return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/registrar-perda/{id}")
     public ResponseEntity<Void> registrarPerdaDoExemplar(@PathVariable Long id) {
     	Emprestimo emp = emprestimoService.registrarPerdaDoExemplar(id);

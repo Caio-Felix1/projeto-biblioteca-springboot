@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.controllers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,12 +45,14 @@ public class PessoaController {
 		this.emailService = emailService;
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping
 	public ResponseEntity<PageResponseDTO<Pessoa>> buscarTodos(@RequestParam int pagina, @RequestParam int tamanho) {
 		Pageable pageable = PageRequest.of(pagina, tamanho);
 		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodos(pageable)));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/status/{status}")
 	public ResponseEntity<PageResponseDTO<Pessoa>> buscarTodosPorStatus(@PathVariable String status, @RequestParam int pagina, @RequestParam int tamanho) {
 		StatusConta statusConta;
@@ -65,59 +68,71 @@ public class PessoaController {
 		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComStatusContaIgualA(statusConta, pageable)));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/clientes")
 	public ResponseEntity<PageResponseDTO<Pessoa>> buscarClientes(@RequestParam int pagina, @RequestParam int tamanho) {
 		Pageable pageable = PageRequest.of(pagina, tamanho);
 		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.CLIENTE, pageable)));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/funcionarios")
 	public ResponseEntity<PageResponseDTO<Pessoa>> buscarFuncionarios(@RequestParam int pagina, @RequestParam int tamanho) {
 		Pageable pageable = PageRequest.of(pagina, tamanho);
 		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.BIBLIOTECARIO, pageable)));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/administradores")
 	public ResponseEntity<PageResponseDTO<Pessoa>> buscarAdministradores(@RequestParam int pagina, @RequestParam int tamanho) {
 		Pageable pageable = PageRequest.of(pagina, tamanho);
 		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComFuncaoIgualA(FuncaoUsuario.ADMINISTRADOR, pageable)));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/em-analise-aprovacao")
 	public ResponseEntity<PageResponseDTO<Pessoa>> buscarClientesEmAnaliseAprovacao(@RequestParam int pagina, @RequestParam int tamanho) {
 		Pageable pageable = PageRequest.of(pagina, tamanho);
 		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_APROVACAO, pageable)));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/em-analise-exclusao")
 	public ResponseEntity<PageResponseDTO<Pessoa>> buscarClientesEmAnaliseExclusao(@RequestParam int pagina, @RequestParam int tamanho) {
 		Pageable pageable = PageRequest.of(pagina, tamanho);
 		return ResponseEntity.ok(PageResponseDTO.converterParaDTO(pessoaService.buscarTodosComStatusContaIgualA(StatusConta.EM_ANALISE_EXCLUSAO, pageable)));
 	}
 	
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/{id}")
-	public ResponseEntity<Pessoa> buscarPorId(@PathVariable Long id) {
+	public ResponseEntity<Pessoa> buscarPorId(@PathVariable Long id, Authentication authentication) {
+		// fazer validacao 
+		
 		return ResponseEntity.ok(pessoaService.buscarPorId(id));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/buscar-por-email")
 	public ResponseEntity<Pessoa> buscarPorEmail(@RequestParam String email) {
 		Email emailFormatoValidado = new Email(email);
 		return ResponseEntity.ok(pessoaService.buscarPorEmail(emailFormatoValidado.getEndereco()));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/buscar-por-cpf")
 	public ResponseEntity<Pessoa> buscarPorCpf(@RequestParam String cpf) {
 		Cpf cpfFormatoValidado = new Cpf(cpf);
 		return ResponseEntity.ok(pessoaService.buscarPorCpf(cpfFormatoValidado.getValor()));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@PostMapping
 	public ResponseEntity<String> cadastrarUsuario(@Valid @RequestBody PessoaDTO pessoaDTO) {
 		pessoaService.cadastrarUsuarioPorAdmin(pessoaDTO);
 		return ResponseEntity.ok("Registro efetuado com sucesso.");
 	}
 	
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
 	@PutMapping("/{id}")
 	public ResponseEntity<Pessoa> atualizarUsuario(@PathVariable Long id, @Valid @RequestBody PessoaDTO pessoaDTO, Authentication authentication) {
 		if (authentication == null) {
@@ -136,6 +151,7 @@ public class PessoaController {
 		return ResponseEntity.ok(pessoaService.atualizar(id, pessoaDTO, usuarioAutenticado));
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@PutMapping("/em-analise-aprovacao/aprovar-conta/{id}") 
 	public ResponseEntity<Void> aprovarUsuario(@PathVariable Long id) {
 		Pessoa usuarioAprovado = pessoaService.aprovarConta(id);
@@ -155,6 +171,7 @@ public class PessoaController {
 		return ResponseEntity.noContent().build();
 	}
 	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
 	@PutMapping("/em-analise-aprovacao/rejeitar-conta/{id}") 
 	public ResponseEntity<Void> rejeitarUsuario(@PathVariable Long id, @Valid @RequestBody MotivoRejeicaoDeCadastroDTO motivoRejeicaoDeCadastroDTO) {
 		Pessoa usuarioRejeitado = pessoaService.rejeitarConta(id);
@@ -169,18 +186,23 @@ public class PessoaController {
 		return ResponseEntity.noContent().build();
 	}
 	
+	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO')")
 	@PutMapping("/solicitar-exclusao-conta/{id}")
-	public ResponseEntity<Void> solicitarExclusaoDeUsuario(@PathVariable Long id, @Valid @RequestBody MotivoSolicitacaoExclusaoDTO motivoSolicitacaoExclusaoDTO) {
+	public ResponseEntity<Void> solicitarExclusaoDeUsuario(@PathVariable Long id, @Valid @RequestBody MotivoSolicitacaoExclusaoDTO motivoSolicitacaoExclusaoDTO, Authentication authentication) {
+		// fazer validacao
+		
 		pessoaService.solicitarExclusaoConta(id, motivoSolicitacaoExclusaoDTO.motivo());
 		return ResponseEntity.noContent().build();
 	}
 	
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR')")
 	@PutMapping("/em-analise-exclusao/rejeitar-exclusao-conta/{id}")
 	public ResponseEntity<Void> rejeitarSolicitacaoDeExclusaoDeUsuario(@PathVariable Long id) {
 		pessoaService.rejeitarSolicitacaoExclusao(id);
 		return ResponseEntity.noContent().build();
 	}
 	
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> inativarUsuario(@PathVariable Long id, @Valid @RequestBody MotivoInativacaoDoUsuarioDTO motivoInativacaoDoUsuarioDTO, Authentication authentication) {
 		if (authentication == null) {

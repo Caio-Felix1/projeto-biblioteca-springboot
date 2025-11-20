@@ -3,6 +3,7 @@ package com.projeto.sistemabiblioteca.controllers;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,13 +31,15 @@ public class ExemplarController {
     public ExemplarController(ExemplarService exemplarService) {
         this.exemplarService = exemplarService;
     }
-
+    
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping
     public ResponseEntity<List<Exemplar>> listarTodos() {
     	List<Exemplar> exemplares = exemplarService.buscarTodos();
         return ResponseEntity.ok(exemplares);
     }
-
+	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Exemplar>> listarPorStatus(@PathVariable String status) {
     	StatusExemplar statusExemplar;
@@ -51,12 +54,14 @@ public class ExemplarController {
         return ResponseEntity.ok(exemplares);
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-por-edicao/{idEdicao}")
     public ResponseEntity<List<Exemplar>> listarPorEdicao(@PathVariable Long idEdicao) {
     	List<Exemplar> exemplares = exemplarService.buscarTodosComEdicaoComIdIgualA(idEdicao);
         return ResponseEntity.ok(exemplares);
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-primeiro-exemplar-por-edicao/{idEdicao}/status/{status}")
     public ResponseEntity<Exemplar> listarPrimeiroDisponivelPorEdicao(@PathVariable Long idEdicao, @PathVariable String status) {
     	StatusExemplar statusExemplar;
@@ -71,49 +76,53 @@ public class ExemplarController {
         return ResponseEntity.ok(exemplar);
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/em-analise-exclusao")
     public ResponseEntity<List<Exemplar>> listarTodosEmAnaliseExclusao() {
     	List<Exemplar> exemplares = exemplarService.buscarTodosComStatusIgualA(StatusExemplar.EM_ANALISE_EXCLUSAO);
         return ResponseEntity.ok(exemplares);
     }
-
+	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<Exemplar> buscarPorId(@PathVariable Long id) {
     	Exemplar exemplar = exemplarService.buscarPorId(id);
         return ResponseEntity.ok(exemplar);
     }
 
-
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<List<Exemplar>> cadastrarExemplares(@Valid @RequestBody ExemplarCreateDTO exemplarCreateDTO) {
         List<Exemplar> novoExemplares = exemplarService.cadastrarExemplares(exemplarCreateDTO);
         // return ResponseEntity.status(HttpStatus.CREATED).body(novoExemplar);
         return ResponseEntity.ok(novoExemplares);
     }
-
+	
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<Exemplar> atualizar(@PathVariable Long id, @Valid @RequestBody ExemplarUpdateDTO exemplarUpdateDTO) {
         Exemplar atualizado = exemplarService.atualizar(id, exemplarUpdateDTO);
         return ResponseEntity.ok(atualizado);
     }
     
+	@PreAuthorize("hasAnyRole('BIBLIOTECARIO')")
     @PutMapping("/solicitar-exclusao-exemplar/{id}")
     public ResponseEntity<Void> solicitarExclusaoDoExemplar(@PathVariable Long id, @Valid @RequestBody MotivoSolicitacaoExclusaoDTO motivoSoliticaoExclusaoDTO) {
     	exemplarService.solicitarExclusaoDoExemplar(id, motivoSoliticaoExclusaoDTO.motivo());
     	return ResponseEntity.noContent().build();
     }
     
-    
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     @PutMapping("/em-analise-exclusao/rejeitar-exclusao-exemplar/{id}")
     public ResponseEntity<Void> rejeitarSolicitacaoDeExclusaoDeExemplar(@PathVariable Long id) {
     	exemplarService.rejeitarSolicitacaoDeExclusaoDoExemplar(id);
     	return ResponseEntity.noContent().build();
     }
     
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
     	exemplarService.remover(id);
         return ResponseEntity.noContent().build();
-
     }
 }
