@@ -30,6 +30,7 @@ import com.projeto.sistemabiblioteca.entities.Pessoa;
 import com.projeto.sistemabiblioteca.entities.enums.FuncaoUsuario;
 import com.projeto.sistemabiblioteca.entities.enums.StatusConta;
 import com.projeto.sistemabiblioteca.entities.enums.StatusEmprestimo;
+import com.projeto.sistemabiblioteca.exceptions.AcessoNegadoException;
 import com.projeto.sistemabiblioteca.services.EmailService;
 import com.projeto.sistemabiblioteca.services.EmprestimoService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
@@ -103,6 +104,10 @@ public class EmprestimoController {
 	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-por-pessoa/{id}")
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorPessoa(@PathVariable Long id, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
 		String usernameAutenticado = authentication.getName();
 		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
 		
@@ -130,7 +135,11 @@ public class EmprestimoController {
 	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-por-email")
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorEmailDoUsuario(@RequestParam String email, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
-    	Email emailFormatoValidado = new Email(email);
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
+		Email emailFormatoValidado = new Email(email);
     	
 		String usernameAutenticado = authentication.getName();
 		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
@@ -159,7 +168,11 @@ public class EmprestimoController {
 	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/buscar-por-cpf")
     public ResponseEntity<PageResponseDTO<EmprestimoResponseDTO>> listarTodosPorCpfDoUsuario(@RequestParam String cpf, @RequestParam int pagina, @RequestParam int tamanho, Authentication authentication) {
-    	Cpf cpfFormatoValidado = new Cpf(cpf);
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
+		Cpf cpfFormatoValidado = new Cpf(cpf);
     	
 		String usernameAutenticado = authentication.getName();
 		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
@@ -195,7 +208,16 @@ public class EmprestimoController {
 	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO', 'ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<List<Emprestimo>> cadastrarEmprestimos(@Valid @RequestBody EmprestimoCreateDTO emprestimoCreateDTO, Authentication authentication) {
-		// fazer validacao
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
+		String usernameAutenticado = authentication.getName();
+		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
+		
+		if (usuarioAutenticado.getFuncao() == FuncaoUsuario.CLIENTE && !usuarioAutenticado.getIdPessoa().equals(emprestimoCreateDTO.idPessoa())) {
+			throw new IllegalArgumentException("Erro: um cliente não pode cadastrar empréstimos para outro cliente.");
+		}
 		
     	List<Emprestimo> emprestimos = emprestimoService.cadastrarEmprestimos(emprestimoCreateDTO);
     	return ResponseEntity.ok(emprestimos);
@@ -203,9 +225,7 @@ public class EmprestimoController {
 
 	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @PutMapping("/{id}")
-    public ResponseEntity<Emprestimo> atualizar(@PathVariable Long id, @Valid @RequestBody EmprestimoUpdateDTO emprestimoUpdateDTO, Authentication authentication) {
-    	// fazer validacao
-    	
+    public ResponseEntity<Emprestimo> atualizar(@PathVariable Long id, @Valid @RequestBody EmprestimoUpdateDTO emprestimoUpdateDTO) {
     	Emprestimo emprestimoAtualizado = emprestimoService.atualizar(id, emprestimoUpdateDTO);
         return ResponseEntity.ok(emprestimoAtualizado);
     }
@@ -261,7 +281,7 @@ public class EmprestimoController {
         return ResponseEntity.noContent().build();
     }
     
-	@PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
+	@PreAuthorize("hasAnyRole('CLIENTE')")
     @PutMapping("/pagar-multa/{id}")
     public ResponseEntity<Void> pagarMulta(@PathVariable Long id) {
     	emprestimoService.pagarMulta(id);

@@ -106,7 +106,16 @@ public class PessoaController {
 	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO','ADMINISTRADOR')")
 	@GetMapping("/{id}")
 	public ResponseEntity<Pessoa> buscarPorId(@PathVariable Long id, Authentication authentication) {
-		// fazer validacao 
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
+		String usernameAutenticado = authentication.getName();
+		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
+		
+		if (usuarioAutenticado.getFuncao() == FuncaoUsuario.CLIENTE && !usuarioAutenticado.getIdPessoa().equals(id)) {
+			throw new IllegalArgumentException("Erro: um cliente não pode visualizar os dados de outro usuário.");
+		}
 		
 		return ResponseEntity.ok(pessoaService.buscarPorId(id));
 	}
@@ -189,7 +198,16 @@ public class PessoaController {
 	@PreAuthorize("hasAnyRole('CLIENTE', 'BIBLIOTECARIO')")
 	@PutMapping("/solicitar-exclusao-conta/{id}")
 	public ResponseEntity<Void> solicitarExclusaoDeUsuario(@PathVariable Long id, @Valid @RequestBody MotivoSolicitacaoExclusaoDTO motivoSolicitacaoExclusaoDTO, Authentication authentication) {
-		// fazer validacao
+		if (authentication == null) {
+			throw new AcessoNegadoException("Erro: token ausente ou inválido.");
+		}
+		
+		String usernameAutenticado = authentication.getName();
+		Pessoa usuarioAutenticado = pessoaService.buscarPorEmail(usernameAutenticado);
+		
+		if (usuarioAutenticado.getFuncao() == FuncaoUsuario.CLIENTE && !usuarioAutenticado.getIdPessoa().equals(id)) {
+			throw new IllegalArgumentException("Erro: um cliente não pode solicitar exclusão da conta de outro usuário.");
+		}
 		
 		pessoaService.solicitarExclusaoConta(id, motivoSolicitacaoExclusaoDTO.motivo());
 		return ResponseEntity.noContent().build();
