@@ -99,71 +99,91 @@ public class EmprestimoSeeder implements CommandLineRunner {
         List<Exemplar> exemplares = exemplarRepository.findAll();
 
         //LocalDate hoje = LocalDate.now();
-
-        for (Pessoa pessoa : pessoas) {
-            for (Exemplar exemplar : exemplares) {
-                if (exemplar.getStatus() == StatusExemplar.DISPONIVEL) {
-
-                    // Cria multa vazia
-                    Multa multa = Multa.criarMultaVazia();
-                    multaRepository.save(multa);
-                    
-                    // Marcar exemplar como alugado 
-                    exemplar.alugar();
-                    exemplarRepository.save(exemplar);
-                    
-                    int tipoEmprestimo = random.nextInt(6); // 0 a 5
-                    
-                    LocalDate hoje = LocalDate.now();
-                    
-                    Emprestimo emprestimo;
-                    switch(tipoEmprestimo) {
-                    case 0:
-                        emprestimo = criarEmprestimoEmAndamento(hoje.minusDays(random.nextInt(4) + 3), pessoa, exemplar, multa);
-                        break;
-                    case 1:
-                        emprestimo = criarEmprestimoComStatusDevolvido(hoje.minusDays(random.nextInt(5) + 10), pessoa, exemplar, multa);
-                        break;
-                    case 2:
-                        emprestimo = criarEmprestimoCancelado(hoje.minusDays(random.nextInt(10)), pessoa, exemplar, multa);
-                        break;
-                    case 3:
-                        emprestimo = criarEmprestimoAtrasado(hoje.minusDays(random.nextInt(5) + 30), pessoa, exemplar, multa);
-                        break;
-                    case 4:
-                        emprestimo = criarEmprestimoComStatusExemplarPerdido(hoje.minusDays(random.nextInt(5) + 10), pessoa, exemplar, multa);
-                        break;
-                    case 5:
-                    	emprestimo = criarEmprestimoDevolvidoComAtraso(hoje.minusDays(random.nextInt(5) + 30), pessoa, exemplar, multa);
-                    	break;
-                    default:
-                    	emprestimo = criarEmprestimoEmAndamento(hoje.minusDays(random.nextInt(4) + 3), pessoa, exemplar, multa);
-                    	break;
+        
+        if (emprestimoRepository.count() == 0) {
+	        for (Pessoa pessoa : pessoas) {
+                int qtdEmprestimos = random.nextInt(6); // 0 a 5
+	        	
+                if (qtdEmprestimos == 0) {
+                	continue;
                 }
-                    // atualizando a multa
-                    multaRepository.save(emprestimo.getMulta());
-                    
-                    // atualizando o exemplar
-                    exemplarRepository.save(emprestimo.getExemplar());
-                    
-                    /*
-                    // Cria empréstimo com data de início hoje
-                    Emprestimo emprestimo = new Emprestimo(hoje, pessoa, exemplar, multa);
-                    
-                    
-                    // Separar exemplar
-                    emprestimo.separarExemplar(hoje);
-
-                    // Retirar exemplar (calcula automaticamente a data de devolução prevista)
-                    emprestimo.retirarExemplar(hoje);
-					*/
-					
-                    // Salvar empréstimo
-                    emprestimoRepository.save(emprestimo);
-
-                    break; // só um exemplar por pessoa
-                }
-            }
+                
+                int contador = 1;
+	        	
+	            for (Exemplar exemplar : exemplares) {
+	                if (exemplar.getStatus() == StatusExemplar.DISPONIVEL) {
+	
+	                    // Cria multa vazia
+	                    Multa multa = Multa.criarMultaVazia();
+	                    multaRepository.save(multa);
+	                    
+	                    // Marcar exemplar como alugado 
+	                    exemplar.alugar();
+	                    exemplarRepository.save(exemplar);
+	                    
+	                    int tipoEmprestimo = random.nextInt(6); // 0 a 5
+	                    
+	                    LocalDate hoje = LocalDate.now();
+	                    
+	                    Emprestimo emprestimo;
+	                    switch(tipoEmprestimo) {
+	                    case 0:
+	                        emprestimo = criarEmprestimoEmAndamento(hoje.minusDays(random.nextInt(4) + 3), pessoa, exemplar, multa);
+	                        break;
+	                    case 1:
+	                        emprestimo = criarEmprestimoComStatusDevolvido(hoje.minusDays(random.nextInt(5) + 10), pessoa, exemplar, multa);
+	                        break;
+	                    case 2:
+	                        emprestimo = criarEmprestimoCancelado(hoje.minusDays(random.nextInt(10)), pessoa, exemplar, multa);
+	                        break;
+	                    case 3:
+	                        emprestimo = criarEmprestimoAtrasado(hoje.minusDays(random.nextInt(5) + 30), pessoa, exemplar, multa);
+	                        break;
+	                    case 4:
+	                        emprestimo = criarEmprestimoComStatusExemplarPerdido(hoje.minusDays(random.nextInt(5) + 10), pessoa, exemplar, multa);
+	                        break;
+	                    case 5:
+	                    	emprestimo = criarEmprestimoDevolvidoComAtraso(hoje.minusDays(random.nextInt(5) + 30), pessoa, exemplar, multa);
+	                    	break;
+	                    default:
+	                    	emprestimo = criarEmprestimoEmAndamento(hoje.minusDays(random.nextInt(4) + 3), pessoa, exemplar, multa);
+	                    	break;
+	                    }
+	                    // atualizando a multa
+	                    multaRepository.save(emprestimo.getMulta());
+	                    
+	                    // atualizando o exemplar
+	                    exemplarRepository.save(emprestimo.getExemplar());
+	                    
+	                    /*
+	                    // Cria empréstimo com data de início hoje
+	                    Emprestimo emprestimo = new Emprestimo(hoje, pessoa, exemplar, multa);
+	                    
+	                    
+	                    // Separar exemplar
+	                    emprestimo.separarExemplar(hoje);
+	
+	                    // Retirar exemplar (calcula automaticamente a data de devolução prevista)
+	                    emprestimo.retirarExemplar(hoje);
+						*/
+						
+	                    // Salvar empréstimo
+	                    emprestimoRepository.save(emprestimo);
+	
+	                    //break; // só um exemplar por pessoa
+	                    if (contador == qtdEmprestimos) {
+	                    	break;
+	                    }
+	                    
+	                    contador++;
+	                }
+	            }
+	        }
+	        
+            System.out.println("✅ Empréstimos foram criados com sucesso!");
+        }
+        else {
+            System.out.println("⚠️ Empréstimos já existem, seed ignorado.");
         }
     }
 }

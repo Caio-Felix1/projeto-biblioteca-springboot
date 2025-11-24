@@ -40,7 +40,7 @@ public class ExemplarSeeder implements CommandLineRunner {
                 return;
             }
 
-            for (int i = 0; i < 40; i++) {
+            for (int i = 0; i < 60; i++) {
                 Edicao edicao = edicoes.get(random.nextInt(edicoes.size()));
                 EstadoFisico estadoFisico = EstadoFisico.values()[random.nextInt(EstadoFisico.values().length)];
 

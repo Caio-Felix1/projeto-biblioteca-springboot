@@ -47,7 +47,6 @@ public class EdicaoController {
     	return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicaoService.buscarTodos(pageable)));
     }
     
-    @PreAuthorize("hasAnyRole('BIBLIOTECARIO','ADMINISTRADOR')")
     @GetMapping("/ativos")
     public ResponseEntity<PageResponseDTO<Edicao>> listarAtivos(@RequestParam int pagina, @RequestParam int tamanho) {
     	Pageable pageable = PageRequest.of(pagina, tamanho);

@@ -48,7 +48,8 @@ public class SecurityConfigurations {
                 		.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registro").permitAll()
-
+                        
+						.requestMatchers(HttpMethod.GET, "/edicoes/ativos").permitAll()
 						.requestMatchers(HttpMethod.GET, "/edicoes/buscar-por-autor").permitAll()
 						.requestMatchers(HttpMethod.GET, "/edicoes/buscar-por-titulo").permitAll()
 						.requestMatchers(HttpMethod.GET, "/edicoes/buscar-por-categoria/*").permitAll()
