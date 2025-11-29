@@ -134,12 +134,11 @@ public class EdicaoController {
     	edicaoService.inativar(id);
     	return ResponseEntity.noContent().build();
     }
-
+    
     @GetMapping("/filtrar")
    // public String buscar(@RequestParam("q") String termo) {
     public ResponseEntity<PageResponseDTO<Edicao>> buscar(@RequestParam("q") String termo, @RequestParam int pagina, @RequestParam int tamanho) {
     	Pageable pageable = PageRequest.of(pagina, tamanho);
         return ResponseEntity.ok(PageResponseDTO.converterParaDTO(edicaoService.buscarPorTituloOuAutor(termo, pageable)));
     }
-
 }
