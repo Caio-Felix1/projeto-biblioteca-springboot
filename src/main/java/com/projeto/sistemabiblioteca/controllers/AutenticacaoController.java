@@ -1,12 +1,11 @@
 package com.projeto.sistemabiblioteca.controllers;
 
-import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
-import com.projeto.sistemabiblioteca.services.EmailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,12 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.sistemabiblioteca.DTOs.AutenticacaoDTO;
+import com.projeto.sistemabiblioteca.DTOs.EmailDTO;
 import com.projeto.sistemabiblioteca.DTOs.LoginResponseDTO;
 import com.projeto.sistemabiblioteca.DTOs.RegistroDTO;
 import com.projeto.sistemabiblioteca.entities.Pessoa;
+import com.projeto.sistemabiblioteca.exceptions.AcessoNegadoException;
 import com.projeto.sistemabiblioteca.infra.security.TokenService;
+import com.projeto.sistemabiblioteca.services.EmailService;
 import com.projeto.sistemabiblioteca.services.PessoaService;
-import com.projeto.sistemabiblioteca.validation.Email;
 
 import jakarta.validation.Valid;
 
@@ -48,13 +49,20 @@ public class AutenticacaoController {
 
 	@PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody AutenticacaoDTO request) {
-		UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
-                request.email(),
-                request.senha()
-        );
-		Authentication auth = this.authenticationManager.authenticate(usernamePassword);
-		String token = tokenService.generateToken((Pessoa) auth.getPrincipal());
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+		try {
+			UsernamePasswordAuthenticationToken usernamePassword = new UsernamePasswordAuthenticationToken(
+	                request.email(),
+	                request.senha()
+	        );
+			
+			Authentication auth = this.authenticationManager.authenticate(usernamePassword);
+			String token = tokenService.generateToken((Pessoa) auth.getPrincipal());
+	        return ResponseEntity.ok(new LoginResponseDTO(token));
+		} catch (BadCredentialsException ex) {
+			throw new AcessoNegadoException("Usuário ou senha inválidos.");
+		} catch (AuthenticationException ex) {
+			throw new AcessoNegadoException("Falha na autenticação.");
+		}
     }
 
     @PostMapping("/registro")
