@@ -25,6 +25,7 @@ public interface EdicaoRepository extends JpaRepository<Edicao, Long> {
     SELECT edicao
     FROM Edicao edicao
     INNER JOIN edicao.titulo titulo
+    INNER JOIN edicao.editora editora
     WHERE (
         LOWER(titulo.nome) LIKE LOWER(CONCAT('%', :termo, '%'))
         OR EXISTS (
@@ -32,6 +33,13 @@ public interface EdicaoRepository extends JpaRepository<Edicao, Long> {
             FROM titulo.autores autor
             WHERE LOWER(autor.nome) LIKE LOWER(CONCAT('%', :termo, '%'))
         )
+        OR EXISTS (
+            SELECT 1
+            FROM titulo.categorias categoria
+            WHERE LOWER(categoria.nome) LIKE LOWER(CONCAT('%', :termo, '%'))
+        )
+        OR
+        LOWER(editora.nome) LIKE LOWER(CONCAT('%', :termo, '%'))
     )
     AND edicao.status = :status
 	""")
