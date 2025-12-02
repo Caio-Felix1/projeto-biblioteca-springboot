@@ -64,25 +64,74 @@ public class DataSeeder implements CommandLineRunner {
                 
 	                String senhaFixa = "SenhaFixa123";
 	                String senhaCodificada = passwordEncoder.encode(senhaFixa); // agora funciona
-	
-	                Pessoa pessoa = new Pessoa(
-	                        faker.name().fullName(),
-	                        cpf,
-	                        faker.options().option(Sexo.MASCULINO, Sexo.FEMININO, Sexo.OUTRO),
-	                        faker.options().option(FuncaoUsuario.CLIENTE, FuncaoUsuario.BIBLIOTECARIO, FuncaoUsuario.ADMINISTRADOR),
-	                        faker.date().birthday(18, 80).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
-	                        LocalDate.now(),
-	                        telefone,
-	                        emailValido,
-	                        senhaCodificada,
-	                        StatusConta.ATIVA,
-	                        enderecos.get(i)
-	                );
-	
-	                pessoaRepository.save(pessoa);
+	                
+	                if (i == 0) {
+		                Pessoa pessoa1 = new Pessoa(
+		                        faker.name().fullName(),
+		                        new Cpf("11111111111"),
+		                        faker.options().option(Sexo.MASCULINO, Sexo.FEMININO, Sexo.OUTRO),
+		                        FuncaoUsuario.ADMINISTRADOR,
+		                        faker.date().birthday(18, 80).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
+		                        LocalDate.now(),
+		                        telefone,
+		                        new Email("usuario753@exemplo.com"),
+		                        senhaCodificada,
+		                        StatusConta.ATIVA,
+		                        enderecos.get(i)
+		                );
+		                
+		                Pessoa pessoa2 = new Pessoa(
+		                        faker.name().fullName(),
+		                        new Cpf("11111111112"),
+		                        faker.options().option(Sexo.MASCULINO, Sexo.FEMININO, Sexo.OUTRO),
+		                        FuncaoUsuario.BIBLIOTECARIO,
+		                        faker.date().birthday(18, 80).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
+		                        LocalDate.now(),
+		                        telefone,
+		                        new Email("usuario715@exemplo.com"),
+		                        senhaCodificada,
+		                        StatusConta.ATIVA,
+		                        enderecos.get(i)
+		                );
+		                
+		                Pessoa pessoa3 = new Pessoa(
+		                        faker.name().fullName(),
+		                        new Cpf("11111111113"),
+		                        faker.options().option(Sexo.MASCULINO, Sexo.FEMININO, Sexo.OUTRO),
+		                        FuncaoUsuario.CLIENTE,
+		                        faker.date().birthday(18, 80).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
+		                        LocalDate.now(),
+		                        telefone,
+		                        new Email("usuario072@exemplo.com"),
+		                        senhaCodificada,
+		                        StatusConta.ATIVA,
+		                        enderecos.get(i)
+		                );
+		                
+		                pessoaRepository.save(pessoa1);
+		                pessoaRepository.save(pessoa2);
+		                pessoaRepository.save(pessoa3);
+	                }
+	                else {
+		                Pessoa pessoa = new Pessoa(
+		                        faker.name().fullName(),
+		                        cpf,
+		                        faker.options().option(Sexo.MASCULINO, Sexo.FEMININO, Sexo.OUTRO),
+		                        faker.options().option(FuncaoUsuario.CLIENTE, FuncaoUsuario.BIBLIOTECARIO, FuncaoUsuario.ADMINISTRADOR),
+		                        faker.date().birthday(18, 80).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate(),
+		                        LocalDate.now(),
+		                        telefone,
+		                        emailValido,
+		                        senhaCodificada,
+		                        StatusConta.ATIVA,
+		                        enderecos.get(i)
+		                );
+		                
+		                pessoaRepository.save(pessoa);
+	                }	                
                 }
             }
-            System.out.println("✅ 30 pessoas falsas criadas!");
+            System.out.println("✅ 33 pessoas falsas criadas!");
         } else {
             System.out.println("⚠️ Pessoas já existem, seed ignorado.");
         }

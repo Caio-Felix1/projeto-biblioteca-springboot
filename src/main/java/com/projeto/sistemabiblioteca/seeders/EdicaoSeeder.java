@@ -22,6 +22,7 @@ import com.projeto.sistemabiblioteca.repositories.EdicaoRepository;
 import com.projeto.sistemabiblioteca.repositories.EditoraRepository;
 import com.projeto.sistemabiblioteca.repositories.IdiomaRepository;
 import com.projeto.sistemabiblioteca.repositories.TituloRepository;
+import com.projeto.sistemabiblioteca.services.ArmazenamentoLocalService;
 
 @Component
 @Order(6)
@@ -32,6 +33,7 @@ public class EdicaoSeeder implements CommandLineRunner {
     private final TituloRepository tituloRepository;
     private final EditoraRepository editoraRepository;
     private final IdiomaRepository idiomaRepository;
+    private final ArmazenamentoLocalService armazenamentoService;
     private final Faker faker = new Faker(new Locale("pt-BR"));
     private final Random random = new Random();
 
@@ -39,12 +41,14 @@ public class EdicaoSeeder implements CommandLineRunner {
             EdicaoRepository edicaoRepository,
             TituloRepository tituloRepository,
             EditoraRepository editoraRepository,
-            IdiomaRepository idiomaRepository
+            IdiomaRepository idiomaRepository,
+            ArmazenamentoLocalService armazenamentoService
     ) {
         this.edicaoRepository = edicaoRepository;
         this.tituloRepository = tituloRepository;
         this.editoraRepository = editoraRepository;
         this.idiomaRepository = idiomaRepository;
+        this.armazenamentoService = armazenamentoService;
     }
 
     @Override
@@ -72,7 +76,7 @@ public class EdicaoSeeder implements CommandLineRunner {
                         TamanhoEdicao.values()[random.nextInt(TamanhoEdicao.values().length)],
                         ClassificacaoIndicativa.values()[random.nextInt(ClassificacaoIndicativa.values().length)],
                         LocalDate.now().minusYears(random.nextInt(50)), // Data de publicação até 50 anos atrás
-                        null,
+                        armazenamentoService.pegarCapaAleatoria(),
                         titulo,
                         editora,
                         idioma

@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import com.projeto.sistemabiblioteca.entities.interfaces.ArmazenamentoService;
 @Service
 public class ArmazenamentoLocalService implements ArmazenamentoService {
 	
+    private final Random random = new Random();
 	private final Path root = Paths.get("imagens");
 
 	@Override
@@ -34,4 +37,25 @@ public class ArmazenamentoLocalService implements ArmazenamentoService {
 			throw new RuntimeException("Erro: não foi possível salvar o arquivo", e);
 		}
 	}
+	
+    public String pegarCapaAleatoria() {
+        try {
+            if (!Files.exists(root)) {
+                return null;
+            }
+
+            List<Path> arquivos = Files.list(root)
+                    .filter(Files::isRegularFile)
+                    .toList();
+
+            if (arquivos.isEmpty()) {
+                return null;
+            }
+
+            Path escolhido = arquivos.get(random.nextInt(arquivos.size()));
+            return "http://localhost:8080/imagens/" + escolhido.getFileName().toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao buscar capas aleatórias", e);
+        }
+    }
 }
