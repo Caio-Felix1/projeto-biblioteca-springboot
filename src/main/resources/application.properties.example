@@ -1,4 +1,4 @@
-# Copie este arquivo para application.properties e preencha as credenciais reais
+# Copie este arquivo para application.properties e preencha com as credenciais reais
 
 
 # Nome da aplicação no Spring Boot
@@ -7,7 +7,8 @@ spring.application.name=sistemabiblioteca
 # Porta HTTP da aplicação (padrão 8080)
 server.port=8080
 
-# Configuração do MySQL
+# Configuração de exemplo para conexão com MySQL
+# Substitua os valores abaixo pelos dados reais do seu ambiente
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.datasource.url=jdbc:mysql://localhost:3306/sistemabiblioteca?useSSL=false&serverTimezone=UTC
 spring.datasource.username=SEU_USUARIO
@@ -22,16 +23,22 @@ spring.jpa.hibernate.ddl-auto=update
 # Mostrar queries no console
 spring.jpa.show-sql=true
 
-# Perfil para executar certos códigos
+# Perfis de execução do sistema
+# test: utilizado para rodar os testes automatizados (JUnit). 
+#       Esse perfil também executa o TestConfig, mas se o código dentro do método run(...) estiver comentado,
+#       não haverá impacto nos testes. Caso existam trechos ativos, podem ocorrer erros durante a execução dos testes.
+# dev: utilizado para rodar os seeders e é o perfil ideal para desenvolvimento e uso do sistema.
+
 spring.profiles.active=nomedoperfil
 
-spring.mail.host=sandbox.smtp.mailtrap.io
-spring.mail.port=2525
-spring.mail.username=8507a6d65c398e
-spring.mail.password=75fa69245edec6
+# Configurações de exemplo para envio de e-mails com Spring Boot
+# Substitua os valores abaixo pelos dados reais do seu servidor SMTP
+spring.mail.host=smtp.exemplo.com
+spring.mail.port=587
+spring.mail.username=usuario_exemplo
+spring.mail.password=senha_exemplo
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
-
 
 # Para que os links das imagens salvas localmente funcionem no front-end
 spring.web.resources.static-locations=file:imagens/
